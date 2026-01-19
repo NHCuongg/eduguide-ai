@@ -1,0 +1,50 @@
+import NextAuth from 'next-auth';
+import { authConfig } from './auth.config';
+import Google from 'next-auth/providers/google';
+import Credentials from 'next-auth/providers/credentials';
+import { z } from 'zod';
+import bcrypt from 'bcryptjs';
+
+// Mock User Database for Demo
+const getUser = async (email: string) => {
+    // In a real app, this would query your database
+    if (email === 'demo@eduguide.ai') {
+        return {
+            id: '1',
+            email: 'demo@eduguide.ai',
+            password: await bcrypt.hash('password123', 10),
+            name: 'Dr. James Dalton',
+        };
+    }
+    return null;
+};
+
+export const { handlers, auth, signIn, signOut } = NextAuth({
+    ...authConfig,
+    providers: [
+        Google({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        }),
+        Credentials({
+            async authorize(credentials) {
+                const parsedCredentials = z
+                    .object({ email: z.string().email(), password: z.string().min(6) })
+                    .safeParse(credentials);
+
+                if (parsedCredentials.success) {
+                    const { email, password } = parsedCredentials.data;
+                    const user = await getUser(email);
+
+                    if (!user) return null;
+
+                    const passwordsMatch = await bcrypt.compare(password, user.password);
+                    if (passwordsMatch) return user;
+                }
+
+                console.log('Invalid credentials');
+                return null;
+            },
+        }),
+    ],
+});
