@@ -1,7 +1,8 @@
 import { GoogleGenerativeAI } from "@google/generative-ai"
+import { env } from './env'
 
-// Ensure API key is present
-const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || ""
+// Get API key with fallback
+const apiKey = env.GEMINI_API_KEY || env.GOOGLE_API_KEY || ""
 
 if (!apiKey) {
     console.warn("Missing GEMINI_API_KEY or GOOGLE_API_KEY in environment variables.")

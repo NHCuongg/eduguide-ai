@@ -34,32 +34,32 @@ export default function Step1() {
 
             <div className="space-y-6">
                 <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                    <label className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
                         Target Subject
                     </label>
                     <Input
                         placeholder="e.g. Molecular Biology, Calculus II..."
                         value={data.targetSkill || ''}
                         onChange={(e) => setData({ targetSkill: e.target.value })}
-                        className="h-14 text-lg border-slate-200 bg-white/50 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all font-serif dark:bg-slate-950/50 dark:border-slate-800 dark:text-white"
+                        className="h-14 text-lg border-slate-300 bg-white focus:bg-white dark:focus:bg-slate-900 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/20 transition-all font-serif text-slate-900 dark:bg-slate-900 dark:border-slate-700 dark:text-white font-medium"
                         autoFocus
                     />
                 </div>
 
                 <div className="space-y-3">
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Current Proficiency</label>
+                    <label className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">Current Proficiency</label>
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                         {levels.map((level) => (
                             <div
                                 key={level.id}
-                                onClick={() => setData({ currentLevel: level.id as any })}
-                                className={`cursor-pointer rounded-xl border p-4 text-center transition-all duration-200 hover:scale-105 ${data.currentLevel === level.id
-                                    ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 ring-2 ring-indigo-500/20 shadow-lg shadow-indigo-500/10"
-                                    : "border-slate-200 bg-white dark:bg-slate-900 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-indigo-200 hover:bg-slate-50"
+                                onClick={() => setData({ currentLevel: level.id as "Beginner" | "Intermediate" | "Advanced" })}
+                                className={`cursor-pointer rounded-xl border-2 p-4 text-center transition-all duration-200 hover:scale-105 ${data.currentLevel === level.id
+                                    ? "border-indigo-600 bg-indigo-600 text-white shadow-xl shadow-indigo-600/30 transform scale-105"
+                                    : "border-slate-300 bg-white dark:bg-slate-900 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-indigo-400 hover:bg-slate-50"
                                     }`}
                             >
                                 <div className="font-bold text-sm mb-1">{level.id}</div>
-                                <div className="text-[10px] text-slate-400 uppercase tracking-wide opacity-80">{level.desc}</div>
+                                <div className={`text-[10px] uppercase tracking-wide font-semibold ${data.currentLevel === level.id ? "text-indigo-100" : "text-slate-500"}`}>{level.desc}</div>
                             </div>
                         ))}
                     </div>

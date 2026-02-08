@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Play, Star, Lock, Trophy, Flag, MapPin } from "lucide-react"
+import { Star, Lock, MapPin } from "lucide-react"
 import { motion } from "framer-motion"
 
 // Mock Data for the Map Nodes

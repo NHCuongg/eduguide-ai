@@ -34,7 +34,7 @@ export default function LoginPage() {
                         transition={{ delay: 0.2 }}
                     >
                         <h2 className="font-serif text-4xl font-bold leading-tight mb-6">
-                            "The most sophisticated curriculum design tool I've ever used. It understands academic rigor unlike anything else."
+                            &quot;The most sophisticated curriculum design tool I&apos;ve ever used. It understands academic rigor unlike anything else.&quot;
                         </h2>
                         <div className="flex items-center gap-4">
                             <div className="h-12 w-12 rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 p-0.5">
@@ -66,17 +66,20 @@ export default function LoginPage() {
                 <div className="absolute top-8 right-8 lg:top-8 lg:right-12">
                     <Link href="/onboarding">
                         <Button variant="ghost" className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400">
-                            Don't have an account? Sign up
+                            Don&apos;t have an account? Sign up
                         </Button>
                     </Link>
                 </div>
 
-                <div className="w-full max-w-[400px] space-y-6">
-                    <div className="flex flex-col space-y-2 text-center">
-                        <h1 className="text-3xl font-serif font-bold tracking-tight text-slate-900 dark:text-white">
+                <div className="w-full max-w-[400px] space-y-8">
+                    <div className="flex flex-col space-y-3 text-center">
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-100 to-violet-100 dark:from-indigo-900/30 dark:to-violet-900/30 mx-auto mb-2">
+                            <Sparkles className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
+                        </div>
+                        <h1 className="text-4xl font-serif font-black tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-200 bg-clip-text text-transparent">
                             Welcome back
                         </h1>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                        <p className="text-base text-slate-600 dark:text-slate-400 font-medium">
                             Enter your email to sign in to your workspace
                         </p>
                     </div>
@@ -84,44 +87,49 @@ export default function LoginPage() {
                     <div className="grid gap-6">
                         <form action={dispatch}>
                             <div className="grid gap-4">
-                                <div className="grid gap-2">
-                                    <Label className="dark:text-slate-200" htmlFor="email">Email</Label>
-                                    <Input
-                                        id="email"
-                                        name="email"
-                                        placeholder="name@example.com"
-                                        type="email"
-                                        autoCapitalize="none"
-                                        autoComplete="email"
-                                        autoCorrect="off"
-                                        disabled={isPending}
-                                        className="h-11 dark:bg-slate-900 dark:border-slate-800"
-                                        defaultValue="demo@eduguide.ai"
-                                    />
-                                </div>
-                                <div className="grid gap-2">
-                                    <div className="flex items-center justify-between">
-                                        <Label className="dark:text-slate-200" htmlFor="password">Password</Label>
-                                        <Link href="#" className="text-xs text-indigo-600 hover:text-indigo-500 font-medium">Forgot password?</Link>
+                                <div className="grid gap-3">
+                                    <div className="grid gap-2">
+                                        <Label className="dark:text-slate-200 font-semibold text-slate-700 dark:text-slate-300" htmlFor="email">Email</Label>
+                                        <Input
+                                            id="email"
+                                            name="email"
+                                            placeholder="name@example.com"
+                                            type="email"
+                                            autoCapitalize="none"
+                                            autoComplete="email"
+                                            autoCorrect="off"
+                                            disabled={isPending}
+                                            className="h-12 border-2 border-slate-200 dark:border-slate-700 focus:border-indigo-500 dark:focus:border-indigo-500 dark:bg-slate-900 rounded-xl shadow-sm hover:shadow-md transition-all"
+                                            defaultValue="demo@eduguide.ai"
+                                        />
                                     </div>
-                                    <Input
-                                        id="password"
-                                        name="password"
-                                        type="password"
-                                        autoCapitalize="none"
-                                        autoCorrect="off"
-                                        disabled={isPending}
-                                        className="h-11 dark:bg-slate-900 dark:border-slate-800"
-                                        defaultValue="password123"
-                                    />
+                                    <div className="grid gap-2">
+                                        <div className="flex items-center justify-between">
+                                            <Label className="dark:text-slate-200 font-semibold text-slate-700 dark:text-slate-300" htmlFor="password">Password</Label>
+                                            <Link href="#" className="text-xs text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 font-semibold transition-colors">Forgot password?</Link>
+                                        </div>
+                                        <Input
+                                            id="password"
+                                            name="password"
+                                            type="password"
+                                            autoCapitalize="none"
+                                            autoCorrect="off"
+                                            disabled={isPending}
+                                            className="h-12 border-2 border-slate-200 dark:border-slate-700 focus:border-indigo-500 dark:focus:border-indigo-500 dark:bg-slate-900 rounded-xl shadow-sm hover:shadow-md transition-all"
+                                            defaultValue="password123"
+                                        />
+                                    </div>
+                                    <Button 
+                                        disabled={isPending} 
+                                        className="h-12 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all rounded-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 mt-2"
+                                    >
+                                        {isPending ? (
+                                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                        ) : (
+                                            <span className="flex items-center gap-2">Sign In <Sparkles className="w-5 h-5" /></span>
+                                        )}
+                                    </Button>
                                 </div>
-                                <Button disabled={isPending} className="h-11 bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-indigo-100 dark:shadow-none hover:shadow-lg transition-all rounded-lg">
-                                    {isPending ? (
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    ) : (
-                                        <span className="flex items-center gap-2">Sign In <Sparkles className="w-4 h-4" /></span>
-                                    )}
-                                </Button>
                                 <div className="flex h-8 items-end space-x-1" aria-live="polite" aria-atomic="true">
                                     {errorMessage && (
                                         <>
@@ -141,12 +149,20 @@ export default function LoginPage() {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <Button variant="outline" disabled={isPending} className="dark:bg-slate-900 dark:border-slate-800 dark:text-white dark:hover:bg-slate-800 h-10">
-                                <Github className="mr-2 h-4 w-4" /> Github
+                        <div className="grid grid-cols-2 gap-3">
+                            <Button 
+                                variant="outline" 
+                                disabled={isPending} 
+                                className="dark:bg-slate-900 dark:border-2 dark:border-slate-800 dark:text-white dark:hover:bg-slate-800 h-12 border-2 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:scale-105 transition-all font-semibold rounded-xl"
+                            >
+                                <Github className="mr-2 h-5 w-5" /> Github
                             </Button>
-                            <Button variant="outline" disabled={isPending} className="dark:bg-slate-900 dark:border-slate-800 dark:text-white dark:hover:bg-slate-800 h-10">
-                                <Globe className="mr-2 h-4 w-4" /> Google
+                            <Button 
+                                variant="outline" 
+                                disabled={isPending} 
+                                className="dark:bg-slate-900 dark:border-2 dark:border-slate-800 dark:text-white dark:hover:bg-slate-800 h-12 border-2 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:scale-105 transition-all font-semibold rounded-xl"
+                            >
+                                <Globe className="mr-2 h-5 w-5" /> Google
                             </Button>
                         </div>
                     </div>

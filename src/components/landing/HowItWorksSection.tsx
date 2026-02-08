@@ -1,6 +1,6 @@
 // ... imports
 import { useState, useEffect } from "react"
-import { MousePointerClick, FileText, Wand2, FileType, Globe, Sparkles, Search, Download } from "lucide-react"
+import { MousePointerClick, FileText, Wand2, Globe, Sparkles, Search, Download } from "lucide-react"
 import SectionWrapper from "./SectionWrapper"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"

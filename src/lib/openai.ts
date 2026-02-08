@@ -1,6 +1,7 @@
 import OpenAI from 'openai'
+import { env } from './env'
 
 export const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-    dangerouslyAllowBrowser: true, // Allow client-side usage if needed, though server-side is preferred
+    apiKey: env.OPENAI_API_KEY,
+    // Removed dangerouslyAllowBrowser - API keys should only be used server-side
 })

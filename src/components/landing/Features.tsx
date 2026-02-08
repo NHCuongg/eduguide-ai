@@ -1,63 +1,72 @@
 'use client'
 
-import { useRef, useState } from "react"
-import { Brain, Layout, Layers, Zap, Clock, Shield } from "lucide-react"
+import { Brain, Layout, Layers, Zap, Clock, Sparkles } from "lucide-react"
 import SectionWrapper from "./SectionWrapper"
-import { motion } from "framer-motion"
+import { cn } from "@/lib/utils"
 
 const features = [
     {
         title: "Adaptive Architecture",
         description: "Our AI engines analyze your current proficiency and learning style to construct a bespoke syllabus that evolves as you progress.",
         icon: Layout,
-        className: "md:col-span-2",
-        color: "text-indigo-600 bg-indigo-50 dark:bg-indigo-950/30 dark:text-indigo-400"
+        className: "md:col-span-2 md:row-span-2",
+        color: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400",
+        delay: 0
     },
     {
         title: "Curated Resources",
         description: "Access a library of high-impact articles, videos, and papers.",
         icon: Layers,
-        className: "md:col-span-1",
-        color: "text-violet-600 bg-violet-50 dark:bg-violet-950/30 dark:text-violet-400"
+        className: "md:col-span-1 md:row-span-1",
+        color: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
+        delay: 0.1
     },
     {
         title: "Socratic Guidance",
-        description: "An integrated AI teaching assistant is always available to clarify complex topics, conduct quizzes, and ensure retention.",
+        description: "AI Teaching Assistant available 24/7 to clarify complex topics.",
         icon: Brain,
-        className: "md:col-span-1",
-        color: "text-fuchsia-600 bg-fuchsia-50 dark:bg-fuchsia-950/30 dark:text-fuchsia-400"
+        className: "md:col-span-1 md:row-span-1",
+        color: "bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400",
+        delay: 0.2
     },
     {
         title: "Micro-Learning",
-        description: "Bite-sized modules designed for maximum retention in minimum time.",
+        description: "Bite-sized modules designed for maximum retention.",
         icon: Zap,
-        className: "md:col-span-1",
-        color: "text-amber-600 bg-amber-50 dark:bg-amber-950/30 dark:text-amber-400"
+        className: "md:col-span-1 md:row-span-1",
+        color: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+        delay: 0.3
     },
     {
         title: "Smart Scheduling",
-        description: "Algorithms that optimize study times based on your circadian rhythm and availability.",
+        description: "Algorithms that optimize study times based on your circadian rhythm.",
         icon: Clock,
-        className: "md:col-span-1",
-        color: "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-400"
+        className: "md:col-span-2 md:row-span-1",
+        color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+        delay: 0.4
     },
 ]
 
 export default function Features() {
     return (
-        <section id="methodology" className="py-20 md:py-32 bg-zinc-50 dark:bg-zinc-950 relative z-20 rounded-t-[3rem] -mt-10 shadow-[0_-20px_40px_-15px_rgba(0,0,0,0.05)] transition-colors duration-500">
+        <section id="methodology" className="py-20 md:py-32 bg-white dark:bg-black relative z-20">
             <div className="container mx-auto px-6">
                 <SectionWrapper className="mb-20 text-center">
-                    <h2 className="font-serif text-4xl md:text-5xl font-bold text-zinc-900 dark:text-white mb-6">Core Methodology</h2>
-                    <div className="h-1.5 w-24 bg-gradient-to-r from-indigo-500 to-fuchsia-500 mx-auto rounded-full"></div>
-                    <p className="mt-6 text-zinc-500 dark:text-zinc-400 max-w-2xl mx-auto text-lg leading-relaxed">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wider mb-6">
+                        <Sparkles className="w-3 h-3" />
+                        Methodology
+                    </div>
+                    <h2 className="font-serif text-4xl md:text-5xl font-bold text-zinc-900 dark:text-white mb-6">
+                        Engineered for Retention
+                    </h2>
+                    <p className="mt-6 text-zinc-500 dark:text-zinc-400 max-w-2xl mx-auto text-lg leading-relaxed font-light">
                         We combine cognitive science with advanced artificial intelligence to create a learning experience that adapts to your brain.
                     </p>
                 </SectionWrapper>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-3 gap-6 max-w-5xl mx-auto h-auto md:h-[800px]">
                     {features.map((feature, i) => (
-                        <SpotlightCard key={i} index={i} feature={feature} className={feature.className} />
+                        <BentoCard key={i} feature={feature} />
                     ))}
                 </div>
             </div>
@@ -65,48 +74,44 @@ export default function Features() {
     )
 }
 
-function SpotlightCard({ feature, index, className }: { feature: any, index: number, className?: string }) {
-    const divRef = useRef<HTMLDivElement>(null)
-    const [position, setPosition] = useState({ x: 0, y: 0 })
-    const [opacity, setOpacity] = useState(0)
+interface Feature {
+    title: string
+    description: string
+    icon: React.ComponentType<{ className?: string }>
+    className: string
+    color: string
+    delay: number
+}
 
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (!divRef.current) return
-        const rect = divRef.current.getBoundingClientRect()
-        setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top })
-    }
-
-    const handleMouseEnter = () => setOpacity(1)
-    const handleMouseLeave = () => setOpacity(0)
-
+function BentoCard({ feature }: { feature: Feature }) {
     return (
-        <SectionWrapper delay={index * 0.1} className={className}>
-            <div
-                ref={divRef}
-                onMouseMove={handleMouseMove}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-                className="group h-full p-8 rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/50 hover:bg-white dark:hover:bg-zinc-900 transition-all duration-500 relative overflow-hidden flex flex-col justify-between"
-            >
-                {/* Spotlight Effect */}
-                <div
-                    className="pointer-events-none absolute -inset-px opacity-0 transition duration-300 group-hover:opacity-100"
-                    style={{
-                        background: `radial-gradient(600px circle at ${position.x}px ${position.y}px, rgba(99, 102, 241, 0.1), transparent 40%)`
-                    }}
-                />
-
-                <div className="relative z-10">
-                    <div className={`mb-6 inline-flex p-4 rounded-2xl ${feature.color} group-hover:scale-110 transition-transform duration-300 ring-1 ring-inset ring-black/5 dark:ring-white/10`}>
-                        <feature.icon className="h-8 w-8" />
+        <SectionWrapper
+            delay={feature.delay}
+            className={cn(
+                "group relative p-8 rounded-3xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 cursor-pointer overflow-hidden transition-all duration-500 hover:shadow-2xl hover:border-zinc-200 dark:hover:border-zinc-700 hover:-translate-y-1",
+                feature.className
+            )}
+        >
+            <div className="relative z-10 h-full flex flex-col justify-between">
+                <div>
+                    <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center mb-6 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3", feature.color)}>
+                        <feature.icon className="h-6 w-6" />
                     </div>
-                    <h3 className="font-serif text-2xl font-bold text-zinc-900 dark:text-white mb-3 group-hover:text-indigo-700 dark:group-hover:text-indigo-400 transition-colors">
+                    <h3 className="font-serif text-2xl font-bold text-zinc-900 dark:text-white mb-3 tracking-tight">
                         {feature.title}
                     </h3>
                 </div>
-                <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed text-lg relative z-10 font-light">
+                <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">
                     {feature.description}
                 </p>
+            </div>
+
+            {/* Hover Gradient Effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-indigo-50/50 dark:to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+            {/* Decorative Patterns */}
+            <div className="absolute -right-8 -bottom-8 opacity-[0.03] dark:opacity-[0.05] pointer-events-none group-hover:scale-110 transition-transform duration-700">
+                <feature.icon className="w-40 h-40" />
             </div>
         </SectionWrapper>
     )

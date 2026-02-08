@@ -4,6 +4,7 @@ import Google from 'next-auth/providers/google';
 import Credentials from 'next-auth/providers/credentials';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
+import { env } from './lib/env';
 
 // Mock User Database for Demo
 const getUser = async (email: string) => {
@@ -23,8 +24,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     ...authConfig,
     providers: [
         Google({
-            clientId: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            clientId: env.GOOGLE_CLIENT_ID,
+            clientSecret: env.GOOGLE_CLIENT_SECRET,
         }),
         Credentials({
             async authorize(credentials) {

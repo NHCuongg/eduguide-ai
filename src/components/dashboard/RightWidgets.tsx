@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from "@/components/ui/button"
-import { Calendar, Trophy, Zap, Bell, Clock, MoreHorizontal } from "lucide-react"
+import { Bell, Clock, MoreHorizontal } from "lucide-react"
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 
@@ -16,8 +16,6 @@ export default function RightWidgets() {
             interval = setInterval(() => {
                 setTimeLeft((prev) => prev - 1)
             }, 1000)
-        } else if (timeLeft === 0) {
-            setIsActive(false)
         }
 
         return () => {
@@ -26,6 +24,12 @@ export default function RightWidgets() {
             }
         }
     }, [isActive, timeLeft])
+
+    useEffect(() => {
+        if (timeLeft === 0 && isActive) {
+            setIsActive(false)
+        }
+    }, [timeLeft, isActive])
 
     const toggleTimer = () => setIsActive(!isActive)
     const resetTimer = () => {
@@ -113,10 +117,10 @@ export default function RightWidgets() {
             </div>
 
             {/* Mascot Area */}
-            <div className="mt-auto bg-gradient-to-br from-violet-600 to-indigo-700 rounded-2xl p-6 text-white relative overflow-hidden shadow-lg shadow-indigo-200/50 hover:shadow-indigo-300/50 transition-shadow">
+                    <div className="mt-auto bg-gradient-to-br from-violet-600 to-indigo-700 rounded-2xl p-6 text-white relative overflow-hidden shadow-lg shadow-indigo-200/50 hover:shadow-indigo-300/50 transition-shadow">
                 <div className="relative z-10">
                     <h3 className="font-extrabold text-xl mb-2 tracking-tight">Keep it up! 🔥</h3>
-                    <p className="text-indigo-100 text-sm mb-5 leading-relaxed font-medium">Consistency is the key to mastery. Complete today's session to earn a streak.</p>
+                    <p className="text-indigo-100 text-sm mb-5 leading-relaxed font-medium">Consistency is the key to mastery. Complete today&apos;s session to earn a streak.</p>
                     <Button size="sm" className="bg-white text-indigo-700 hover:bg-indigo-50 w-full font-bold shadow-md hover:shadow-lg transition-all border border-indigo-100">
                         Continue Learning
                     </Button>

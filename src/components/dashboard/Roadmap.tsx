@@ -2,7 +2,7 @@
 
 import { useWizardStore } from "@/lib/store"
 import { motion } from "framer-motion"
-import { CheckCircle2, Circle, PlayCircle, BookOpen, ExternalLink, Code2, Target } from "lucide-react"
+import { CheckCircle2, Circle, ExternalLink, Target } from "lucide-react"
 
 export default function Roadmap() {
     const { roadmap, completedModules, toggleModule } = useWizardStore()
@@ -49,7 +49,7 @@ export default function Roadmap() {
                             <Target className="h-12 w-12 text-primary" />
                         </div>
                         <div className="relative z-10">
-                            <div className="text-xs font-bold text-primary uppercase tracking-wider mb-1">Today's Mission</div>
+                            <div className="text-xs font-bold text-primary uppercase tracking-wider mb-1">Today&apos;s Mission</div>
                             <div className="bg-primary/20 text-primary w-fit px-2 py-0.5 rounded text-[10px] mb-2">Phase {missionPhaseIndex}</div>
                             <div className="font-semibold text-white">{missionModule.title}</div>
                             <p className="text-xs text-zinc-400 mt-1 line-clamp-1">{missionModule.description}</p>
@@ -59,7 +59,7 @@ export default function Roadmap() {
             </div>
 
             <div className="relative border-l border-zinc-800 ml-4 space-y-12">
-                {roadmap.phases.map((phase: any, i: number) => (
+                {roadmap.phases.map((phase, i: number) => (
                     <motion.div
                         key={i}
                         initial={{ opacity: 0, x: -20 }}
@@ -80,7 +80,7 @@ export default function Roadmap() {
                             <p className="text-muted-foreground">{phase.goal}</p>
 
                             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                                {phase.modules.map((module: any, j: number) => {
+                                {phase.modules.map((module, j: number) => {
                                     const moduleId = `${i}-${j}`
                                     const isCompleted = completedModules.includes(moduleId)
 
@@ -112,7 +112,7 @@ export default function Roadmap() {
                                                 </p>
 
                                                 <div className="space-y-2 mt-4 pt-4 border-t border-zinc-800/50" onClick={(e) => e.stopPropagation()}>
-                                                    {module.resources.slice(0, 2).map((res: any, k: number) => (
+                                                    {module.resources.slice(0, 2).map((res, k: number) => (
                                                         <a
                                                             key={k}
                                                             href={res.url !== "URL or keywords" ? res.url : "#"}

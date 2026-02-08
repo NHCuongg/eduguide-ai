@@ -29,7 +29,6 @@ export default function DashboardLayout({
 
                     <div className="font-serif font-bold text-xl text-slate-800 dark:text-white flex items-center gap-2">
                         EduGuide AI
-                        <span className="text-primary text-xs font-sans font-bold bg-primary/10 px-2 py-0.5 rounded-full uppercase tracking-wider hidden sm:inline-block">Beta</span>
                     </div>
                 </div>
 

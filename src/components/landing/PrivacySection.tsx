@@ -46,7 +46,7 @@ export default function PrivacySection() {
                                 </h2>
 
                                 <p className="text-slate-500 dark:text-slate-400 text-lg leading-relaxed max-w-2xl">
-                                    We never share or sell your data to third parties. EduGuide's philosophy is to minimize data collection with a focus on providing a secure, private learning footprint.
+                                    We never share or sell your data to third parties. EduGuide&apos;s philosophy is to minimize data collection with a focus on providing a secure, private learning footprint.
                                 </p>
                             </div>
                         </div>

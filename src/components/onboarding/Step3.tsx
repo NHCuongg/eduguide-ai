@@ -40,9 +40,9 @@ export default function Step3() {
             </div>
 
             {/* Receipt Ticket Card */}
-            <div className="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+            <div className="relative bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-800/50 border-2 border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-2xl hover:shadow-3xl transition-shadow">
                 {/* Decorative Top */}
-                <div className="h-2 bg-gradient-to-r from-indigo-500 to-purple-500" />
+                <div className="h-3 bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500" />
 
                 <div className="p-8 space-y-6">
                     <div className="flex items-start justify-between">
@@ -92,16 +92,19 @@ export default function Step3() {
                 </Button>
                 <Button
                     onClick={handleSubmit}
-                    className="w-2/3 h-12 text-base font-bold shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl"
+                    className="w-2/3 h-12 text-base font-bold shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                     disabled={isLoading}
                 >
                     {isLoading ? (
                         <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Initializing...
+                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                            Generating...
                         </>
                     ) : (
-                        "Generate Syllabus"
+                        <>
+                            <Ticket className="mr-2 h-5 w-5" />
+                            Generate Syllabus
+                        </>
                     )}
                 </Button>
             </div>

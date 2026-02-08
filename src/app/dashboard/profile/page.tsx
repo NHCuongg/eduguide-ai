@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from "@/components/ui/button"
-import { UserCircle, ShieldCheck, Mail } from "lucide-react"
+import { ShieldCheck, Mail } from "lucide-react"
 
 export default function LearningProfilePage() {
     return (

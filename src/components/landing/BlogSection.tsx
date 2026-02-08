@@ -50,10 +50,11 @@ export default function BlogSection() {
                             <div className="group cursor-pointer">
                                 <div className="aspect-[4/3] w-full rounded-2xl mb-4 relative overflow-hidden shadow-sm group-hover:shadow-md transition-all">
                                     <div className="absolute inset-0 bg-slate-200 dark:bg-slate-800 animate-pulse" /> {/* Loading state placeholder */}
-                                    <img
+                                    <Image
                                         src={post.image}
                                         alt={post.title}
-                                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                        fill
+                                        className="object-cover group-hover:scale-105 transition-transform duration-500"
                                     />
                                     <div className="absolute inset-0 bg-indigo-900/0 group-hover:bg-indigo-900/10 transition-colors duration-300" />
                                 </div>

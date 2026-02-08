@@ -1,15 +1,16 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { OnboardingData } from './schemas'
+import { Roadmap } from './types'
 
 interface WizardState {
     currentStep: number
     data: Partial<OnboardingData>
-    roadmap: any | null
+    roadmap: Roadmap | null
     completedModules: string[]
     activeModuleId: string | null
     setData: (data: Partial<OnboardingData>) => void
-    setRoadmap: (roadmap: any) => void
+    setRoadmap: (roadmap: Roadmap) => void
     toggleModule: (moduleId: string) => void
     setActiveModule: (moduleId: string) => void
     nextStep: () => void
@@ -26,7 +27,7 @@ export const useWizardStore = create<WizardState>()(
             completedModules: [],
             activeModuleId: null,
             setData: (newData: Partial<OnboardingData>) => set((state) => ({ data: { ...state.data, ...newData } })),
-            setRoadmap: (roadmap: any) => set({ roadmap }),
+            setRoadmap: (roadmap: Roadmap) => set({ roadmap }),
             toggleModule: (moduleId: string) => set((state) => {
                 const exists = state.completedModules.includes(moduleId)
                 return {

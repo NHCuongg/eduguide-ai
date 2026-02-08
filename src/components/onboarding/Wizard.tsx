@@ -5,6 +5,7 @@ import Step1 from "./Step1"
 import Step2 from "./Step2"
 import Step3 from "./Step3"
 import { AnimatePresence } from "framer-motion"
+import { cn } from "@/lib/utils"
 
 export default function Wizard() {
     const { currentStep } = useWizardStore()
@@ -12,17 +13,28 @@ export default function Wizard() {
     return (
         <div className="w-full relative min-h-[500px]">
             {/* Progress Container */}
-            <div className="mb-10 max-w-sm mx-auto">
-                <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
-                    <span className={currentStep >= 1 ? "text-indigo-400" : ""}>Focus</span>
-                    <span className={currentStep >= 2 ? "text-indigo-400" : ""}>Style</span>
-                    <span className={currentStep >= 3 ? "text-indigo-400" : ""}>Review</span>
+            <div className="mb-10 max-w-md mx-auto">
+                <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4 px-2">
+                    <span className={cn(
+                        "transition-colors duration-300",
+                        currentStep >= 1 ? "text-indigo-600 dark:text-indigo-400 font-extrabold scale-110" : ""
+                    )}>Focus</span>
+                    <span className={cn(
+                        "transition-colors duration-300",
+                        currentStep >= 2 ? "text-indigo-600 dark:text-indigo-400 font-extrabold scale-110" : ""
+                    )}>Style</span>
+                    <span className={cn(
+                        "transition-colors duration-300",
+                        currentStep >= 3 ? "text-indigo-600 dark:text-indigo-400 font-extrabold scale-110" : ""
+                    )}>Review</span>
                 </div>
-                <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                <div className="w-full h-3 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden shadow-inner border border-slate-300 dark:border-slate-700">
                     <div
-                        className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500 ease-out shadow-[0_0_10px_rgba(99,102,241,0.5)]"
+                        className="h-full bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 rounded-full transition-all duration-700 ease-out shadow-lg shadow-indigo-500/50 relative overflow-hidden"
                         style={{ width: `${(currentStep / 3) * 100}%` }}
-                    />
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
+                    </div>
                 </div>
             </div>
 

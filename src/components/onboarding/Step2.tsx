@@ -35,20 +35,20 @@ export default function Step2() {
 
             <div className="space-y-8">
                 <div className="space-y-3">
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Preferred Style</label>
+                    <label className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">Preferred Style</label>
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                         {styles.map((style) => (
                             <div
                                 key={style.id}
-                                onClick={() => setData({ learningStyle: style.id as any })}
-                                className={`cursor-pointer rounded-xl border p-4 flex flex-col items-center justify-center gap-2 text-center transition-all duration-200 hover:scale-105 ${data.learningStyle === style.id
-                                    ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 ring-2 ring-indigo-500/20 shadow-lg"
-                                    : "border-slate-200 bg-white dark:bg-slate-900 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-indigo-200 hover:bg-slate-50"
+                                onClick={() => setData({ learningStyle: style.id as "Visual" | "Reading" | "Hands-on" })}
+                                className={`cursor-pointer rounded-xl border-2 p-4 flex flex-col items-center justify-center gap-2 text-center transition-all duration-200 hover:scale-105 ${data.learningStyle === style.id
+                                    ? "border-indigo-600 bg-indigo-600 text-white shadow-xl shadow-indigo-600/30 transform scale-105"
+                                    : "border-slate-300 bg-white dark:bg-slate-900 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-indigo-400 hover:bg-slate-50"
                                     }`}
                             >
-                                <style.icon className="w-6 h-6 mb-1 opacity-80" />
+                                <style.icon className={`w-6 h-6 mb-1 ${data.learningStyle === style.id ? "text-indigo-100" : "text-slate-500"}`} />
                                 <div className="font-bold text-sm">{style.label}</div>
-                                <div className="text-[10px] text-slate-400 uppercase tracking-wide opacity-80">{style.desc}</div>
+                                <div className={`text-[10px] uppercase tracking-wide font-semibold ${data.learningStyle === style.id ? "text-indigo-100" : "text-slate-500"}`}>{style.desc}</div>
                             </div>
                         ))}
                     </div>
@@ -56,7 +56,7 @@ export default function Step2() {
 
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                        <label className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
                             <Clock className="w-3 h-3" /> Weekly Hours
                         </label>
                         <Input
@@ -66,19 +66,19 @@ export default function Step2() {
                             min={1}
                             max={168}
                             onChange={(e) => setData({ availability: parseInt(e.target.value) || 0 })}
-                            className="h-12 bg-white/50 border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 dark:bg-slate-900/50 dark:border-slate-800"
+                            className="h-12 bg-white focus:bg-white dark:focus:bg-slate-900 border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/20 dark:bg-slate-900 dark:border-slate-700 font-bold text-slate-900 dark:text-white"
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                        <label className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
                             <Calendar className="w-3 h-3" /> Target Date
                         </label>
                         <Input
                             type="date"
                             value={data.deadline || ''}
                             onChange={(e) => setData({ deadline: e.target.value })}
-                            className="h-12 bg-white/50 border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 dark:bg-slate-900/50 dark:border-slate-800 text-slate-700 dark:text-slate-300"
+                            className="h-12 bg-white focus:bg-white dark:focus:bg-slate-900 border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/20 dark:bg-slate-900 dark:border-slate-700 font-bold text-slate-900 dark:text-white"
                         />
                     </div>
                 </div>

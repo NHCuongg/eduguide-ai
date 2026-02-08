@@ -3,8 +3,8 @@
 import { Button } from "@/components/ui/button"
 import { Quote, ArrowRight } from "lucide-react"
 import SectionWrapper from "./SectionWrapper"
-import Image from "next/image"
 import Link from "next/link"
+import Image from "next/image"
 
 export default function TestimonialSection() {
     return (
@@ -23,14 +23,16 @@ export default function TestimonialSection() {
                     </div>
 
                     <blockquote className="max-w-4xl mx-auto font-serif text-2xl md:text-3xl lg:text-4xl font-medium text-slate-800 dark:text-slate-100 leading-relaxed mb-12">
-                        As an educator with 36 years of experience in various roles... I can confidently say that <span className="text-purple-600 dark:text-purple-400 bg-purple-100/50 dark:bg-purple-900/50 px-1 rounded">Eduaide has impressed me more than any other teacher tool I've encountered...</span> AI is transforming the world, and <span className="text-purple-600 dark:text-purple-400 bg-purple-100/50 dark:bg-purple-900/50 px-1 rounded">Eduaide is at the forefront of revolutionizing education</span> by empowering teachers to focus on what matters most—teaching.
+                        As an educator with 36 years of experience in various roles... I can confidently say that <span className="text-purple-600 dark:text-purple-400 bg-purple-100/50 dark:bg-purple-900/50 px-1 rounded">Eduaide has impressed me more than any other teacher tool I&apos;ve encountered...</span> AI is transforming the world, and <span className="text-purple-600 dark:text-purple-400 bg-purple-100/50 dark:bg-purple-900/50 px-1 rounded">Eduaide is at the forefront of revolutionizing education</span> by empowering teachers to focus on what matters most—teaching.
                     </blockquote>
 
                     <div className="flex flex-col items-center gap-4 mb-10">
                         <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-purple-200 dark:border-purple-800">
-                            <img
+                            <Image
                                 src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop"
                                 alt="Robin Finley"
+                                width={64}
+                                height={64}
                                 className="w-full h-full object-cover"
                             />
                         </div>
