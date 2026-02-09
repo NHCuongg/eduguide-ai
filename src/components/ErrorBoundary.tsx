@@ -1,6 +1,6 @@
 'use client'
 
-import { Component, ReactNode } from 'react'
+import { ReactNode } from 'react'
 import { ErrorBoundary as ReactErrorBoundary, FallbackProps } from 'react-error-boundary'
 import { Button } from '@/components/ui/button'
 import { AlertCircle } from 'lucide-react'
@@ -13,7 +13,7 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
             </div>
             <h2 className="text-2xl font-bold text-slate-900 mb-2">Something went wrong</h2>
             <p className="text-slate-600 mb-6 max-w-md">
-                {error.message || 'An unexpected error occurred. Please try again.'}
+                {(error as Error).message || 'An unexpected error occurred. Please try again.'}
             </p>
             <div className="flex gap-3">
                 <Button onClick={resetErrorBoundary} variant="default">
@@ -29,7 +29,7 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
                         Error details (development only)
                     </summary>
                     <pre className="text-xs bg-slate-100 p-4 rounded overflow-auto">
-                        {error.stack}
+                        {(error as Error).stack}
                     </pre>
                 </details>
             )}

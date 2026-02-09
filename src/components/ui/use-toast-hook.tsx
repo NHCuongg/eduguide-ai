@@ -2,7 +2,7 @@
 
 export const useToast = () => {
     return {
-        toast: (props: any) => {
+        toast: (props: Record<string, unknown>) => {
             console.log('Toast:', props)
         }
     }

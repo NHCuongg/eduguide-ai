@@ -1,0 +1,119 @@
+﻿
+> pet-manager@0.1.0 lint
+> eslint
+
+
+C:\Users\phamd\OneDrive\Desktop\Code\pet-manager\.agent\skills\typescript-expert\references\utility-types.ts
+   71:51  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   71:61  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  178:60  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  183:68  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  183:78  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  190:47  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  190:57  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  242:15  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  251:15  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  311:40  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  311:50  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  333:33  warning  '_value' is defined but never used        @typescript-eslint/no-unused-vars
+
+C:\Users\phamd\OneDrive\Desktop\Code\pet-manager\src\components\ErrorBoundary.tsx
+  3:10  warning  'Component' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\phamd\OneDrive\Desktop\Code\pet-manager\src\components\dashboard\MainContent.tsx
+   7:29  warning  'CardDescription' is defined but never used  @typescript-eslint/no-unused-vars
+   7:69  warning  'CardFooter' is defined but never used       @typescript-eslint/no-unused-vars
+  10:69  warning  'MoreHorizontal' is defined but never used   @typescript-eslint/no-unused-vars
+
+C:\Users\phamd\OneDrive\Desktop\Code\pet-manager\src\components\dashboard\RightWidgets.tsx
+  30:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\phamd\OneDrive\Desktop\Code\pet-manager\src\components\dashboard\RightWidgets.tsx:30:13
+  28 |     useEffect(() => {
+  29 |         if (timeLeft === 0 && isActive) {
+> 30 |             setIsActive(false)
+     |             ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  31 |         }
+  32 |     }, [timeLeft, isActive])
+  33 |  react-hooks/set-state-in-effect
+
+C:\Users\phamd\OneDrive\Desktop\Code\pet-manager\src\components\dashboard\StudyPlan.tsx
+   9:5   warning  'Calendar' is defined but never used               @typescript-eslint/no-unused-vars
+  13:5   warning  'MoreHorizontal' is defined but never used         @typescript-eslint/no-unused-vars
+  22:5   warning  'TrendingUp' is defined but never used             @typescript-eslint/no-unused-vars
+  34:40  warning  'toggleModule' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\phamd\OneDrive\Desktop\Code\pet-manager\src\components\dashboard\export\ExportButton.tsx
+  4:10  warning  'Download' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\phamd\OneDrive\Desktop\Code\pet-manager\src\components\dashboard\flashcards\Flashcard.tsx
+  3:10  warning  'useState' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\phamd\OneDrive\Desktop\Code\pet-manager\src\components\dashboard\flashcards\FlashcardDeck.tsx
+  9:10  warning  'AnimatePresence' is defined but never used  @typescript-eslint/no-unused-vars
+  9:27  warning  'motion' is defined but never used           @typescript-eslint/no-unused-vars
+
+C:\Users\phamd\OneDrive\Desktop\Code\pet-manager\src\components\dashboard\quiz\QuizModal.tsx
+  82:11  warning  'currentQuestionData' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  86:11  warning  'isLastQuestion' is assigned a value but never used       @typescript-eslint/no-unused-vars
+
+C:\Users\phamd\OneDrive\Desktop\Code\pet-manager\src\components\landing\Navbar.tsx
+  20:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\phamd\OneDrive\Desktop\Code\pet-manager\src\components\landing\Navbar.tsx:20:9
+  18 |
+  19 |     useEffect(() => {
+> 20 |         setMounted(true)
+     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  21 |     }, [])
+  22 |
+  23 |     const { scrollY, scrollYProgress } = useScroll()  react-hooks/set-state-in-effect
+
+C:\Users\phamd\OneDrive\Desktop\Code\pet-manager\src\components\ui\button.tsx
+  6:18  warning  'HTMLMotionProps' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\phamd\OneDrive\Desktop\Code\pet-manager\src\components\ui\input.tsx
+  4:18  error  An interface declaring no members is equivalent to its supertype  @typescript-eslint/no-empty-object-type
+
+C:\Users\phamd\OneDrive\Desktop\Code\pet-manager\src\components\ui\textarea.tsx
+  4:18  error  An interface declaring no members is equivalent to its supertype  @typescript-eslint/no-empty-object-type
+
+C:\Users\phamd\OneDrive\Desktop\Code\pet-manager\src\components\ui\use-toast-hook.tsx
+  5:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\phamd\OneDrive\Desktop\Code\pet-manager\src\lib\db\flashcards.ts
+   2:10  warning  'supabase' is defined but never used           @typescript-eslint/no-unused-vars
+  42:11  warning  'cacheKey' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  48:40  warning  'userId' is defined but never used             @typescript-eslint/no-unused-vars
+  48:56  warning  'flashcardIds' is defined but never used       @typescript-eslint/no-unused-vars
+
+C:\Users\phamd\OneDrive\Desktop\Code\pet-manager\src\lib\db\quizzes.ts
+   2:10  warning  'supabase' is defined but never used           @typescript-eslint/no-unused-vars
+  44:11  warning  'cacheKey' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  50:38  warning  'userId' is defined but never used             @typescript-eslint/no-unused-vars
+
+C:\Users\phamd\OneDrive\Desktop\Code\pet-manager\src\lib\db\roadmaps.ts
+   2:10  warning  'supabase' is defined but never used           @typescript-eslint/no-unused-vars
+  50:11  warning  'cacheKey' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  59:39  warning  'userId' is defined but never used             @typescript-eslint/no-unused-vars
+
+C:\Users\phamd\OneDrive\Desktop\Code\pet-manager\src\lib\useGamificationStore.ts
+  18:15  warning  'get' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\phamd\OneDrive\Desktop\Code\pet-manager\src\lib\usePomodoroStore.ts
+  24:15  warning  'get' is defined but never used  @typescript-eslint/no-unused-vars
+
+Γ£û 44 problems (16 errors, 28 warnings)
+

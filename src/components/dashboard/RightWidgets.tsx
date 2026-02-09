@@ -27,6 +27,7 @@ export default function RightWidgets() {
 
     useEffect(() => {
         if (timeLeft === 0 && isActive) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setIsActive(false)
         }
     }, [timeLeft, isActive])
@@ -117,7 +118,7 @@ export default function RightWidgets() {
             </div>
 
             {/* Mascot Area */}
-                    <div className="mt-auto bg-gradient-to-br from-violet-600 to-indigo-700 rounded-2xl p-6 text-white relative overflow-hidden shadow-lg shadow-indigo-200/50 hover:shadow-indigo-300/50 transition-shadow">
+            <div className="mt-auto bg-gradient-to-br from-violet-600 to-indigo-700 rounded-2xl p-6 text-white relative overflow-hidden shadow-lg shadow-indigo-200/50 hover:shadow-indigo-300/50 transition-shadow">
                 <div className="relative z-10">
                     <h3 className="font-extrabold text-xl mb-2 tracking-tight">Keep it up! 🔥</h3>
                     <p className="text-indigo-100 text-sm mb-5 leading-relaxed font-medium">Consistency is the key to mastery. Complete today&apos;s session to earn a streak.</p>
