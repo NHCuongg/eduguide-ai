@@ -83,6 +83,14 @@ export default function Step3() {
                             <div className="font-bold text-slate-700 dark:text-slate-200">{data.availability} hrs/week</div>
                         </div>
                         <div>
+                            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Format</div>
+                            <div className="font-bold text-slate-700 dark:text-slate-200">{data.contentPreference}</div>
+                        </div>
+                        <div className="text-right">
+                            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Goal</div>
+                            <div className="font-bold text-slate-700 dark:text-slate-200">{data.primaryGoal}</div>
+                        </div>
+                        <div>
                             <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Target</div>
                             <div className="font-bold text-slate-700 dark:text-slate-200">{data.deadline}</div>
                         </div>

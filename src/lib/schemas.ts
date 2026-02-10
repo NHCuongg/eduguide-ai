@@ -8,6 +8,9 @@ export const onboardingSchema = z.object({
     deadline: z.string().refine((date) => new Date(date) > new Date(), {
         message: "Deadline must be in the future",
     }),
+    primaryGoal: z.enum(["Career Change", "Skill Improvement", "Academic", "Hobby", "Other"]),
+    interests: z.array(z.string()).min(1, "Select at least one interest"),
+    contentPreference: z.enum(["Video", "Text", "Interactive", "Mixed"]),
 })
 
 export type OnboardingData = z.infer<typeof onboardingSchema>
