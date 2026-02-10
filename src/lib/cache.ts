@@ -64,11 +64,11 @@ class SimpleCache {
             reject = rej
         })
 
-        this.pendingRequests.set(key, { promise, resolve: resolve!, reject: reject! })
+        this.pendingRequests.set(key, { promise, resolve: resolve! as unknown as (value: unknown) => void, reject: reject! })
 
         try {
             const data = await fetcher()
-            
+
             // Cache the result
             this.cache.set(key, {
                 data,

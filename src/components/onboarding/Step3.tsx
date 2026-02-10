@@ -17,7 +17,16 @@ export default function Step3() {
         try {
             // Emulate API call
             await new Promise(resolve => setTimeout(resolve, 2000))
-            const dummyRoadmap = { title: data.targetSkill, modules: [] } // Mock response
+            // Mock response matching Roadmap interface
+            const dummyRoadmap = {
+                title: data.targetSkill || "Custom Roadmap",
+                phases: [
+                    {
+                        name: "Phase 1: Getting Started",
+                        modules: []
+                    }
+                ]
+            }
             setRoadmap(dummyRoadmap)
             router.push('/dashboard')
         } catch (e) {

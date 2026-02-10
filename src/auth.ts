@@ -1,6 +1,7 @@
 import NextAuth from 'next-auth';
 import { authConfig } from './auth.config';
 import Google from 'next-auth/providers/google';
+import GitHub from 'next-auth/providers/github';
 import Credentials from 'next-auth/providers/credentials';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
@@ -26,6 +27,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         Google({
             clientId: env.GOOGLE_CLIENT_ID,
             clientSecret: env.GOOGLE_CLIENT_SECRET,
+        }),
+        GitHub({
+            clientId: env.GITHUB_CLIENT_ID,
+            clientSecret: env.GITHUB_CLIENT_SECRET,
         }),
         Credentials({
             async authorize(credentials) {
