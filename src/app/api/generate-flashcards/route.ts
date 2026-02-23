@@ -20,11 +20,11 @@ export async function POST(req: Request) {
         const rateLimitResult = await rateLimit(req, aiRateLimiter)
         if (rateLimitResult && !rateLimitResult.allowed) {
             return NextResponse.json(
-                { 
+                {
                     error: 'Rate limit exceeded',
                     retryAfter: Math.ceil((rateLimitResult.resetAt - Date.now()) / 1000)
                 },
-                { 
+                {
                     status: 429,
                     headers: {
                         'X-RateLimit-Limit': '5',
@@ -66,7 +66,10 @@ export async function POST(req: Request) {
       }
     `
 
-                const result = await geminiModel.generateContent(prompt)
+                const result = await geminiModel.generateContent({
+                    contents: [{ role: "user", parts: [{ text: prompt }] }],
+                    generationConfig: { responseMimeType: "application/json" }
+                })
                 const response = await result.response
                 const text = response.text()
 

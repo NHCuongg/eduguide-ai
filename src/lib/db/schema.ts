@@ -66,6 +66,7 @@ export const profiles = pgTable("profile", {
     userId: text("userId").primaryKey().references(() => users.id, { onDelete: "cascade" }),
     targetSkill: text("target_skill"),
     currentLevel: text("current_level"),
+    onboardingData: jsonb("onboarding_data"), // Stores full wizard payload
     streak: integer("streak").default(0),
     xp: integer("xp").default(0),
     lastActiveDate: timestamp("last_active_date", { mode: "date" }),

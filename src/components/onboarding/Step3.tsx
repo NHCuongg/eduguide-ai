@@ -3,34 +3,49 @@
 import { useWizardStore } from "@/lib/store"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
-import { Loader2, Ticket, CheckCircle2 } from "lucide-react"
+import { Loader2, Ticket, CheckCircle2, AlertCircle } from "lucide-react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { saveOnboardingData } from "@/app/actions/onboarding"
 
 export default function Step3() {
     const { data, prevStep, setRoadmap } = useWizardStore()
     const router = useRouter()
     const [isLoading, setIsLoading] = useState(false)
 
+    const [error, setError] = useState<string | null>(null)
+
     const handleSubmit = async () => {
         setIsLoading(true)
+        setError(null)
         try {
-            // Emulate API call
-            await new Promise(resolve => setTimeout(resolve, 2000))
-            // Mock response matching Roadmap interface
-            const dummyRoadmap = {
-                title: data.targetSkill || "Custom Roadmap",
-                phases: [
-                    {
-                        name: "Phase 1: Getting Started",
-                        modules: []
-                    }
-                ]
+            // 1. Generate Roadmap via API
+            const response = await fetch('/api/generate-roadmap', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            })
+
+            if (!response.ok) {
+                throw new Error('Failed to generate roadmap from AI')
             }
-            setRoadmap(dummyRoadmap)
+
+            const roadmapData = await response.json()
+
+            // 2. Save Profile + Roadmap to Database via Server Action
+            // Remove full interests/fields from being strictly typed to fit partial schema, or pass as is
+            const saveResult = await saveOnboardingData(data as any, roadmapData)
+
+            if (!saveResult.success) {
+                throw new Error(saveResult.error || 'Failed to sync with database')
+            }
+
+            // 3. Update local store and redirect
+            setRoadmap(roadmapData)
             router.push('/dashboard')
-        } catch (e) {
-            console.error(e)
+        } catch (e: any) {
+            console.error("Submission error:", e)
+            setError(e.message || "An unexpected error occurred.")
         } finally {
             setIsLoading(false)
         }
@@ -97,6 +112,13 @@ export default function Step3() {
                     </div>
                 </div>
             </div>
+
+            {error && (
+                <div className="flex items-center gap-2 p-4 text-sm text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400 rounded-xl border border-red-200 dark:border-red-900">
+                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                    {error}
+                </div>
+            )}
 
             <div className="flex gap-4 pt-4">
                 <Button

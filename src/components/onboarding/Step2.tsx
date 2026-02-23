@@ -97,7 +97,7 @@ export default function Step2() {
                     className="w-2/3 h-12 text-base font-bold shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl"
                     disabled={!data.learningStyle || !data.availability || !data.deadline}
                 >
-                    Review Profile
+                    Continue
                 </Button>
             </div>
         </motion.div>

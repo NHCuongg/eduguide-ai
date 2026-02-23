@@ -11,6 +11,9 @@ export const onboardingSchema = z.object({
     primaryGoal: z.enum(["Career Change", "Skill Improvement", "Academic", "Hobby", "Other"]),
     interests: z.array(z.string()).min(1, "Select at least one interest"),
     contentPreference: z.enum(["Video", "Text", "Interactive", "Mixed"]),
+    background: z.string().optional(),
+    strengths: z.string().optional(),
+    weaknesses: z.string().optional(),
 })
 
 export type OnboardingData = z.infer<typeof onboardingSchema>

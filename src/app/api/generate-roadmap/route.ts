@@ -4,18 +4,18 @@ import { cache } from "@/lib/cache"
 import { rateLimit, aiRateLimiter } from "@/lib/rate-limit"
 import { NextResponse } from "next/server"
 import { z } from "zod"
+import { auth } from "@/auth"
 
 export async function POST(req: Request) {
   try {
-    // Rate limiting
     const rateLimitResult = await rateLimit(req, aiRateLimiter)
     if (rateLimitResult && !rateLimitResult.allowed) {
       return NextResponse.json(
-        { 
+        {
           error: 'Rate limit exceeded',
           retryAfter: Math.ceil((rateLimitResult.resetAt - Date.now()) / 1000)
         },
-        { 
+        {
           status: 429,
           headers: {
             'X-RateLimit-Limit': '5',
@@ -27,30 +27,36 @@ export async function POST(req: Request) {
       )
     }
 
+    const session = await auth()
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 })
+    }
+
     const body = await req.json()
     const data = onboardingSchema.parse(body)
 
-    // Generate cache key based on onboarding data
     const cacheKey = cache.generateKey(
       `roadmap:${data.targetSkill}`,
-      `${data.currentLevel}:${data.learningStyle}:${data.deadline}`
+      `${data.currentLevel}:${data.learningStyle}:${data.deadline}:${data.background}:${data.strengths}`
     )
 
-    // Try to get from cache or generate new
     const roadmap = await cache.getOrSet(
       cacheKey,
       async () => {
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" })
 
-        // Construct prompt for Gemini
         const prompt = `
       You are an elite Academic Curriculum Designer.
       Create a rigorous, structured syllabus for a university-level course.
 
-      The user wants to learn: ${data.targetSkill}
-      Current Level: ${data.currentLevel}
-      Learning Style: ${data.learningStyle}
-      Timeframe: ${data.deadline}
+      USER PROFILE:
+      - Wants to learn: ${data.targetSkill}
+      - Current Level: ${data.currentLevel}
+      - Learning Style: ${data.learningStyle}
+      - Timeframe: ${data.deadline}
+      - Background/Experience: ${data.background || 'Not specified'}
+      - Strengths: ${data.strengths || 'Not specified'}
+      - Weaknesses: ${data.weaknesses || 'Not specified'}
 
       Return a JSON object with this EXACT structure (do not use Markdown code blocks, just raw JSON):
       {
@@ -62,8 +68,9 @@ export async function POST(req: Request) {
               {
                 "title": "Module Title",
                 "description": "2-3 sentences academic summary of the lesson.",
+                "estimatedTime": "Time estimate (e.g. 30m, 1h)",
                 "resources": [
-                  { "title": "Resource Name", "url": "URL or keywords", "type": "Article/Video/Paper" }
+                  { "title": "Resource Name", "url": "URL or keywords", "type": "Flashcard" } // MUST ONLY BE ONE OF: Flashcard, Quiz, Reading, Exercise
                 ]
               }
             ]
@@ -71,19 +78,24 @@ export async function POST(req: Request) {
         ]
       }
 
-      Create exactly 3 phases with 3-4 modules each. Focus on depth and academic rigor.
+      CRITICAL RULE: The "type" for resources MUST ONLY BE ONE OF: "Flashcard", "Quiz", "Reading", or "Exercise". DO NOT suggest or create any video materials.
+      Create exactly 3 phases with 3-4 modules each. Focus on depth, academic rigor, and personalize it to the user's background, strengths, and weaknesses if provided. Include realistic estimated times for each module.
     `
 
-        const result = await model.generateContent(prompt)
+        const result = await model.generateContent({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: {
+            responseMimeType: "application/json",
+          }
+        })
         const response = await result.response
         const text = response.text()
 
-        // Clean potential markdown blocks if Gemini adds them
         const jsonString = text.replace(/```json/g, '').replace(/```/g, '').trim()
 
         return JSON.parse(jsonString)
       },
-      24 * 60 * 60 * 1000 // Cache roadmaps for 24 hours (they're more expensive to generate)
+      24 * 60 * 60 * 1000
     )
 
     return NextResponse.json(roadmap)
@@ -94,7 +106,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid data" }, { status: 400 })
     }
     return NextResponse.json({
-      // Fallback/Mock for demo if API key is missing
       mock: true,
       roadmap: {
         title: "Mock Roadmap (API Key Missing)",

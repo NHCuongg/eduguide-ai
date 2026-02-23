@@ -7,9 +7,7 @@ import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { env } from './lib/env';
 
-// Mock User Database for Demo
 const getUser = async (email: string) => {
-    // In a real app, this would query your database
     if (email === 'demo@eduguide.ai') {
         return {
             id: '1',

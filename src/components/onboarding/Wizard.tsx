@@ -7,16 +7,16 @@ import StepGoals from "./StepGoals"
 import StepInterests from "./StepInterests"
 import StepContent from "./StepContent"
 import Step3 from "./Step3"
+import StepBackground from "./StepBackground"
 import { AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 
 export default function Wizard() {
     const { currentStep } = useWizardStore()
-    const totalSteps = 6
+    const totalSteps = 7
 
     return (
         <div className="w-full relative min-h-[500px]">
-            {/* Progress Container */}
             <div className="mb-10 max-w-md mx-auto">
                 <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4 px-2">
                     <span className={cn(currentStep >= 1 ? "text-indigo-600 dark:text-indigo-400 font-extrabold" : "")}>Basics</span>
@@ -36,15 +36,15 @@ export default function Wizard() {
                 </div>
             </div>
 
-            {/* Glass Card Container for Steps */}
             <div className="glass-card rounded-3xl p-8 md:p-12">
                 <AnimatePresence mode="wait">
                     {currentStep === 1 && <Step1 key="step1" />}
                     {currentStep === 2 && <Step2 key="step2" />}
-                    {currentStep === 3 && <StepGoals key="step3" />}
-                    {currentStep === 4 && <StepInterests key="step4" />}
-                    {currentStep === 5 && <StepContent key="step5" />}
-                    {currentStep === 6 && <Step3 key="step6" />}
+                    {currentStep === 3 && <StepBackground key="step3_bg" />}
+                    {currentStep === 4 && <StepGoals key="step4" />}
+                    {currentStep === 5 && <StepInterests key="step5" />}
+                    {currentStep === 6 && <StepContent key="step6" />}
+                    {currentStep === 7 && <Step3 key="step7" />}
                 </AnimatePresence>
             </div>
         </div>

@@ -5,15 +5,15 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
-import { 
-    Calendar, 
-    LayoutGrid, 
-    List, 
-    Clock, 
-    MoreHorizontal, 
-    Sparkles, 
-    Zap, 
-    Circle, 
+import {
+    Calendar,
+    LayoutGrid,
+    List,
+    Clock,
+    MoreHorizontal,
+    Sparkles,
+    Zap,
+    Circle,
     Search,
     Filter,
     CheckCircle2,
@@ -33,7 +33,7 @@ type SortOption = 'default' | 'phase' | 'completed'
 export default function StudyPlan() {
     const { roadmap, completedModules, toggleModule, setActiveModule } = useWizardStore()
     const { streak } = useGamificationStore()
-    
+
     const [activeTab, setActiveTab] = useState<'today' | 'roadmap'>('today')
     const [viewMode, setViewMode] = useState<ViewMode>('grid')
     const [searchQuery, setSearchQuery] = useState('')
@@ -44,19 +44,19 @@ export default function StudyPlan() {
     const allSessions = useMemo(() => {
         const sessions = roadmap?.phases?.flatMap((phase, phaseIdx: number) =>
             phase.modules?.map((module, modIdx: number) => ({
-            ...module,
-            id: `${phaseIdx}-${modIdx}`,
-            phaseName: phase.name,
-            phaseIdx,
+                ...module,
+                id: `${phaseIdx}-${modIdx}`,
+                phaseName: phase.name,
+                phaseIdx,
                 modIdx,
                 isCompleted: completedModules.includes(`${phaseIdx}-${modIdx}`)
             })) || []
-    ) || []
+        ) || []
 
         // Filter by search query
         let filtered = sessions
         if (searchQuery.trim()) {
-            filtered = sessions.filter(session => 
+            filtered = sessions.filter(session =>
                 session.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 session.phaseName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 session.description?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -103,8 +103,8 @@ export default function StudyPlan() {
                     <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                             <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                            <Circle className="w-2 h-2 fill-green-500 text-green-500 animate-pulse" />
-                            Current Course
+                                <Circle className="w-2 h-2 fill-green-500 text-green-500 animate-pulse" />
+                                Current Course
                             </div>
                             {roadmap && (
                                 <Badge variant="secondary" className="text-xs font-semibold">
@@ -117,13 +117,13 @@ export default function StudyPlan() {
                         </h1>
                     </div>
                     <div className="flex gap-2">
-                        <Button 
-                            variant="outline" 
+                        <Button
+                            variant="outline"
                             className="gap-2 hidden md:flex border-2 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold"
                         >
                             <List className="h-4 w-4" /> Curriculum
                         </Button>
-                        <Button 
+                        <Button
                             className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 gap-2 transition-all hover:-translate-y-0.5 active:translate-y-0 font-bold"
                             onClick={() => currentSession && handleSessionClick(currentSession.id)}
                         >
@@ -169,8 +169,8 @@ export default function StudyPlan() {
                                 Good Morning! ☀️
                             </h3>
                             <p className="text-indigo-50 text-sm max-w-2xl leading-relaxed font-medium">
-                                You&apos;re on a <span className="font-bold text-white border-b border-white/30">{streak}-day streak</span>! 
-                                {currentSession 
+                                You&apos;re on a <span className="font-bold text-white border-b border-white/30">{streak}-day streak</span>!
+                                {currentSession
                                     ? ` Continue with "${currentSession.title}" to maintain your momentum.`
                                     : ' Great job completing all sessions!'}
                             </p>
@@ -313,9 +313,9 @@ export default function StudyPlan() {
                                 {searchQuery ? 'No results found' : !roadmap ? 'No study plan available' : activeTab === 'today' ? 'All caught up!' : 'No sessions available'}
                             </h3>
                             <p className="text-base text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
-                                {searchQuery 
+                                {searchQuery
                                     ? `No sessions match "${searchQuery}". Try a different search term.`
-                                    : !roadmap 
+                                    : !roadmap
                                         ? "You haven&apos;t created a study plan yet. Complete the onboarding to get started!"
                                         : activeTab === 'today'
                                             ? "You've completed all sessions for today! Great work! 🎉"
@@ -323,7 +323,7 @@ export default function StudyPlan() {
                             </p>
                         </div>
                         {!roadmap && (
-                            <Button 
+                            <Button
                                 className="mt-8 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all"
                                 onClick={() => window.location.href = '/onboarding'}
                             >
@@ -331,7 +331,7 @@ export default function StudyPlan() {
                             </Button>
                         )}
                         {searchQuery && (
-                            <Button 
+                            <Button
                                 variant="outline"
                                 className="mt-4"
                                 onClick={() => setSearchQuery('')}
@@ -378,25 +378,25 @@ export default function StudyPlan() {
                                             )}
 
                                             {/* Active Indicator */}
-                                {isCurrent && (
+                                            {isCurrent && (
                                                 <span className="absolute top-4 right-4 flex h-4 w-4">
-                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                                        <span className="relative inline-flex rounded-full h-4 w-4 bg-indigo-500 border-2 border-white"></span>
-                                    </span>
-                                )}
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                                                    <span className="relative inline-flex rounded-full h-4 w-4 bg-indigo-500 border-2 border-white"></span>
+                                                </span>
+                                            )}
 
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-3 mb-4">
-                                        <div className={cn(
+                                                    <div className={cn(
                                                         "h-12 w-12 rounded-2xl flex items-center justify-center font-black text-base shadow-inner transition-all duration-300",
                                                         session.isCompleted
                                                             ? "bg-green-500 text-white"
                                                             : isCurrent
                                                                 ? "bg-indigo-600 text-white shadow-indigo-700/50"
                                                                 : "bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/30 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
-                                        )}>
-                                            {i + 1}
-                                        </div>
+                                                    )}>
+                                                        {i + 1}
+                                                    </div>
                                                     <div className="flex-1 min-w-0">
                                                         <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1">
                                                             Session {i + 1}
@@ -407,8 +407,8 @@ export default function StudyPlan() {
                                                         )}>
                                                             {session.phaseName}
                                                         </span>
-                                        </div>
-                                    </div>
+                                                    </div>
+                                                </div>
 
                                                 <h3 className={cn(
                                                     "font-serif font-bold text-lg mb-3 line-clamp-2 leading-snug transition-colors",
@@ -416,8 +416,8 @@ export default function StudyPlan() {
                                                         ? "text-green-800 dark:text-green-200"
                                                         : "text-slate-900 dark:text-slate-100 group-hover:text-indigo-700 dark:group-hover:text-indigo-300"
                                                 )}>
-                                        {session.title}
-                                    </h3>
+                                                    {session.title}
+                                                </h3>
 
                                                 {session.description && (
                                                     <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-4">
@@ -427,27 +427,27 @@ export default function StudyPlan() {
 
                                                 <div className="flex flex-wrap gap-2">
                                                     <Badge variant="secondary" className="text-[10px] font-bold uppercase tracking-wider">
-                                            Concept
+                                                        Concept
                                                     </Badge>
                                                     <Badge variant="secondary" className="text-[10px] font-bold uppercase tracking-wider bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300">
-                                            Practice
+                                                        Practice
                                                     </Badge>
-                                    </div>
-                                </div>
+                                                </div>
+                                            </div>
 
                                             <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                                                 <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-semibold">
                                                     <Clock className="h-4 w-4" />
-                                        45m
-                                    </div>
+                                                    45m
+                                                </div>
                                                 {session.isCompleted ? (
                                                     <div className="flex items-center gap-1 text-xs font-bold text-green-600 dark:text-green-400">
                                                         <CheckCircle2 className="w-4 h-4" />
                                                         Completed
                                                     </div>
                                                 ) : isCurrent ? (
-                                                    <Button 
-                                                        size="sm" 
+                                                    <Button
+                                                        size="sm"
                                                         className="h-9 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white text-xs font-bold rounded-full px-5 shadow-lg hover:shadow-xl hover:scale-105 transition-all"
                                                         onClick={(e) => {
                                                             e.stopPropagation()
@@ -455,9 +455,9 @@ export default function StudyPlan() {
                                                         }}
                                                     >
                                                         <Play className="w-3 h-3 mr-1.5 fill-current" />
-                                            Start Now
-                                        </Button>
-                                    ) : (
+                                                        Start Now
+                                                    </Button>
+                                                ) : (
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
@@ -540,12 +540,12 @@ export default function StudyPlan() {
                                                 <div className="flex items-center gap-4 flex-shrink-0">
                                                     <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 font-semibold">
                                                         <Clock className="h-4 w-4" />
-                                                        45m
-                                        </div>
+                                                        {session.estimatedTime || "45m"}
+                                                    </div>
                                                     {session.isCompleted ? (
                                                         <CheckCircle2 className="w-6 h-6 text-green-500" />
                                                     ) : isCurrent ? (
-                                                        <Button 
+                                                        <Button
                                                             size="sm"
                                                             className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold"
                                                         >
@@ -554,12 +554,12 @@ export default function StudyPlan() {
                                                         </Button>
                                                     ) : (
                                                         <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-indigo-500 transition-colors" />
-                                    )}
-                                </div>
-                            </div>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </motion.div>
-                        )
-                    })}
+                                    )
+                                })}
                             </motion.div>
                         )}
                     </AnimatePresence>

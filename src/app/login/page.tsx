@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { motion } from "framer-motion"
-import { ArrowLeft, Loader2, Github, Globe, Sparkles } from "lucide-react"
+import { ArrowLeft, Loader2, Sparkles } from "lucide-react"
 
 export default function LoginPage() {
     const [errorMessage, dispatch, isPending] = useActionState(authenticate, undefined)
@@ -119,8 +119,8 @@ export default function LoginPage() {
                                             defaultValue="password123"
                                         />
                                     </div>
-                                    <Button 
-                                        disabled={isPending} 
+                                    <Button
+                                        disabled={isPending}
                                         className="h-12 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all rounded-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 mt-2"
                                     >
                                         {isPending ? (
@@ -140,31 +140,7 @@ export default function LoginPage() {
                             </div>
                         </form>
 
-                        <div className="relative">
-                            <div className="absolute inset-0 flex items-center">
-                                <span className="w-full border-t border-slate-200 dark:border-slate-800" />
-                            </div>
-                            <div className="relative flex justify-center text-xs uppercase">
-                                <span className="bg-white dark:bg-slate-950 px-2 text-slate-500">Or continue with</span>
-                            </div>
-                        </div>
 
-                        <div className="grid grid-cols-2 gap-3">
-                            <Button 
-                                variant="outline" 
-                                disabled={isPending} 
-                                className="dark:bg-slate-900 dark:border-2 dark:border-slate-800 dark:text-white dark:hover:bg-slate-800 h-12 border-2 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:scale-105 transition-all font-semibold rounded-xl"
-                            >
-                                <Github className="mr-2 h-5 w-5" /> Github
-                            </Button>
-                            <Button 
-                                variant="outline" 
-                                disabled={isPending} 
-                                className="dark:bg-slate-900 dark:border-2 dark:border-slate-800 dark:text-white dark:hover:bg-slate-800 h-12 border-2 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:scale-105 transition-all font-semibold rounded-xl"
-                            >
-                                <Globe className="mr-2 h-5 w-5" /> Google
-                            </Button>
-                        </div>
                     </div>
 
                     <p className="px-8 text-center text-sm text-slate-500 dark:text-slate-400">

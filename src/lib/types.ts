@@ -1,4 +1,4 @@
-// Types for roadmap structure
+
 export interface RoadmapResource {
     title: string
     url: string
@@ -8,6 +8,7 @@ export interface RoadmapResource {
 export interface RoadmapModule {
     title: string
     description: string
+    estimatedTime: string
     resources: RoadmapResource[]
 }
 

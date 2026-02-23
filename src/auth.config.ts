@@ -9,21 +9,18 @@ export const authConfig = {
         authorized({ auth, request: { nextUrl } }) {
             const isLoggedIn = !!auth?.user;
             const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
-            if (isOnDashboard) {
+            const isOnBoarding = nextUrl.pathname.startsWith('/onboarding');
+            if (isOnDashboard || isOnBoarding) {
                 if (isLoggedIn) return true;
-                return false; // Redirect unauthenticated users to login page
+                return false;
             } else if (isLoggedIn) {
                 if (nextUrl.pathname === '/login') {
                     return Response.redirect(new URL('/dashboard', nextUrl));
                 }
-                // Redirect root to dashboard if logged in? Optional, but typical for apps.
-                // if (nextUrl.pathname === '/') {
-                //    return Response.redirect(new URL('/dashboard', nextUrl));
-                // }
             }
             return true;
         },
     },
-    providers: [], // Add providers with an empty array for now
+    providers: [],
     secret: env.AUTH_SECRET,
 } satisfies NextAuthConfig;
