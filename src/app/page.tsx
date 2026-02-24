@@ -13,29 +13,33 @@ import PrivacySection from "@/components/landing/PrivacySection"
 import BlogSection from "@/components/landing/BlogSection"
 import FAQSection from "@/components/landing/FAQSection"
 import Footer from "@/components/landing/Footer"
+import ScrollToTop from "@/components/landing/ScrollToTop"
 
 export default function Home() {
   return (
-    <motion.main
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
-      transition={{ duration: 0.5 }}
-      className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-500"
-    >
-      <Navbar />
+    <>
+      <motion.main
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
+        transition={{ duration: 0.5 }}
+        className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-500"
+      >
+        <Navbar />
 
-      <Hero />
-      <Features />
-      <VideoSection />
-      <HowItWorksSection />
-      <TestimonialSection />
-      <PricingSection />
-      <CTASection />
-      <PrivacySection />
-      <FAQSection />
-      <BlogSection />
-      <Footer />
-    </motion.main>
+        <Hero />
+        <Features />
+        <VideoSection />
+        <HowItWorksSection />
+        <TestimonialSection />
+        <PricingSection />
+        <CTASection />
+        <PrivacySection />
+        <FAQSection />
+        <BlogSection />
+        <Footer />
+      </motion.main>
+      <ScrollToTop />
+    </>
   );
 }

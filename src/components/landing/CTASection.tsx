@@ -44,16 +44,7 @@ export default function CTASection() {
                                 Try EduGuide Free
                             </Button>
                         </Link>
-                        <Link href="/dashboard">
-                            <Button variant="outline" size="lg" className="h-16 px-10 text-lg border-white/30 text-white hover:bg-white/10 hover:text-white transition-all bg-transparent rounded-full backdrop-blur-sm">
-                                Get a Demo
-                            </Button>
-                        </Link>
                     </div>
-
-                    <p className="mt-8 text-indigo-100/70 dark:text-indigo-300/60 text-sm">
-                        No credit card required • Free tier forever
-                    </p>
                 </SectionWrapper>
             </div>
         </section>

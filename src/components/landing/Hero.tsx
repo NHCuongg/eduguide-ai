@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Sparkles, BookOpen, GraduationCap, Brain } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import HeroParticles from "./HeroParticles"
 
 const subjects = ["Biology", "Computer Science", "History", "Psychology", "Physics", "Literature"]
 
@@ -22,6 +23,9 @@ export default function Hero() {
         <section className="relative overflow-hidden bg-white dark:bg-zinc-950 pt-32 pb-40 lg:pt-48 lg:pb-48 transition-colors duration-500">
             {/* Animated Modern Grid Background */}
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+
+            {/* Dynamic Particles */}
+            <HeroParticles />
 
             {/* Glowing Orbs - Softer & Slower */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">

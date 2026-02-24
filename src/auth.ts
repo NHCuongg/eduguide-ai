@@ -6,15 +6,18 @@ import Credentials from 'next-auth/providers/credentials';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { env } from './lib/env';
+import { db } from './lib/db';
+import { users } from './lib/db/schema';
+import { eq } from 'drizzle-orm';
 
 const getUser = async (email: string) => {
-    if (email === 'demo@eduguide.ai') {
-        return {
-            id: '1',
-            email: 'demo@eduguide.ai',
-            password: await bcrypt.hash('password123', 10),
-            name: 'Dr. James Dalton',
-        };
+    try {
+        const userArr = await db.select().from(users).where(eq(users.email, email)).limit(1);
+        if (userArr.length > 0) {
+            return userArr[0];
+        }
+    } catch (error) {
+        console.error('Failed to fetch user:', error);
     }
     return null;
 };
@@ -40,9 +43,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     const { email, password } = parsedCredentials.data;
                     const user = await getUser(email);
 
-                    if (!user) return null;
+                    if (!user || (!user.password && user.email)) {
+                        // User might exist but registered with Google/Github instead of password
+                        return null;
+                    }
 
-                    const passwordsMatch = await bcrypt.compare(password, user.password);
+                    const passwordsMatch = await bcrypt.compare(password, user.password as string);
                     if (passwordsMatch) return user;
                 }
 

@@ -1,5 +1,6 @@
 import { inngest } from "./client";
 import { supabaseAdmin } from "../supabase-admin";
+import { resend } from "../resend";
 
 export const helloWorld = inngest.createFunction(
     { id: "hello-world" },
@@ -28,5 +29,50 @@ export const helloWorld = inngest.createFunction(
         }
 
         return result;
+    }
+);
+
+export const sendWelcomeEmail = inngest.createFunction(
+    { id: "send-welcome-email" },
+    { event: "user/signup" },
+    async ({ event, step }) => {
+        const { email, name } = event.data;
+
+        await step.run("send-email-via-resend", async () => {
+            try {
+                // If RESEND_API_KEY is not set or a dummy key is used, just mock the sending for local dev
+                if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY.startsWith('re_dummy')) {
+                    console.log(`[MOCK EMAIL] To: ${email}, Subject: Welcome to EduGuide AI, ${name}!`);
+                    return { simulated: true, email };
+                }
+
+                const { data, error } = await resend.emails.send({
+                    from: 'EduGuide AI <onboarding@eduguide.ai>', // Make sure this domain is verified in your Resend dashboard
+                    to: [email],
+                    subject: `Welcome to EduGuide AI, ${name}!`,
+                    html: `
+                        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+                            <h2>Welcome to EduGuide AI, ${name}!</h2>
+                            <p>We are thrilled to have you onboard.</p>
+                            <p>Your journey to a personalized curriculum begins now. If you haven't already, please complete your onboarding assessment so we can tailor the best experience for you.</p>
+                            <br/>
+                            <p>Cheers,</p>
+                            <p><strong>The EduGuide AI Team</strong></p>
+                        </div>
+                    `,
+                });
+
+                if (error) {
+                    throw new Error(error.message);
+                }
+
+                return data;
+            } catch (error) {
+                console.error("Failed to send welcome email:", error);
+                throw error;
+            }
+        });
+
+        return { success: true, user: email };
     }
 );
