@@ -1,4 +1,4 @@
-import { genAI } from "@/lib/gemini"
+import { openai } from "@/lib/openai"
 import { onboardingSchema } from "@/lib/schemas"
 import { cache } from "@/lib/cache"
 import { rateLimit, aiRateLimiter } from "@/lib/rate-limit"
@@ -43,8 +43,6 @@ export async function POST(req: Request) {
     const roadmap = await cache.getOrSet(
       cacheKey,
       async () => {
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" })
-
         const prompt = `
       You are an elite Academic Curriculum Designer.
       Create a rigorous, structured syllabus for a university-level course.
@@ -58,7 +56,7 @@ export async function POST(req: Request) {
       - Strengths: ${data.strengths || 'Not specified'}
       - Weaknesses: ${data.weaknesses || 'Not specified'}
 
-      Return a JSON object with this EXACT structure (do not use Markdown code blocks, just raw JSON):
+      Return a JSON object with this EXACT structure:
       {
         "title": "Course Title (e.g. Advanced Molecular Biology)",
         "phases": [
@@ -82,14 +80,12 @@ export async function POST(req: Request) {
       Create exactly 3 phases with 3-4 modules each. Focus on depth, academic rigor, and personalize it to the user's background, strengths, and weaknesses if provided. Include realistic estimated times for each module.
     `
 
-        const result = await model.generateContent({
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
-          generationConfig: {
-            responseMimeType: "application/json",
-          }
+        const completion = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [{ role: "system", content: "You are a helpful curriculum designer that outputs JSON." }, { role: "user", content: prompt }],
+          response_format: { type: "json_object" }
         })
-        const response = await result.response
-        const text = response.text()
+        const text = completion.choices[0].message.content || ""
 
         const jsonString = text.replace(/```json/g, '').replace(/```/g, '').trim()
 

@@ -1,4 +1,4 @@
-import { genAI } from "@/lib/gemini"
+import { openai } from "@/lib/openai"
 import { cache } from "@/lib/cache"
 import { rateLimit, aiRateLimiter } from "@/lib/rate-limit"
 import { NextResponse } from "next/server"
@@ -41,8 +41,6 @@ export async function POST(req: Request) {
     const data = await cache.getOrSet(
       cacheKey,
       async () => {
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" })
-
         const prompt = `
           You are an expert examiner. Create a 5-question multiple-choice quiz about: ${topic}.
           Target Audience Level: ${skillLevel}.
@@ -60,14 +58,12 @@ export async function POST(req: Request) {
           }
         `
 
-        const result = await model.generateContent({
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
-          generationConfig: {
-            responseMimeType: "application/json",
-          }
+        const completion = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [{ role: "system", content: "You are an expert examiner that outputs JSON." }, { role: "user", content: prompt }],
+          response_format: { type: "json_object" }
         })
-        const response = await result.response
-        const text = response.text()
+        const text = completion.choices[0].message.content || ""
 
         // Clean potentially markdown blocks
         const jsonString = text.replace(/```json/g, '').replace(/```/g, '').trim()
