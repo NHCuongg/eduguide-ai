@@ -40,7 +40,6 @@ export default function StudyPlan() {
     const [sortBy, setSortBy] = useState<SortOption>('default')
     const [showFilters, setShowFilters] = useState(false)
 
-    // Flatten phases to get a list of "Sessions"
     const allSessions = useMemo(() => {
         const sessions = roadmap?.phases?.flatMap((phase, phaseIdx: number) =>
             phase.modules?.map((module, modIdx: number) => ({
@@ -53,7 +52,6 @@ export default function StudyPlan() {
             })) || []
         ) || []
 
-        // Filter by search query
         let filtered = sessions
         if (searchQuery.trim()) {
             filtered = sessions.filter(session =>
@@ -63,13 +61,11 @@ export default function StudyPlan() {
             )
         }
 
-        // Filter by tab
         if (activeTab === 'today') {
-            // Show only incomplete sessions for today
+            
             filtered = filtered.filter(s => !s.isCompleted).slice(0, 6)
         }
 
-        // Sort
         if (sortBy === 'phase') {
             filtered = [...filtered].sort((a, b) => a.phaseIdx - b.phaseIdx)
         } else if (sortBy === 'completed') {
@@ -82,22 +78,20 @@ export default function StudyPlan() {
         return filtered
     }, [roadmap, completedModules, searchQuery, activeTab, sortBy])
 
-    // Calculate progress
     const totalSessions = roadmap?.phases?.reduce((acc, phase) => acc + (phase.modules?.length || 0), 0) || 0
     const completedCount = completedModules.length
     const progressPercentage = totalSessions > 0 ? Math.round((completedCount / totalSessions) * 100) : 0
 
-    // Find current/next session
     const currentSession = allSessions.find(s => !s.isCompleted) || allSessions[0]
 
     const handleSessionClick = (sessionId: string) => {
         setActiveModule(sessionId)
-        // In a real app, navigate to the module detail page
+        
     }
 
     return (
         <div className="flex-1 bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 relative">
-            {/* Header Section */}
+            {}
             <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 px-6 md:px-8 py-6 sticky top-0 z-30 transition-all duration-300 shadow-sm">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                     <div className="flex-1">
@@ -132,7 +126,7 @@ export default function StudyPlan() {
                     </div>
                 </div>
 
-                {/* Progress Bar */}
+                {}
                 {roadmap && totalSessions > 0 && (
                     <div className="mb-6">
                         <div className="flex items-center justify-between mb-2">
@@ -154,7 +148,7 @@ export default function StudyPlan() {
                     </div>
                 )}
 
-                {/* AI Briefing Card */}
+                {}
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -180,7 +174,7 @@ export default function StudyPlan() {
                     <div className="absolute bottom-0 left-0 w-40 h-40 bg-indigo-900/20 rounded-full blur-2xl translate-y-1/2 -translate-x-1/4" />
                 </motion.div>
 
-                {/* Search and Filters */}
+                {}
                 <div className="flex flex-col md:flex-row gap-3 mb-4">
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -238,7 +232,7 @@ export default function StudyPlan() {
                     </div>
                 </div>
 
-                {/* Filter Panel */}
+                {}
                 <AnimatePresence>
                     {showFilters && (
                         <motion.div
@@ -265,7 +259,7 @@ export default function StudyPlan() {
                     )}
                 </AnimatePresence>
 
-                {/* Interactive Tabs */}
+                {}
                 <div className="flex items-center justify-between">
                     <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
                         <button
@@ -294,7 +288,7 @@ export default function StudyPlan() {
                 </div>
             </div>
 
-            {/* Content */}
+            {}
             <div className="p-6 md:p-8 pb-32 overflow-y-auto h-[calc(100vh-280px)] scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700 scrollbar-track-transparent">
                 {allSessions.length === 0 ? (
                     <motion.div
@@ -368,7 +362,7 @@ export default function StudyPlan() {
                                                         : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-xl hover:shadow-indigo-500/10 hover:-translate-y-2"
                                             )}
                                         >
-                                            {/* Completion Badge */}
+                                            {}
                                             {session.isCompleted && (
                                                 <div className="absolute top-4 right-4">
                                                     <div className="p-2 rounded-xl bg-green-500 text-white shadow-lg">
@@ -377,7 +371,7 @@ export default function StudyPlan() {
                                                 </div>
                                             )}
 
-                                            {/* Active Indicator */}
+                                            {}
                                             {isCurrent && (
                                                 <span className="absolute top-4 right-4 flex h-4 w-4">
                                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>

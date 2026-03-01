@@ -22,7 +22,7 @@ export default function WorkspaceSidebar() {
 
     return (
         <div className="w-[260px] bg-[#0f172a] text-slate-300 flex flex-col h-[calc(100vh-60px)] border-r border-slate-800">
-            {/* User Profile Summary - Optional placement or top header */}
+            {}
             <div className="p-6">
                 <div className="flex items-center gap-3 mb-8">
                     <div className="h-10 w-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold text-lg">
@@ -69,14 +69,12 @@ export default function WorkspaceSidebar() {
                     variant="ghost"
                     className="w-full justify-start gap-3 text-red-400 hover:text-red-300 hover:bg-red-900/20 mt-2"
                     onClick={async () => {
-                        // 1. Clear Local Storage / Session Storage
+                        
                         localStorage.clear()
                         sessionStorage.clear()
 
-                        // 2. Reset Zustand Store (if persistent)
                         useWizardStore.getState().reset()
 
-                        // 3. NextAuth Sign Out & Redirect
                         await signOut({ callbackUrl: "/login" })
                     }}
                 >

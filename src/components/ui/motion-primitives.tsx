@@ -2,11 +2,9 @@
 
 import { motion } from 'framer-motion';
 
-// --- Default Animation Settings ---
 const defaultDuration = 0.5;
-const defaultEase: [number, number, number, number] = [0.25, 0.4, 0.25, 1]; // Cubic bezier for smooth motion
+const defaultEase: [number, number, number, number] = [0.25, 0.4, 0.25, 1]; 
 
-// --- Fade In Component ---
 export const FadeIn = ({
     children,
     delay = 0,
@@ -31,7 +29,6 @@ export const FadeIn = ({
     </motion.div>
 );
 
-// --- Slide In Component ---
 export const SlideIn = ({
     children,
     direction = 'left',
@@ -72,7 +69,6 @@ export const SlideIn = ({
     );
 };
 
-// --- Stagger Container ---
 export const StaggerContainer = ({
     children,
     delay = 0,
@@ -103,7 +99,6 @@ export const StaggerContainer = ({
     </motion.div>
 );
 
-// --- Stagger Item (Use inside StaggerContainer) ---
 export const StaggerItem = ({
     children,
     className = '',
@@ -123,7 +118,6 @@ export const StaggerItem = ({
     </motion.div>
 );
 
-// --- Hover Scale Effect ---
 export const HoverCard = ({
     children,
     className = '',

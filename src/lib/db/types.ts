@@ -1,4 +1,4 @@
-// Database types for Supabase tables
+
 
 export interface FlashcardRecord {
     id: string

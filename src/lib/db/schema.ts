@@ -2,8 +2,6 @@
 import { pgTable, text, timestamp, boolean, uuid, integer, jsonb, primaryKey } from "drizzle-orm/pg-core"
 import type { AdapterAccountType } from "next-auth/adapters"
 
-// --- Auth Tables (NextAuth Standard) ---
-
 export const users = pgTable("user", {
     id: text("id")
         .primaryKey()
@@ -61,13 +59,11 @@ export const verificationTokens = pgTable(
     })
 )
 
-// --- Application Tables ---
-
 export const profiles = pgTable("profile", {
     userId: text("userId").primaryKey().references(() => users.id, { onDelete: "cascade" }),
     targetSkill: text("target_skill"),
     currentLevel: text("current_level"),
-    onboardingData: jsonb("onboarding_data"), // Stores full wizard payload
+    onboardingData: jsonb("onboarding_data"), 
     streak: integer("streak").default(0),
     xp: integer("xp").default(0),
     lastActiveDate: timestamp("last_active_date", { mode: "date" }),
@@ -79,7 +75,7 @@ export const roadmaps = pgTable("roadmap", {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: text("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
     title: text("title").notNull(),
-    content: jsonb("content").notNull(), // Stores the detailed AI structure
+    content: jsonb("content").notNull(), 
     status: text("status", { enum: ["active", "completed", "archived"] }).default("active").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -88,7 +84,7 @@ export const roadmaps = pgTable("roadmap", {
 export const studyModules = pgTable("study_module", {
     id: uuid("id").defaultRandom().primaryKey(),
     roadmapId: uuid("roadmap_id").references(() => roadmaps.id, { onDelete: "cascade" }).notNull(),
-    moduleIndex: integer("module_index").notNull(), // To map back to the JSON array index
+    moduleIndex: integer("module_index").notNull(), 
     title: text("title").notNull(),
     isCompleted: boolean("is_completed").default(false).notNull(),
     completedAt: timestamp("completed_at"),

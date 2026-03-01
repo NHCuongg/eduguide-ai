@@ -10,7 +10,7 @@ export default function VideoSection() {
 
     return (
         <section className="py-24 bg-slate-50 dark:bg-slate-950 relative overflow-hidden transition-colors duration-500">
-            {/* Background decoration */}
+            {}
             <div className="absolute top-0 left-0 w-full h-full opacity-30 dark:opacity-10 pointer-events-none">
                 <div className="absolute top-20 right-20 w-64 h-64 bg-indigo-200 dark:bg-indigo-900 rounded-full blur-[80px]" />
                 <div className="absolute bottom-20 left-20 w-80 h-80 bg-pink-200 dark:bg-pink-900 rounded-full blur-[80px]" />
@@ -31,7 +31,7 @@ export default function VideoSection() {
                     >
                         {!isPlaying ? (
                             <>
-                                {/* Real Video Thumbnail */}
+                                {}
                                 <Image
                                     src="https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=1600&auto=format&fit=crop"
                                     alt="EduGuide Interface Demo"
@@ -67,7 +67,7 @@ export default function VideoSection() {
                         )}
                     </div>
 
-                    {/* Decorative background blur */}
+                    {}
                     <div className="absolute -inset-4 bg-indigo-600/20 rounded-[2.5rem] blur-2xl -z-10 group-hover:bg-indigo-600/30 transition-colors duration-500" />
                 </SectionWrapper>
             </div>

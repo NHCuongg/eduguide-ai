@@ -1,7 +1,7 @@
 'use server'
 
 import { db } from "@/lib/db"
-import { users } from "@/lib/db/schema"
+import { users, verificationTokens } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import bcrypt from "bcryptjs"
 import { signIn } from "@/auth"
@@ -13,51 +13,135 @@ export async function registerUser(formData: FormData) {
     const password = formData.get('password') as string | null
 
     if (!name || !email || !password) {
-        return { error: 'Missing required fields. Please fill out all fields.' }
+        return { error: 'Vui lòng điền đầy đủ các thông tin.' }
     }
 
     if (password.length < 6) {
-        return { error: 'Password must be at least 6 characters long.' }
+        return { error: 'Mật khẩu phải dài tối thiểu 6 ký tự.' }
     }
 
     try {
-        // 1. Check if user already exists
+        
         const existingUsers = await db.select().from(users).where(eq(users.email, email)).limit(1)
         if (existingUsers.length > 0) {
-            return { error: 'An account with this email already exists.' }
+            return { error: 'Địa chỉ email này đã được đăng ký.' }
         }
 
-        // 2. Hash password
         const hashedPassword = await bcrypt.hash(password, 10)
 
-        // 3. Insert new user into the database
         await db.insert(users).values({
             name,
             email,
             password: hashedPassword
         })
 
-        // 4. Trigger Welcome Email event via Inngest
         await inngest.send({
             name: "user/signup",
             data: { email, name }
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Failed to register user:', error)
-        return { error: 'Failed to create user account. Please try again later.' }
+        if (typeof error === 'object' && error !== null) {
+            const err = error as { code?: string, message?: string }
+            if (err.code === 'ECONNREFUSED' || err.message?.includes('ECONNREFUSED')) {
+                return { error: 'Không thể kết nối đến máy chủ CSDL. Vui lòng thử lại sau.' };
+            }
+        }
+        return { error: 'Đăng ký thất bại. Xin vui lòng thử lại sau.' }
     }
 
-    // Attempt to login the user automatically
     try {
         await signIn('credentials', { email, password, redirectTo: '/onboarding' })
         return { success: true }
-    } catch (authError: any) {
-        // NextJS redirects throw an error that must be re-thrown
-        if (authError.message === 'NEXT_REDIRECT') {
-            throw authError; // Allow the redirect to happen naturally
+    } catch (authError) {
+        
+        if (authError && typeof authError === 'object' && 'message' in authError && authError.message === 'NEXT_REDIRECT') {
+            throw authError; 
         }
         console.error("Auto-login error:", authError)
-        return { error: 'Account created, but failed to automatically log in. Please return to login page.' }
+        return { error: 'Bản ghi đã được tạo tuy nhiên tự động đăng nhập thất bại. Xin vui lòng quay lại trang Sign In.' }
+    }
+}
+
+export async function sendResetPasswordEmail(formData: FormData) {
+    const email = formData.get('email') as string | null
+
+    if (!email) {
+        return { error: 'Vui lòng cung cấp địa chỉ email.' }
+    }
+
+    try {
+        const existingUsers = await db.select().from(users).where(eq(users.email, email)).limit(1)
+
+        if (existingUsers.length === 0) {
+            return { error: 'Tài khoản không tồn tại trong hệ thống.' }
+        }
+
+        const token = crypto.randomUUID()
+        const expires = new Date(Date.now() + 3600 * 1000) 
+
+        await db.insert(verificationTokens).values({
+            identifier: email,
+            token,
+            expires
+        })
+
+        await inngest.send({
+            name: "user/password-reset",
+            data: { email, token }
+        })
+
+        return { success: true }
+    } catch (error: unknown) {
+        console.error('Failed to process forgot password:', error)
+        if (typeof error === 'object' && error !== null) {
+            const err = error as { code?: string, message?: string }
+            if (err.code === 'ECONNREFUSED' || err.message?.includes('ECONNREFUSED')) {
+                return { error: 'Không thể kết nối đến máy chủ CSDL. Vui lòng thử lại sau.' };
+            }
+        }
+        return { error: 'Không thể gửi yêu cầu lúc này. Xin vui lòng thử lại sau.' }
+    }
+}
+
+export async function resetPassword(formData: FormData) {
+    const token = formData.get('token') as string | null
+    const newPassword = formData.get('password') as string | null
+
+    if (!token || !newPassword) {
+        return { error: 'Vui lòng cung cấp đầy đủ thông tin.' }
+    }
+
+    if (newPassword.length < 6) {
+        return { error: 'Mật khẩu phải dài tối thiểu 6 ký tự.' }
+    }
+
+    try {
+        
+        const vt = await db.select().from(verificationTokens).where(eq(verificationTokens.token, token)).limit(1)
+
+        if (vt.length === 0) {
+            return { error: 'Liên kết không hợp lệ.' }
+        }
+
+        const verificationToken = vt[0]
+
+        if (new Date() > verificationToken.expires) {
+            return { error: 'Liên kết khôi phục đã hết hạn.' }
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10)
+
+        await db.update(users)
+            .set({ password: hashedPassword })
+            .where(eq(users.email, verificationToken.identifier))
+
+        await db.delete(verificationTokens).where(eq(verificationTokens.token, token))
+
+        return { success: true }
+    } catch (error: unknown) {
+        console.error('Failed to reset password:', error)
+        return { error: 'Không thể đặt lại mật khẩu. Vui lòng thử lại sau.' }
     }
 }

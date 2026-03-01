@@ -8,10 +8,9 @@ import { Briefcase, GraduationCap, Laptop, Sparkles, Trophy } from "lucide-react
 export default function StepGoals() {
     const { data, setData, nextStep, prevStep } = useWizardStore()
 
-    // Auto-advance if already selected? Maybe not, better to confirm.
     const handleSelect = (goal: any) => {
         setData({ primaryGoal: goal })
-        // Could auto-next here if desired
+
     }
 
     const goals = [
@@ -30,7 +29,7 @@ export default function StepGoals() {
             className="space-y-8"
         >
             <div className="space-y-2 text-center">
-                <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">What's your main goal?</h2>
+                <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">What&apos;s your main goal?</h2>
                 <p className="text-slate-500 dark:text-slate-400">Understanding your motivation helps us tailor the pace.</p>
             </div>
 

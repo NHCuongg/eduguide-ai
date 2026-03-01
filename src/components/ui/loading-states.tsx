@@ -1,4 +1,4 @@
-// Loading state components for better UX
+
 import { Skeleton } from "./skeleton"
 import { Loader2 } from "lucide-react"
 

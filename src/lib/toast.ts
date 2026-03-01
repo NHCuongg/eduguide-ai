@@ -1,4 +1,4 @@
-// Toast utility functions using sonner
+
 import { toast } from 'sonner'
 
 export const showToast = {

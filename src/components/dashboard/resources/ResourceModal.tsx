@@ -15,13 +15,12 @@ import { useGamificationStore } from "@/lib/useGamificationStore"
 export function ResourceModal({ moduleTitle }: { moduleTitle: string }) {
     const { addXP } = useGamificationStore()
 
-    // Smart Search Links
     const youtubeSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(moduleTitle + " tutorial")}`
     const googleScholarUrl = `https://scholar.google.com/scholar?q=${encodeURIComponent(moduleTitle)}`
     const mediumUrl = `https://medium.com/search?q=${encodeURIComponent(moduleTitle)}`
 
     const handleResourceClick = () => {
-        addXP(5) // Small reward for exploring resources
+        addXP(5) 
     }
 
     return (
@@ -40,7 +39,7 @@ export function ResourceModal({ moduleTitle }: { moduleTitle: string }) {
                 </DialogHeader>
 
                 <div className="grid gap-4 py-4">
-                    {/* 1. YouTube */}
+                    {}
                     <a href={youtubeSearchUrl} onClick={handleResourceClick} target="_blank" rel="noreferrer" className="group flex items-center gap-4 p-4 rounded-xl border hover:border-red-200 hover:bg-red-50 transition-all cursor-pointer">
                         <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                             <Youtube className="w-6 h-6 text-red-600" />
@@ -52,7 +51,7 @@ export function ResourceModal({ moduleTitle }: { moduleTitle: string }) {
                         <ExternalLink className="w-4 h-4 text-slate-300 group-hover:text-red-400" />
                     </a>
 
-                    {/* 2. Google Scholar */}
+                    {}
                     <a href={googleScholarUrl} target="_blank" rel="noreferrer" className="group flex items-center gap-4 p-4 rounded-xl border hover:border-blue-200 hover:bg-blue-50 transition-all cursor-pointer">
                         <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                             <BookOpen className="w-6 h-6 text-blue-600" />
@@ -64,7 +63,7 @@ export function ResourceModal({ moduleTitle }: { moduleTitle: string }) {
                         <ExternalLink className="w-4 h-4 text-slate-300 group-hover:text-blue-400" />
                     </a>
 
-                    {/* 3. Medium/Blogs */}
+                    {}
                     <a href={mediumUrl} target="_blank" rel="noreferrer" className="group flex items-center gap-4 p-4 rounded-xl border hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
                         <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                             <Video className="w-6 h-6 text-slate-600" />

@@ -35,7 +35,7 @@ const faqs = [
 export default function FAQSection() {
     return (
         <section className="py-32 bg-slate-50 dark:bg-slate-950 relative overflow-hidden transition-colors duration-500">
-            {/* Background Gradients */}
+            {}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl opacity-40 dark:opacity-20 pointer-events-none">
                 <div className="absolute top-20 left-0 w-96 h-96 bg-indigo-200 dark:bg-indigo-900 rounded-full blur-[100px]" />
                 <div className="absolute bottom-20 right-0 w-96 h-96 bg-purple-200 dark:bg-purple-900 rounded-full blur-[100px]" />

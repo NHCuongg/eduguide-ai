@@ -9,12 +9,12 @@ import Link from "next/link"
 export default function PrivacySection() {
     return (
         <section className="py-24 bg-slate-50 dark:bg-slate-950 relative overflow-hidden transition-colors duration-500">
-            {/* Background Decoration (Subtle) */}
+            {}
             <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-white/50 dark:bg-slate-900/50 blur-3xl opacity-50" />
             </div>
 
-            {/* Floating Background Icons */}
+            {}
             <div className="absolute inset-0 pointer-events-none">
                 <motion.div
                     animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }}
@@ -29,7 +29,7 @@ export default function PrivacySection() {
                 <SectionWrapper>
                     <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 md:p-16 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-12 relative overflow-hidden transition-colors duration-500">
 
-                        {/* Subtle Shield Background Decoration inside card */}
+                        {}
                         <div className="absolute -top-10 -right-10 text-slate-50 dark:text-slate-800 opacity-50 pointer-events-none">
                             <Shield className="w-64 h-64 fill-slate-50 dark:fill-slate-800" />
                         </div>

@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge"
 import { addDays, format, isSameDay } from "date-fns"
 import { Calendar as CalendarIcon, Clock } from "lucide-react"
 
-// Mock schedule data - In a real app, this would come from the store/backend
 const mockSchedule = [
     { date: new Date(), title: "Intro to Astrophysics", type: "Module" },
     { date: addDays(new Date(), 2), title: "Calculus Review", type: "Practice" },

@@ -25,7 +25,7 @@ export function Flashcard({ front, back, isFlipped, onClick }: FlashcardProps) {
                 style={{ transformStyle: 'preserve-3d' }}
                 whileHover={{ scale: 1.02 }}
             >
-                {/* Front */}
+                {}
                 <div className={cn(
                     "absolute inset-0 w-full h-full backface-hidden rounded-3xl shadow-2xl border-2 border-slate-200 dark:border-slate-700 bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 flex flex-col items-center justify-center p-8 text-center group-hover:shadow-indigo-500/20 transition-shadow duration-300",
                 )}
@@ -45,7 +45,7 @@ export function Flashcard({ front, back, isFlipped, onClick }: FlashcardProps) {
                     </div>
                 </div>
 
-                {/* Back */}
+                {}
                 <div className={cn(
                     "absolute inset-0 w-full h-full backface-hidden rounded-3xl shadow-2xl border-2 border-indigo-300 dark:border-indigo-700 bg-gradient-to-br from-indigo-50 via-violet-50 to-purple-50 dark:from-indigo-950/50 dark:via-violet-950/50 dark:to-purple-950/50 flex flex-col items-center justify-center p-8 text-center group-hover:shadow-indigo-500/30 transition-shadow duration-300",
                 )}

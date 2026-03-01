@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Trophy, AlertCircle, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
-// Removed unused imports
+
 import { useGamificationStore } from "@/lib/useGamificationStore"
 import { showToast } from "@/lib/toast"
 

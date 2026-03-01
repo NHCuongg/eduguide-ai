@@ -15,7 +15,6 @@ export default function Roadmap() {
         )
     }
 
-    // Find first incomplete module for "Today's Mission"
     let missionModule = null
     let missionPhaseIndex = 0
 
@@ -23,7 +22,7 @@ export default function Roadmap() {
         const phase = roadmap.phases[i]
         for (let j = 0; j < phase.modules.length; j++) {
             const mod = phase.modules[j]
-            const id = `${i}-${j}` // Simple ID generation
+            const id = `${i}-${j}` 
             if (!completedModules.includes(id)) {
                 missionModule = mod
                 missionPhaseIndex = i + 1

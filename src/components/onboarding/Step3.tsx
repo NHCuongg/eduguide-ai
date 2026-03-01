@@ -34,7 +34,7 @@ export default function Step3() {
 
             // 2. Save Profile + Roadmap to Database via Server Action
             // Remove full interests/fields from being strictly typed to fit partial schema, or pass as is
-            const saveResult = await saveOnboardingData(data as any, roadmapData)
+            const saveResult = await saveOnboardingData(data as Parameters<typeof saveOnboardingData>[0], roadmapData)
 
             if (!saveResult.success) {
                 throw new Error(saveResult.error || 'Failed to sync with database')
@@ -43,9 +43,9 @@ export default function Step3() {
             // 3. Update local store and redirect
             setRoadmap(roadmapData)
             router.push('/dashboard')
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.error("Submission error:", e)
-            setError(e.message || "An unexpected error occurred.")
+            setError(e instanceof Error ? e.message : "An unexpected error occurred.")
         } finally {
             setIsLoading(false)
         }
@@ -60,7 +60,7 @@ export default function Step3() {
         >
             <div className="space-y-2 text-center">
                 <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Confirm Plan</h2>
-                <p className="text-slate-500 dark:text-slate-400">verify your academic profile.</p>
+                <p className="text-slate-500 dark:text-slate-400">Verify your academic profile.</p>
             </div>
 
             {/* Receipt Ticket Card */}

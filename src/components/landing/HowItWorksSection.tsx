@@ -1,4 +1,4 @@
-// ... imports
+
 import { useState, useEffect } from "react"
 import { MousePointerClick, FileText, Wand2, Globe, Sparkles, Search, Download } from "lucide-react"
 import SectionWrapper from "./SectionWrapper"
@@ -101,12 +101,12 @@ export default function HowItWorksSection() {
                 </SectionWrapper>
 
                 <div className="grid lg:grid-cols-2 gap-16 items-center">
-                    {/* Left Side: Stepper */}
+                    {}
                     <div className="space-y-8 relative">
-                        {/* Connecting Line - Dynamic Height based on steps being a fixed list implies we can just have a full line behind */}
+                        {}
                         <div className="absolute left-[27px] top-4 bottom-12 w-0.5 bg-slate-100 dark:bg-slate-800 -z-10" />
 
-                        {/* Progress Line (Animated) - Optional complexity, skipping for simplicity to avoid height calc issues */}
+                        {}
 
                         {steps.map((step, i) => (
                             <div
@@ -151,7 +151,7 @@ export default function HowItWorksSection() {
                         ))}
                     </div>
 
-                    {/* Right Side: Visuals */}
+                    {}
                     <div className="relative aspect-square w-full max-w-lg mx-auto bg-slate-50 dark:bg-slate-800 rounded-3xl border-4 border-slate-100 dark:border-slate-700 p-8 flex items-center justify-center overflow-hidden">
                         <AnimatePresence mode="wait">
                             <motion.div
@@ -166,7 +166,7 @@ export default function HowItWorksSection() {
                             </motion.div>
                         </AnimatePresence>
 
-                        {/* Decorative Blob */}
+                        {}
                         <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl" />
                         <div className="absolute -top-20 -left-20 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl" />
                     </div>

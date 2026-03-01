@@ -1,28 +1,23 @@
 import { z } from 'zod'
 
-// Environment variables schema
 const envSchema = z.object({
-    // Next.js
+    
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 
-    // NextAuth
     AUTH_SECRET: z.string().min(1, 'AUTH_SECRET is required'),
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
     GITHUB_CLIENT_ID: z.string().optional(),
     GITHUB_CLIENT_SECRET: z.string().optional(),
 
-    // Supabase
     NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional().or(z.literal('')),
     NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().optional().or(z.literal('')),
 
-    // AI APIs
     OPENAI_API_KEY: z.string().optional(),
     GEMINI_API_KEY: z.string().optional(),
     GOOGLE_API_KEY: z.string().optional(),
 })
 
-// Parse and validate environment variables
 function getEnv() {
     try {
         return envSchema.parse({

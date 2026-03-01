@@ -8,7 +8,7 @@ export default function MyCoursesPage() {
         <div className="flex-1 bg-slate-50/50 p-8 overflow-y-auto">
             <h1 className="font-serif text-3xl font-bold text-slate-900 mb-8">My Courses</h1>
 
-            {/* Resume Section */}
+            {}
             <div className="mb-12">
                 <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Continue Learning</h2>
                 <div className="bg-white rounded-2xl border border-slate-200 p-6 flex items-start gap-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer group">
@@ -27,7 +27,7 @@ export default function MyCoursesPage() {
                         <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-indigo-600 transition-colors">Advanced AI Engineering</h3>
                         <p className="text-slate-500 text-sm mb-4 line-clamp-2">Mastering Transformers, Large Language Models, and deploying scalable AI architectures.</p>
 
-                        {/* Progress Bar */}
+                        {}
                         <div className="space-y-2">
                             <div className="flex justify-between text-xs font-bold text-slate-500">
                                 <span>Progress</span>
@@ -41,17 +41,17 @@ export default function MyCoursesPage() {
                 </div>
             </div>
 
-            {/* Explore Section */}
+            {}
             <div className="mb-8 flex items-center justify-between">
                 <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider">Explore More</h2>
                 <Button variant="link" className="text-indigo-600 font-bold text-sm">Browse Catalog</Button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {/* Card 1 */}
+                {}
                 <div className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer flex flex-col">
                     <div className="h-44 bg-slate-100 relative overflow-hidden">
-                        {/* Mock Image using Gradient/Pattern */}
+                        {}
                         <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-indigo-700 opacity-90 group-hover:scale-105 transition-transform duration-500" />
                         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20 mixed-blend-overlay" />
 
@@ -77,7 +77,7 @@ export default function MyCoursesPage() {
                     </div>
                 </div>
 
-                {/* Card 2 */}
+                {}
                 <div className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer flex flex-col">
                     <div className="h-44 bg-slate-100 relative overflow-hidden">
                         <div className="absolute inset-0 bg-gradient-to-br from-teal-500 to-emerald-600 opacity-90 group-hover:scale-105 transition-transform duration-500" />

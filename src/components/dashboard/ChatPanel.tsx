@@ -34,20 +34,17 @@ export default function ChatPanel() {
     const [isTyping, setIsTyping] = useState(false)
     const scrollRef = useRef<HTMLDivElement>(null)
 
-    // Context Awareness Logic
     const currentContext = activeModuleId ? (() => {
         const [p, m] = activeModuleId.split('-').map(Number)
         return roadmap?.phases[p]?.modules[m]?.title || "General"
     })() : "General"
 
-    // Auto-scroll to bottom
     useEffect(() => {
         if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight
         }
     }, [messages])
 
-    // Proactive Suggestions based on Context
     const suggestions = [
         { label: "Summerize this lesson", icon: BookOpen, prompt: `Can you summarize the key takeaways from ${currentContext}?` },
         { label: "Create a micro-quiz", icon: BrainCircuit, prompt: `Generate 3 multiple-choice questions about ${currentContext} to test my understanding.` },
@@ -57,12 +54,10 @@ export default function ChatPanel() {
     const handleSendMessage = async (text: string) => {
         if (!text.trim()) return
 
-        // 1. Add User Message
         setMessages(prev => [...prev, { role: 'user', content: text }])
         setInputValue("")
         setIsTyping(true)
 
-        // 2. Simulate AI Thinking & Response (Mock API Call)
         setTimeout(() => {
             setIsTyping(false)
             setMessages(prev => [...prev, {
@@ -74,7 +69,7 @@ export default function ChatPanel() {
 
     return (
         <div className="w-96 border-l-2 border-slate-200 dark:border-slate-800 bg-gradient-to-b from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-800/50 h-[calc(100vh-60px)] flex flex-col shadow-2xl z-20">
-            {/* Header: The Persona */}
+            {}
             <div className="p-5 border-b-2 border-slate-100 dark:border-slate-800 bg-gradient-to-r from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-800/50 flex items-center justify-between sticky top-0 z-10 backdrop-blur-sm">
                 <div className="flex items-center gap-3">
                     <div className="relative">
@@ -93,7 +88,7 @@ export default function ChatPanel() {
                 </Button>
             </div>
 
-            {/* Chat Area */}
+            {}
             <div className="flex-1 overflow-y-auto bg-slate-50/30 dark:bg-slate-900/30 p-5 space-y-4" ref={scrollRef}>
                 {messages.map((msg, i) => (
                     <motion.div
@@ -139,7 +134,7 @@ export default function ChatPanel() {
                 )}
             </div>
 
-            {/* Proactive Suggestions (Context Aware) */}
+            {}
             <div className="px-5 py-3 bg-gradient-to-r from-slate-50/80 to-white dark:from-slate-800/50 dark:to-slate-900/50 border-t border-slate-100 dark:border-slate-800">
                 <p className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 mb-2.5 tracking-wider pl-1">Suggested Actions</p>
                 <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
@@ -156,7 +151,7 @@ export default function ChatPanel() {
                 </div>
             </div>
 
-            {/* Input Area */}
+            {}
             <div className="p-5 bg-gradient-to-r from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-800/50 border-t-2 border-slate-100 dark:border-slate-800">
                 <form
                     className="relative flex items-center"

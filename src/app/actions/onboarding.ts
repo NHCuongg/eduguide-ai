@@ -15,7 +15,6 @@ export async function saveOnboardingData(onboardingData: OnboardingData, roadmap
 
         const userId = session.user.id
 
-        // 1. Upsert Profile Data
         await db.insert(profiles).values({
             userId,
             targetSkill: onboardingData.targetSkill,
@@ -31,12 +30,10 @@ export async function saveOnboardingData(onboardingData: OnboardingData, roadmap
             }
         })
 
-        // 2. Insert Roadmap
-        // Note: Drizzle's `.insert` with RETURNING gets the auto-generated ID
         const [insertedRoadmap] = await db.insert(roadmaps).values({
             userId,
             title: roadmapData.title,
-            content: roadmapData, // Full JSON for easy retrieval of phases
+            content: roadmapData, 
             status: "active"
         }).returning({ id: roadmaps.id })
 
@@ -46,8 +43,6 @@ export async function saveOnboardingData(onboardingData: OnboardingData, roadmap
 
         const newRoadmapId = insertedRoadmap.id
 
-        // 3. Insert Study Modules sequentially
-        // Flatten the phases and modules to insert into the studyModules table
         const modulesToInsert = []
         let globalModuleIndex = 0
 

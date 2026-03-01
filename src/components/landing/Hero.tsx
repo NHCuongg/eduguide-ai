@@ -21,13 +21,13 @@ export default function Hero() {
 
     return (
         <section className="relative overflow-hidden bg-white dark:bg-zinc-950 pt-32 pb-40 lg:pt-48 lg:pb-48 transition-colors duration-500">
-            {/* Animated Modern Grid Background */}
+            {}
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
 
-            {/* Dynamic Particles */}
+            {}
             <HeroParticles />
 
-            {/* Glowing Orbs - Softer & Slower */}
+            {}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                 <motion.div
                     animate={{ x: [0, 50, 0], y: [0, -30, 0], opacity: [0.3, 0.5, 0.3] }}
@@ -43,7 +43,7 @@ export default function Hero() {
 
             <div className="container mx-auto px-6 relative z-10">
                 <div className="max-w-5xl mx-auto text-center space-y-8">
-                    {/* Badge */}
+                    {}
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -57,7 +57,7 @@ export default function Hero() {
                         </div>
                     </motion.div>
 
-                    {/* Headline */}
+                    {}
                     <motion.h1
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -80,7 +80,7 @@ export default function Hero() {
                         <span>Curriculum</span>
                     </motion.h1>
 
-                    {/* Description */}
+                    {}
                     <motion.p
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -91,7 +91,7 @@ export default function Hero() {
                         Master any subject with a structure adapted to your unique profile.
                     </motion.p>
 
-                    {/* CTA Buttons */}
+                    {}
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -111,7 +111,7 @@ export default function Hero() {
                         </Link>
                     </motion.div>
 
-                    {/* Floating Icons/Elements for depth */}
+                    {}
                     <div className="hidden lg:block absolute top-1/2 -left-12 -translate-y-1/2 w-24 h-24 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl rotate-12 flex items-center justify-center animate-float" style={{ animationDelay: '0s' }}>
                         <Brain className="w-10 h-10 text-indigo-500" />
                     </div>
@@ -125,7 +125,7 @@ export default function Hero() {
                 </div>
             </div>
 
-            {/* Scroll Indicator */}
+            {}
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

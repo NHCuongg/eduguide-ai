@@ -106,10 +106,10 @@ function BentoCard({ feature }: { feature: Feature }) {
                 </p>
             </div>
 
-            {/* Hover Gradient Effect */}
+            {}
             <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-indigo-50/50 dark:to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-            {/* Decorative Patterns */}
+            {}
             <div className="absolute -right-8 -bottom-8 opacity-[0.03] dark:opacity-[0.05] pointer-events-none group-hover:scale-110 transition-transform duration-700">
                 <feature.icon className="w-40 h-40" />
             </div>

@@ -26,8 +26,6 @@ export function useJobStatus(jobId: string | null): UseJobStatusResult {
 
         setStatus("pending");
 
-        // Lắng nghe qua Supabase Broadcast / Postgres Changes
-        // Ở ví dụ này, mình giả định backend phát broadcast event vào room 'jobs'
         const channel = supabase.channel(`job_${jobId}`)
             .on(
                 'broadcast',

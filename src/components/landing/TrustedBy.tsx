@@ -10,7 +10,7 @@ const universities = [
 export default function TrustedBy() {
     return (
         <section className="bg-white dark:bg-zinc-950 border-y border-zinc-100 dark:border-zinc-900 py-16 overflow-hidden relative">
-            {/* Fade Edges */}
+            {}
             <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-white dark:from-zinc-950 to-transparent z-10" />
             <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-white dark:from-zinc-950 to-transparent z-10" />
 
@@ -36,7 +36,7 @@ export default function TrustedBy() {
                             {uni}
                         </div>
                     ))}
-                    {/* Duplicate for seamless loop */}
+                    {}
                     {universities.map((uni, i) => (
                         <div key={`dup-${i}`} className="text-3xl md:text-4xl font-serif font-black text-zinc-200 dark:text-zinc-800 select-none hover:text-indigo-200 dark:hover:text-indigo-900 transition-colors cursor-default">
                             {uni}

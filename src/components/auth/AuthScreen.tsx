@@ -1,16 +1,16 @@
 'use client'
 
 import { authenticate } from "@/lib/actions"
-import { registerUser } from "@/app/actions/auth"
+import { registerUser, sendResetPasswordEmail } from "@/app/actions/auth"
 import { useActionState, useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowLeft, Loader2, Sparkles, AlertCircle } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { AlertCircle, ArrowLeft, Loader2, Sparkles } from "lucide-react"
 import HeroParticles from "@/components/landing/HeroParticles"
+import { showToast } from "@/lib/toast"
 
 const TESTIMONIALS = [
     {
@@ -52,9 +52,8 @@ const FEATURES = [
     }
 ]
 
-export default function AuthScreen({ initialMode }: { initialMode: 'login' | 'register' }) {
-    const router = useRouter()
-    const [mode, setMode] = useState<'login' | 'register'>(initialMode)
+export default function AuthScreen({ initialMode }: { initialMode: 'login' | 'register' | 'forgot-password' }) {
+    const [mode, setMode] = useState<'login' | 'register' | 'forgot-password'>(initialMode)
     const [activeIndex, setActiveIndex] = useState(0)
 
     useEffect(() => {
@@ -67,10 +66,16 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
     const activeTestimonial = TESTIMONIALS[activeIndex % TESTIMONIALS.length]
     const activeFeature = FEATURES[activeIndex % FEATURES.length]
 
-    // --- Login State ---
-    const [loginErrorMessage, loginDispatch, isLoginPending] = useActionState(authenticate, undefined)
+    const [loginErrorMessage, loginDispatch, isLoginPending] = useActionState(async (prevState: string | undefined, formData: FormData) => {
+        const err = await authenticate(prevState, formData);
+        if (err) {
+            showToast.error("Đăng nhập thất bại", err);
+        } else {
+            showToast.success("Đăng nhập thành công!", "Vào Workspace...");
+        }
+        return err;
+    }, undefined)
 
-    // --- Register State ---
     const [isRegisterPending, setIsRegisterPending] = useState(false)
     const [registerErrorMessage, setRegisterErrorMessage] = useState("")
 
@@ -84,6 +89,9 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
             const result = await registerUser(formData)
             if (result?.error) {
                 setRegisterErrorMessage(result.error)
+                showToast.error("Đăng ký không thành công", result.error)
+            } else if (result?.success) {
+                showToast.success("Tạo tài khoản thành công!", "Đang chuyển hướng...")
             }
         } catch (error) {
             console.error("Registration error:", error)
@@ -92,14 +100,37 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
         }
     }
 
-    // --- Transition Function ---
-    const switchMode = (newMode: 'login' | 'register') => {
+    const [isForgotPasswordPending, setIsForgotPasswordPending] = useState(false)
+    const [forgotPasswordErrorMessage, setForgotPasswordErrorMessage] = useState("")
+
+    const handleForgotPasswordSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        setIsForgotPasswordPending(true)
+        setForgotPasswordErrorMessage("")
+
+        try {
+            const formData = new FormData(e.currentTarget)
+            const result = await sendResetPasswordEmail(formData)
+            if (result?.error) {
+                setForgotPasswordErrorMessage(result.error)
+                showToast.error("Gửi yêu cầu thất bại", result.error)
+            } else if (result?.success) {
+                showToast.success("Đã gửi email khôi phục!", "Vui lòng kiểm tra hộp thư của bạn.")
+                setTimeout(() => switchMode('login'), 2000)
+            }
+        } catch (error) {
+            console.error("Forgot password error:", error)
+        } finally {
+            setIsForgotPasswordPending(false)
+        }
+    }
+
+    const switchMode = (newMode: 'login' | 'register' | 'forgot-password') => {
         setMode(newMode)
-        // Shallow routing: changes the URL without triggering a page reload or Next.js layout transition
+        
         window.history.pushState(null, '', `/${newMode}`)
     }
 
-    // --- Animation Variants ---
     const contentVariants = {
         login: { opacity: 1, x: 0 },
         register: { opacity: 1, x: 0 },
@@ -115,11 +146,11 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
         exit: { opacity: 0, y: -10 },
     }
 
-    const isPending = isLoginPending || isRegisterPending
+    const isPending = isLoginPending || isRegisterPending || isForgotPasswordPending
 
     return (
         <div className="w-full min-h-screen grid lg:grid-cols-2 bg-white dark:bg-slate-950 overflow-hidden">
-            {/* Left Side: Visual/Brand */}
+            {}
             <div className="hidden lg:flex relative bg-slate-900 text-white flex-col justify-between p-12 overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-indigo-900/40 via-slate-900 to-slate-950 pointer-events-none" />
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none" />
@@ -184,13 +215,13 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
                 </div>
             </div>
 
-            {/* Right Side: Form Container */}
+            {}
             <div className="relative flex items-center justify-center p-8 transition-colors duration-500 overflow-y-auto bg-slate-50 dark:bg-slate-950/50">
                 <div className="absolute inset-0 block opacity-50 pointer-events-none">
                     <HeroParticles />
                 </div>
 
-                {/* Subtle Glow behind the form */}
+                {}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-500/5 dark:bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none" />
 
                 <Link href="/" className="absolute top-8 left-8 lg:hidden mt-2 ml-2 z-50">
@@ -211,7 +242,7 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
                                     Don&apos;t have an account? Sign up
                                 </Button>
                             </motion.div>
-                        ) : (
+                        ) : mode === 'register' ? (
                             <motion.div key="btn-register" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                                 <Button
                                     variant="ghost"
@@ -219,6 +250,16 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
                                     className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer"
                                 >
                                     Already have an account? Sign In
+                                </Button>
+                            </motion.div>
+                        ) : (
+                            <motion.div key="btn-forgot-password" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                                <Button
+                                    variant="ghost"
+                                    onClick={() => switchMode('login')}
+                                    className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer"
+                                >
+                                    Back to Sign In
                                 </Button>
                             </motion.div>
                         )}
@@ -271,7 +312,7 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
                                                 <div className="grid gap-2">
                                                     <div className="flex items-center justify-between">
                                                         <Label className="dark:text-slate-200 font-semibold text-slate-700 dark:text-slate-300" htmlFor="password-login">Password</Label>
-                                                        <Link href="#" className="text-xs text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 font-semibold transition-colors">Forgot password?</Link>
+                                                        <button type="button" onClick={() => switchMode('forgot-password')} className="text-xs text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 font-semibold transition-colors">Forgot password?</button>
                                                     </div>
                                                     <Input
                                                         id="password-login"
@@ -296,18 +337,25 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
                                                 </Button>
                                             </div>
                                             <div className="flex min-h-8 items-start my-2 text-sm text-red-500 font-medium" aria-live="polite">
-                                                {loginErrorMessage && (
-                                                    <div className="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg border border-red-100 dark:border-red-900/50 w-full">
-                                                        <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                                                        <span>{loginErrorMessage}</span>
-                                                    </div>
-                                                )}
+                                                <AnimatePresence>
+                                                    {loginErrorMessage && (
+                                                        <motion.div
+                                                            initial={{ opacity: 0, y: -10 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            exit={{ opacity: 0, scale: 0.95 }}
+                                                            className="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg border border-red-100 dark:border-red-900/50 w-full"
+                                                        >
+                                                            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                                                            <span>{loginErrorMessage}</span>
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
                                             </div>
                                         </div>
                                     </form>
                                 </div>
                             </motion.div>
-                        ) : (
+                        ) : mode === 'register' ? (
                             <motion.div
                                 key="form-register"
                                 initial="enterRight"
@@ -387,12 +435,19 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
                                                 </Button>
                                             </div>
                                             <div className="flex min-h-8 items-start my-2 text-sm text-red-500 font-medium" aria-live="polite">
-                                                {registerErrorMessage && (
-                                                    <div className="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg border border-red-100 dark:border-red-900/50 w-full">
-                                                        <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                                                        <span>{registerErrorMessage}</span>
-                                                    </div>
-                                                )}
+                                                <AnimatePresence>
+                                                    {registerErrorMessage && (
+                                                        <motion.div
+                                                            initial={{ opacity: 0, y: -10 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            exit={{ opacity: 0, scale: 0.95 }}
+                                                            className="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg border border-red-100 dark:border-red-900/50 w-full"
+                                                        >
+                                                            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                                                            <span>{registerErrorMessage}</span>
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
                                             </div>
                                         </div>
                                     </form>
@@ -408,6 +463,78 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
                                     </Link>
                                     .
                                 </p>
+                            </motion.div>
+                        ) : (
+                            <motion.div
+                                key="form-forgot-password"
+                                initial="enterRight"
+                                animate="login"
+                                exit="exitRight"
+                                variants={contentVariants}
+                                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                                className="space-y-8"
+                            >
+                                <div className="flex flex-col space-y-3 text-center">
+                                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-100 to-violet-100 dark:from-indigo-900/30 dark:to-violet-900/30 mx-auto mb-2">
+                                        <Sparkles className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
+                                    </div>
+                                    <h1 className="text-4xl font-serif font-black tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-200 bg-clip-text text-transparent">
+                                        Khôi phục mật khẩu
+                                    </h1>
+                                    <p className="text-base text-slate-600 dark:text-slate-400 font-medium">
+                                        Nhập email của bạn để nhận liên kết khôi phục
+                                    </p>
+                                </div>
+
+                                <div className="grid gap-6">
+                                    <form onSubmit={handleForgotPasswordSubmit}>
+                                        <div className="grid gap-4">
+                                            <div className="grid gap-3">
+                                                <div className="grid gap-2">
+                                                    <Label className="dark:text-slate-200 font-semibold text-slate-700 dark:text-slate-300" htmlFor="email-forgot">Email</Label>
+                                                    <Input
+                                                        id="email-forgot"
+                                                        name="email"
+                                                        placeholder="name@example.com"
+                                                        type="email"
+                                                        autoCapitalize="none"
+                                                        autoComplete="email"
+                                                        autoCorrect="off"
+                                                        disabled={isPending}
+                                                        required
+                                                        className="h-12 border-2 border-slate-200 dark:border-slate-700 focus:border-indigo-500 dark:focus:border-indigo-500 dark:bg-slate-900 rounded-xl shadow-sm hover:shadow-md transition-all"
+                                                    />
+                                                </div>
+                                                <Button
+                                                    disabled={isPending}
+                                                    type="submit"
+                                                    className="h-12 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all rounded-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 mt-2"
+                                                >
+                                                    {isForgotPasswordPending ? (
+                                                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                                    ) : (
+                                                        <span className="flex items-center gap-2">Gửi liên kết khôi phục <Sparkles className="w-5 h-5" /></span>
+                                                    )}
+                                                </Button>
+                                            </div>
+                                            <div className="flex min-h-8 items-start my-2 text-sm text-red-500 font-medium" aria-live="polite">
+                                                <AnimatePresence>
+                                                    {forgotPasswordErrorMessage && (
+                                                        <motion.div
+                                                            initial={{ opacity: 0, y: -10 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            exit={{ opacity: 0, scale: 0.95 }}
+                                                            className="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg border border-red-100 dark:border-red-900/50 w-full"
+                                                        >
+                                                            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                                                            <span>{forgotPasswordErrorMessage}</span>
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
                             </motion.div>
                         )}
                     </AnimatePresence>

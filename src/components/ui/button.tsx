@@ -49,9 +49,6 @@ export interface ButtonProps
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ({ className, variant, size, asChild = false, ...props }, ref) => {
         const Comp = asChild ? Slot : "button"
-        // Use motion.button if it's not a Slot, otherwise regular
-        // Note: complex typing with Slot + Motion is tricky, keeping it simple for now
-        // Just adding a hover scale via CSS or simple motion wrapper could be better
 
         return (
             <Comp
@@ -64,7 +61,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 )
 Button.displayName = "Button"
 
-// Create a MotionButton for specific animated uses
 const MotionButton = motion(Button)
 
 export { Button, buttonVariants, MotionButton }

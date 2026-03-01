@@ -47,20 +47,20 @@ export default function Navbar() {
                     scrolled ? "bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-200/50 dark:border-zinc-800/50 shadow-sm" : "bg-transparent"
                 )}
             >
-                {/* Scroll Progress Bar */}
+                {}
                 <motion.div
                     className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 origin-left opacity-80"
                     style={{ scaleX }}
                 />
 
                 <div className="container mx-auto px-6 h-full flex items-center justify-between">
-                    {/* Logo */}
+                    {}
                     <Link href="/" className="font-serif font-black text-xl md:text-2xl text-zinc-900 dark:text-white flex items-center gap-2 group relative z-50">
                         <span className="text-2xl md:text-3xl bg-clip-text text-transparent bg-gradient-to-tr from-indigo-600 to-violet-600 group-hover:scale-110 transition-transform">❖</span>
                         EduGuide AI
                     </Link>
 
-                    {/* Desktop Menu */}
+                    {}
                     <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-zinc-600 dark:text-zinc-400">
                         {["Methodology", "Resources", "Pricing"].map((item) => (
                             <Link key={item} href={`#${item.toLowerCase()}`} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors relative group">
@@ -69,12 +69,11 @@ export default function Navbar() {
                             </Link>
                         ))}
 
-                        {/* Dark Mode Toggle */}
+                        {}
                         <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-zinc-600 dark:text-zinc-400">
                             {mounted && (theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />)}
                             {!mounted && <Moon className="w-5 h-5" />}
                         </button>
-
 
                         {status === 'authenticated' ? (
                             <Link href="/dashboard">
@@ -92,7 +91,7 @@ export default function Navbar() {
                         )}
                     </div>
 
-                    {/* Mobile Hamburger */}
+                    {}
                     <div className="flex md:hidden items-center gap-4 relative z-50">
                         <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-zinc-600 dark:text-zinc-300">
                             {mounted && (theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />)}
@@ -105,7 +104,7 @@ export default function Navbar() {
                 </div>
             </motion.nav>
 
-            {/* Mobile Menu Overlay */}
+            {}
             <AnimatePresence>
                 {mobileMenuOpen && (
                     <motion.div

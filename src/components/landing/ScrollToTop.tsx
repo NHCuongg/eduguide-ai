@@ -45,10 +45,10 @@ export default function ScrollToTop() {
                         className="relative flex items-center justify-center h-14 w-14 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 text-white shadow-[0_10px_40px_-5px_rgba(79,70,229,0.5)] focus:outline-none transition-all duration-300"
                         title="Scroll to top"
                     >
-                        {/* Glow layer */}
+                        {}
                         <div className="absolute inset-0 rounded-full bg-indigo-500 opacity-0 group-hover:opacity-40 blur-xl transition-opacity duration-300" />
 
-                        {/* Hover brightener */}
+                        {}
                         <div className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
 
                         <ArrowUp className="w-6 h-6 stroke-[2.5]" />

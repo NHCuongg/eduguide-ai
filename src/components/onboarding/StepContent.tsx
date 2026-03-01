@@ -3,7 +3,7 @@
 import { useWizardStore } from "@/lib/store"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
-import { Book, FileText, MonitorPlay, MousePointerClick, Layers } from "lucide-react"
+import { Book, FileText, MousePointerClick, Layers } from "lucide-react"
 
 export default function StepContent() {
     const { data, setData, nextStep, prevStep } = useWizardStore()
@@ -13,7 +13,6 @@ export default function StepContent() {
     }
 
     const options = [
-        { id: "Video", icon: MonitorPlay, label: "Video Based", desc: "Watch and learn" },
         { id: "Text", icon: FileText, label: "Text Based", desc: "Read at your own pace" },
         { id: "Interactive", icon: MousePointerClick, label: "Interactive", desc: "Quizzes and hands-on" },
         { id: "Mixed", icon: Layers, label: "Mixed Media", desc: "A bit of everything" },

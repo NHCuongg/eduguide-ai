@@ -6,15 +6,13 @@ export const helloWorld = inngest.createFunction(
     { id: "hello-world" },
     { event: "test/hello.world" },
     async ({ event, step }) => {
-        // 1. Dùng step.sleep để mô phỏng tác vụ ngầm tốn thời gian (ví dụ: AI generating)
+        
         await step.sleep("wait-a-moment", "3s");
 
-        // 2. Chạy logic
         const jobId = event.data.jobId;
         const message = `Xin chào ${event.data.name || "bạn"}! Mình là Inngest Worker đã chạy ngầm xong.`;
         const result = { message, timestamp: new Date().toISOString() };
 
-        // 3. Bắn event realtime qua Supabase báo cho Frontend
         if (jobId) {
             await step.run("broadcast-result", async () => {
                 const channel = supabaseAdmin.channel(`job_${jobId}`);
@@ -23,7 +21,7 @@ export const helloWorld = inngest.createFunction(
                     event: "status_update",
                     payload: { status: "completed", result },
                 });
-                // Xóa channel sau khi gửi để tránh rác channel trên Supabase
+                
                 supabaseAdmin.removeChannel(channel);
             });
         }
@@ -40,14 +38,14 @@ export const sendWelcomeEmail = inngest.createFunction(
 
         await step.run("send-email-via-resend", async () => {
             try {
-                // If RESEND_API_KEY is not set or a dummy key is used, just mock the sending for local dev
+                
                 if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY.startsWith('re_dummy')) {
                     console.log(`[MOCK EMAIL] To: ${email}, Subject: Welcome to EduGuide AI, ${name}!`);
                     return { simulated: true, email };
                 }
 
                 const { data, error } = await resend.emails.send({
-                    from: 'EduGuide AI <onboarding@eduguide.ai>', // Make sure this domain is verified in your Resend dashboard
+                    from: 'EduGuide AI <onboarding@eduguide.ai>', 
                     to: [email],
                     subject: `Welcome to EduGuide AI, ${name}!`,
                     html: `

@@ -4,8 +4,6 @@ import { ArrowRight } from "lucide-react"
 import SectionWrapper from "./SectionWrapper"
 import Image from "next/image"
 
-/* Using standard <img> tag to avoid next.config.js strict domain issues for the demo */
-
 const posts = [
     {
         title: "The Future of AI in Higher Education",
@@ -49,7 +47,7 @@ export default function BlogSection() {
                         <SectionWrapper key={i} delay={i * 0.1}>
                             <div className="group cursor-pointer">
                                 <div className="aspect-[4/3] w-full rounded-2xl mb-4 relative overflow-hidden shadow-sm group-hover:shadow-md transition-all">
-                                    <div className="absolute inset-0 bg-slate-200 dark:bg-slate-800 animate-pulse" /> {/* Loading state placeholder */}
+                                    <div className="absolute inset-0 bg-slate-200 dark:bg-slate-800 animate-pulse" /> {}
                                     <Image
                                         src={post.image}
                                         alt={post.title}

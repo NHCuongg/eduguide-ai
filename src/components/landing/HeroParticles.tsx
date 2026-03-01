@@ -16,14 +16,14 @@ export default function HeroParticles() {
     const [particles, setParticles] = useState<Particle[]>([])
 
     useEffect(() => {
-        // Generate random particles only on client-side to prevent hydration mismatch
+        
         const generatedParticles = Array.from({ length: 20 }).map((_, i) => ({
             id: i,
-            x: Math.random() * 100, // percentage
-            y: Math.random() * 100, // percentage
-            size: Math.random() * 4 + 2, // 2px to 6px
-            duration: Math.random() * 10 + 10, // 10s to 20s
-            delay: Math.random() * 5, // 0s to 5s
+            x: Math.random() * 100, 
+            y: Math.random() * 100, 
+            size: Math.random() * 4 + 2, 
+            duration: Math.random() * 10 + 10, 
+            delay: Math.random() * 5, 
         }))
         setParticles(generatedParticles)
     }, [])

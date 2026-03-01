@@ -26,7 +26,6 @@ export default function MainContent() {
     const { data } = useWizardStore()
     const { xp, level, streak, checkStreak } = useGamificationStore()
 
-    // Memoize progress calculation
     const progressPercentage = useMemo(() => {
         return Math.min(100, Math.round((xp / getNextLevelXP(level)) * 100))
     }, [xp, level])
@@ -35,7 +34,6 @@ export default function MainContent() {
         return (xp / getNextLevelXP(level)) * 100
     }, [xp, level])
 
-    // Memoize stroke dash offset calculation
     const strokeDashoffset = useMemo(() => {
         return 364 - (364 * progressPercentage) / 100
     }, [progressPercentage])
@@ -50,18 +48,17 @@ export default function MainContent() {
         checkStreak()
     }, [checkStreak])
 
-    // Redirect to onboarding if no data found (fresh session)
     useEffect(() => {
         handleRedirect()
     }, [handleRedirect])
 
-    if (!data?.targetSkill) return null // Avoid flash of content
+    if (!data?.targetSkill) return null 
 
     return (
         <main className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-6 xl:p-10 scroll-smooth">
             <div className="max-w-6xl mx-auto space-y-10">
 
-                {/* 1. Header Section */}
+                {}
                 <FadeIn className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight font-serif mb-2">
@@ -86,7 +83,7 @@ export default function MainContent() {
                     </div>
                 </FadeIn>
 
-                {/* 2. Main Stats Grid */}
+                {}
                 <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <StaggerItem>
                         <Card className="rounded-3xl border-none shadow-lg hover:shadow-2xl transition-all duration-500 group cursor-pointer bg-gradient-to-br from-white to-amber-50/30 dark:from-slate-900 dark:to-amber-950/20 card-hover card-glow overflow-hidden relative h-full">
@@ -164,11 +161,11 @@ export default function MainContent() {
                     </StaggerItem>
                 </StaggerContainer>
 
-                {/* 3. Continue Learning 'Hero' Card */}
+                {}
                 <FadeIn delay={0.2}>
                     <HoverCard>
                         <Card className="group relative overflow-hidden border-none shadow-2xl hover:shadow-[0_20px_50px_rgba(79,70,229,0.4)] transition-all duration-500 rounded-[2.5rem] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white isolate">
-                            {/* Mesh Gradient Background */}
+                            {}
                             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-500/30 via-slate-900 to-slate-900" />
                             <div className="absolute inset-0 opacity-50 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] contrast-125 brightness-100" />
 
@@ -203,10 +200,10 @@ export default function MainContent() {
                                     </div>
                                 </div>
 
-                                {/* Dynamic Progress Ring */}
+                                {}
                                 <div className="relative group-hover:scale-105 transition-transform duration-500">
                                     <div className="relative w-48 h-48 md:w-56 md:h-56 flex items-center justify-center">
-                                        {/* Outer Glow */}
+                                        {}
                                         <div className="absolute inset-0 bg-indigo-500/20 blur-3xl rounded-full" />
 
                                         <svg className="w-full h-full -rotate-90 drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]">
@@ -232,7 +229,7 @@ export default function MainContent() {
                     </HoverCard>
                 </FadeIn>
 
-                {/* 4. Study Tools Section */}
+                {}
                 <div className="space-y-6">
                     <FadeIn delay={0.25} className="flex items-center justify-between">
                         <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-3">
@@ -253,7 +250,7 @@ export default function MainContent() {
                     </div>
                 </div>
 
-                {/* 5. Recent Modules List */}
+                {}
                 <div className="space-y-6">
                     <FadeIn delay={0.3} className="flex items-center justify-between">
                         <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-3">
@@ -269,9 +266,9 @@ export default function MainContent() {
                         {[1, 2, 3].map((i) => (
                             <StaggerItem key={i}>
                                 <div className="group bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-800/50 rounded-2xl p-6 border-2 border-slate-100 dark:border-slate-800 shadow-md hover:shadow-2xl hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-500 flex flex-col md:flex-row items-start md:items-center gap-6 cursor-pointer relative overflow-hidden card-hover">
-                                    {/* Hover Highlight */}
+                                    {}
                                     <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 shadow-lg" />
-                                    {/* Glow effect */}
+                                    {}
                                     <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/0 via-indigo-500/5 to-indigo-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                                     <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center group-hover:from-indigo-100 group-hover:to-violet-100 dark:group-hover:from-indigo-900/50 dark:group-hover:to-violet-900/50 transition-all duration-300 shrink-0 shadow-sm group-hover:shadow-md group-hover:scale-110">
@@ -306,7 +303,7 @@ export default function MainContent() {
                     </StaggerContainer>
                 </div>
 
-                {/* 6. Schedule Section */}
+                {}
                 <FadeIn delay={0.5}>
                     <div className="flex items-center justify-between mb-6 mt-12">
                         <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-3">

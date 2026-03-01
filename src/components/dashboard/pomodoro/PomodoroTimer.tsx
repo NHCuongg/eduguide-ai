@@ -26,7 +26,7 @@ export function PomodoroTimer() {
             }, 1000)
         } else if (timeLeft === 0) {
             pauseTimer()
-            // Optional: Play sound here
+            
         }
         return () => {
             if (interval) clearInterval(interval)

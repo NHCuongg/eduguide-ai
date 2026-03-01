@@ -16,7 +16,7 @@ const FlashcardsResponseSchema = z.object({
 
 export async function POST(req: Request) {
     try {
-        // Rate limiting
+        
         const rateLimitResult = await rateLimit(req, aiRateLimiter)
         if (rateLimitResult && !rateLimitResult.allowed) {
             return NextResponse.json(
@@ -42,10 +42,8 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Topic is required' }, { status: 400 })
         }
 
-        // Generate cache key
         const cacheKey = cache.generateKey(`flashcards:${topic}`, context)
 
-        // Try to get from cache or generate new
         const parsedData = await cache.getOrSet(
             cacheKey,
             async () => {
@@ -73,13 +71,12 @@ export async function POST(req: Request) {
                 const response = await result.response
                 const text = response.text()
 
-                // Clean up markdown code blocks if present
                 const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim()
 
                 const data = JSON.parse(cleanText)
                 return FlashcardsResponseSchema.parse(data)
             },
-            60 * 60 * 1000 // Cache for 1 hour
+            60 * 60 * 1000 
         )
 
         return NextResponse.json(parsedData)

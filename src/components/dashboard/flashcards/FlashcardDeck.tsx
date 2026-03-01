@@ -20,9 +20,6 @@ export function FlashcardDeck() {
     const [isFlipped, setIsFlipped] = useState(false)
     const [loading, setLoading] = useState(false)
 
-    // Simple toast mock if not available, replacing with console for safety if no hook file
-    // But ideally we use the project's toast. I'll stick to basic alert if needed or assume hook.
-
     const generateCards = useCallback(async () => {
         if (!topic.trim()) {
             showToast.warning('Please enter a topic')

@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import { Star, Lock, MapPin } from "lucide-react"
 import { motion } from "framer-motion"
 
-// Mock Data for the Map Nodes
 const mapNodes = [
     { id: 1, level: "4.0", title: "Foundations", status: "completed", x: 50, y: 85 },
     { id: 2, level: "5.0", title: "Core Concepts", status: "completed", x: 75, y: 65 },
@@ -18,17 +17,17 @@ export default function GamifiedMap() {
     return (
         <div className="absolute inset-0 w-full h-full bg-slate-950 overflow-hidden flex flex-col items-center py-20">
 
-            {/* Ambient Background Effects */}
+            {}
             <div className="absolute inset-0 z-0">
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-900/20 rounded-full blur-[100px]" />
                 <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-900/20 rounded-full blur-[100px]" />
-                {/* Stars */}
+                {}
                 <div className="absolute top-10 left-20 w-1 h-1 bg-white/70 rounded-full animate-pulse" />
                 <div className="absolute top-40 right-40 w-1.5 h-1.5 bg-blue-200/50 rounded-full animate-pulse delay-700" />
                 <div className="absolute bottom-20 left-1/3 w-1 h-1 bg-white/40 rounded-full animate-pulse delay-300" />
             </div>
 
-            {/* Clouds Layer */}
+            {}
             <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
                 <motion.div
                     initial={{ x: 0 }}
@@ -44,11 +43,11 @@ export default function GamifiedMap() {
                 />
             </div>
 
-            {/* Map Container */}
+            {}
             <div className="relative w-full max-w-3xl h-full flex-1 z-20 overflow-y-auto scrollbar-none pb-20">
 
-                <div className="relative w-full h-[1200px]"> {/* Scrollable Height */}
-                    {/* Connecting Path (SVG) */}
+                <div className="relative w-full h-[1200px]"> {}
+                    {}
                     <svg className="absolute inset-0 w-full h-full pointer-events-none drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]">
                         <defs>
                             <linearGradient id="pathGradient" x1="0%" y1="100%" x2="0%" y2="0%">
@@ -69,17 +68,16 @@ export default function GamifiedMap() {
                         />
                     </svg>
 
-                    {/* Nodes */}
+                    {}
                     {mapNodes.map((node) => {
                         const isCompleted = node.status === 'completed'
                         const isActive = node.status === 'active'
 
-                        // Adjust Y positions for longer scroll
-                        const yPos = node.id === 1 ? 90 : // Start bottom
+                        const yPos = node.id === 1 ? 90 : 
                             node.id === 2 ? 65 :
                                 node.id === 3 ? 40 :
                                     node.id === 4 ? 15 :
-                                        5 // Goal top
+                                        5 
 
                         return (
                             <motion.div
@@ -132,7 +130,7 @@ export default function GamifiedMap() {
                 </div>
             </div>
 
-            {/* Floating Action Button (Return to Grid) */}
+            {}
             <Button
                 className="fixed bottom-8 right-8 bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 rounded-full h-12 px-6 shadow-2xl z-50 transition-all font-bold group"
             >

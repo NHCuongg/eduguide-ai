@@ -47,7 +47,7 @@ export default function RightWidgets() {
     return (
         <div className="w-[300px] border-l border-slate-200 bg-white p-6 hidden xl:flex flex-col h-[calc(100vh-60px)]">
 
-            {/* Focus Timer Section - NEW */}
+            {}
             <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="font-bold text-slate-900 flex items-center gap-2">
@@ -92,7 +92,7 @@ export default function RightWidgets() {
                 </div>
             </div>
 
-            {/* Progress Stats (Compact) */}
+            {}
             <div className="mb-8 p-4 bg-slate-50 border border-slate-100 rounded-xl space-y-3">
                 <div className="flex justify-between items-center text-sm">
                     <span className="text-slate-500 font-medium">Daily Goal</span>
@@ -103,7 +103,7 @@ export default function RightWidgets() {
                 </div>
             </div>
 
-            {/* Daily Goals / Notifications */}
+            {}
             <div className="mb-6">
                 <h3 className="font-bold text-slate-900 mb-4">Daily Focus</h3>
                 <div className="bg-red-50 text-red-900 rounded-xl p-4 flex items-start gap-3 border border-red-100">
@@ -117,7 +117,7 @@ export default function RightWidgets() {
                 </div>
             </div>
 
-            {/* Mascot Area */}
+            {}
             <div className="mt-auto bg-gradient-to-br from-violet-600 to-indigo-700 rounded-2xl p-6 text-white relative overflow-hidden shadow-lg shadow-indigo-200/50 hover:shadow-indigo-300/50 transition-shadow">
                 <div className="relative z-10">
                     <h3 className="font-extrabold text-xl mb-2 tracking-tight">Keep it up! 🔥</h3>
@@ -127,7 +127,7 @@ export default function RightWidgets() {
                     </Button>
                 </div>
 
-                {/* Decorative Circles */}
+                {}
                 <div className="absolute -bottom-8 -right-8 w-32 h-32 bg-white/20 rounded-full blur-2xl" />
                 <div className="absolute -top-4 -right-4 w-20 h-20 bg-purple-500/30 rounded-full blur-xl" />
             </div>

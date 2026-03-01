@@ -6,7 +6,7 @@ import { Facebook, Twitter, Linkedin, Instagram, Youtube } from "lucide-react"
 export default function Footer() {
     return (
         <footer className="bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 py-16 md:py-24 relative overflow-hidden transition-colors duration-500">
-            {/* Giant Watermark */}
+            {}
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/3 text-[20vw] font-black font-serif text-slate-900/[0.02] dark:text-white/[0.02] pointer-events-none select-none whitespace-nowrap">
                 EDUGUIDE
             </div>

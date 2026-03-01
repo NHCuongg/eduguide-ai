@@ -11,7 +11,7 @@ const quizSchema = z.object({
 
 export async function POST(req: Request) {
   try {
-    // Rate limiting
+    
     const rateLimitResult = await rateLimit(req, aiRateLimiter)
     if (rateLimitResult && !rateLimitResult.allowed) {
       return NextResponse.json(
@@ -34,10 +34,8 @@ export async function POST(req: Request) {
     const body = await req.json()
     const { topic, skillLevel } = quizSchema.parse(body)
 
-    // Generate cache key
     const cacheKey = cache.generateKey(`quiz:${topic}`, skillLevel)
 
-    // Try to get from cache or generate new
     const data = await cache.getOrSet(
       cacheKey,
       async () => {
@@ -65,12 +63,11 @@ export async function POST(req: Request) {
         })
         const text = completion.choices[0].message.content || ""
 
-        // Clean potentially markdown blocks
         const jsonString = text.replace(/```json/g, '').replace(/```/g, '').trim()
 
         return JSON.parse(jsonString)
       },
-      60 * 60 * 1000 // Cache for 1 hour
+      60 * 60 * 1000 
     )
 
     return NextResponse.json(data)
@@ -78,7 +75,7 @@ export async function POST(req: Request) {
     console.error("Quiz Generation Error:", error)
     return NextResponse.json({
       error: "Failed to generate quiz",
-      // Mock data for fallback if API fails
+      
       mock: true,
       questions: [
         {

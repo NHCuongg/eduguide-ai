@@ -13,7 +13,6 @@ export function NotesPanel() {
     const [isCreating, setIsCreating] = useState(false)
     const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null)
 
-    // Form states
     const [title, setTitle] = useState('')
     const [content, setContent] = useState('')
 
@@ -67,7 +66,7 @@ export function NotesPanel() {
             </div>
 
             <div className="flex-1 overflow-hidden flex">
-                {/* Note Editor View */}
+                {}
                 {(isCreating || selectedNoteId) ? (
                     <div className="flex-1 flex flex-col p-4 animate-in fade-in slide-in-from-right-4 duration-200">
                         <div className="mb-4 flex gap-2">
@@ -132,7 +131,7 @@ export function NotesPanel() {
                         </div>
                     </div>
                 ) : (
-                    /* Notes List View */
+                    
                     <div className="flex-1 overflow-y-auto p-4 space-y-3">
                         {notes.length === 0 ? (
                             <div className="h-full flex flex-col items-center justify-center text-slate-400 dark:text-slate-500">

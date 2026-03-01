@@ -1,4 +1,4 @@
-// CRUD operations for roadmaps
+
 import { supabase } from '../supabase'
 import { RoadmapRecord } from './types'
 import { Roadmap } from '../types'
@@ -12,7 +12,7 @@ export async function saveRoadmap(
     deadline: string,
     roadmap: Roadmap
 ): Promise<RoadmapRecord> {
-    // In a real implementation, this would insert into Supabase
+    
     const record: RoadmapRecord = {
         id: `roadmap-${Date.now()}`,
         user_id: userId,
@@ -26,13 +26,11 @@ export async function saveRoadmap(
         updated_at: new Date().toISOString(),
     }
 
-    // Cache key for retrieval
     const cacheKey = cache.generateKey(
         `roadmap:${targetSkill}`,
         `${currentLevel}:${learningStyle}:${deadline}`
     )
-    
-    // Store in cache (in production, this would be Supabase)
+
     cache.getOrSet(cacheKey, async () => record, 24 * 60 * 60 * 1000)
 
     return record
@@ -45,19 +43,16 @@ export async function getRoadmapBySkill(
     learningStyle: string,
     deadline: string
 ): Promise<RoadmapRecord | null> {
-    // In a real implementation, this would query Supabase
-    // For now, check cache first
+
     const cacheKey = cache.generateKey(
         `roadmap:${targetSkill}`,
         `${currentLevel}:${learningStyle}:${deadline}`
     )
-    
-    // This is a placeholder - in production, query Supabase
+
     return null
 }
 
 export async function getUserRoadmaps(userId: string): Promise<RoadmapRecord[]> {
-    // In a real implementation, this would query Supabase
-    // Placeholder for now
+
     return []
 }

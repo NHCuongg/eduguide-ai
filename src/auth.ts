@@ -44,7 +44,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     const user = await getUser(email);
 
                     if (!user || (!user.password && user.email)) {
-                        // User might exist but registered with Google/Github instead of password
+                        
                         return null;
                     }
 

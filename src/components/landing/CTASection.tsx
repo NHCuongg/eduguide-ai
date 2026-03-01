@@ -8,13 +8,13 @@ import { motion } from "framer-motion"
 export default function CTASection() {
     return (
         <section className="py-32 relative overflow-hidden bg-indigo-600 dark:bg-slate-900 transition-colors duration-500">
-            {/* Animated Mesh Gradient Background - Adaptive */}
+            {}
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-500 via-indigo-600 to-purple-600 dark:from-indigo-900 dark:via-slate-900 dark:to-slate-950 opacity-90" />
 
-            {/* Noise overlay for texture */}
+            {}
             <div className="absolute inset-0 opacity-[0.1] dark:opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }} />
 
-            {/* Floating Blobs */}
+            {}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <motion.div
                     animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}

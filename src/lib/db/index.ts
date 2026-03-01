@@ -5,6 +5,5 @@ import * as schema from './schema'
 
 const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/petmanager'
 
-// Disable prefetch for serverless environments to save resources
 const client = postgres(connectionString, { prepare: false })
 export const db = drizzle(client, { schema })

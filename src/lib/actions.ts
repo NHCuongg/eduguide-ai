@@ -18,7 +18,7 @@ export async function authenticate(
                     return 'Something went wrong.'
             }
         }
-        // IMPORTANT: Next.js Redirects throw an error, we must rethrow it
+        
         throw error
     }
 }

@@ -5,7 +5,7 @@ import { useJobStatus } from "@/hooks/useJobStatus";
 
 export default function TestAsyncPage() {
     const [jobId, setJobId] = useState<string | null>(null);
-    const { status, result, error } = useJobStatus(jobId);
+    const { status, result } = useJobStatus(jobId);
 
     const startJob = async () => {
         setJobId(null);
@@ -14,7 +14,6 @@ export default function TestAsyncPage() {
             body: JSON.stringify({ name: "User" })
         });
 
-        // HTTP 202 Accepted, trả về jobId
         const data = await res.json();
         setJobId(data.jobId);
     };
@@ -23,7 +22,7 @@ export default function TestAsyncPage() {
         <div className="p-8 max-w-xl mx-auto space-y-4">
             <h1 className="text-2xl font-bold">Thử nghiệm Bất đồng bộ (Async Flow)</h1>
             <p className="text-gray-500">
-                Click để gọi API. Backend sẽ lập tức trả về `HTTP 202` và `jobId`.
+                Click để gọi API. Backend sẽ lập tức trả về &lsquo;HTTP 202&rsquo; và &lsquo;jobId&rsquo;.
                 Sau khoảng 3 giây, Inngest Worker chạy xong sẽ bắn Realtime event về.
             </p>
 

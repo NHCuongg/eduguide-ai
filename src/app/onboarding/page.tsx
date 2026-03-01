@@ -3,11 +3,11 @@ import Wizard from "@/components/onboarding/Wizard"
 export default function OnboardingPage() {
     return (
         <main className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4 relative overflow-hidden">
-            {/* Animated Background */}
+            {}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-950 via-slate-950 to-black pointer-events-none" />
             <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid.svg')] opacity-[0.02] pointer-events-none" />
 
-            {/* Content Container */}
+            {}
             <div className="z-10 w-full max-w-4xl relative">
                 <div className="absolute -inset-1 rounded-[2.5rem] bg-gradient-to-b from-white/10 to-transparent opacity-50 blur-sm pointer-events-none" />
                 <div className="mb-8 text-center">

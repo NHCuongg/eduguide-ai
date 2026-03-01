@@ -4,7 +4,7 @@ import { useWizardStore } from "@/lib/store"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
-import { Video, BookOpen, Hammer, Clock, Calendar } from "lucide-react"
+import { BookOpen, Hammer, Clock, Calendar } from "lucide-react"
 
 export default function Step2() {
     const { data, setData, nextStep, prevStep } = useWizardStore()
@@ -16,7 +16,6 @@ export default function Step2() {
     }
 
     const styles = [
-        { id: "Visual", label: "Visual", desc: "Videos & Diagrams", icon: Video },
         { id: "Reading", label: "Reading", desc: "Docs & Articles", icon: BookOpen },
         { id: "Hands-on", label: "Pragmatic", desc: "Projects & Labs", icon: Hammer },
     ]
@@ -40,7 +39,7 @@ export default function Step2() {
                         {styles.map((style) => (
                             <div
                                 key={style.id}
-                                onClick={() => setData({ learningStyle: style.id as "Visual" | "Reading" | "Hands-on" })}
+                                onClick={() => setData({ learningStyle: style.id as "Reading" | "Hands-on" })}
                                 className={`cursor-pointer rounded-xl border-2 p-4 flex flex-col items-center justify-center gap-2 text-center transition-all duration-200 hover:scale-105 ${data.learningStyle === style.id
                                     ? "border-indigo-600 bg-indigo-600 text-white shadow-xl shadow-indigo-600/30 transform scale-105"
                                     : "border-slate-300 bg-white dark:bg-slate-900 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-indigo-400 hover:bg-slate-50"

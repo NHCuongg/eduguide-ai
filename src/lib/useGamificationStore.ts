@@ -24,7 +24,7 @@ export const useGamificationStore = create<GamificationState>()(
             addXP: (amount) => {
                 set((state) => {
                     const newXP = state.xp + amount
-                    // Calculate level based on thresholds
+                    
                     let newLevel = 1
                     for (let i = 0; i < LEVEL_THRESHOLDS.length; i++) {
                         if (newXP >= LEVEL_THRESHOLDS[i]) {
@@ -47,13 +47,13 @@ export const useGamificationStore = create<GamificationState>()(
                     }
 
                     if (isToday(lastActive)) {
-                        // Already logged in today, keep streak
+                        
                         return {}
                     } else if (isYesterday(lastActive)) {
-                        // Logged in yesterday, increment streak
+                        
                         return { streak: state.streak + 1, lastActiveDate: now }
                     } else {
-                        // Missed a day, reset streak
+                        
                         return { streak: 1, lastActiveDate: now }
                     }
                 })
@@ -75,5 +75,5 @@ export const getLevelTitle = (level: number) => {
 
 export const getNextLevelXP = (level: number) => {
     if (level >= LEVEL_THRESHOLDS.length) return 1000000
-    return LEVEL_THRESHOLDS[level] // because level is 1-indexed, but array is 0-indexed so level 1 looks at index 1 for next threshold
+    return LEVEL_THRESHOLDS[level] 
 }

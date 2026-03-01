@@ -1,7 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai"
 import { env } from './env'
 
-// Get API key with fallback
 const apiKey = env.GEMINI_API_KEY || env.GOOGLE_API_KEY || ""
 
 if (!apiKey) {
