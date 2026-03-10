@@ -65,6 +65,7 @@ export default function Hero() {
                         className="font-serif text-5xl md:text-7xl lg:text-8xl font-black text-zinc-900 dark:text-white leading-[1.1] tracking-tight pb-2 flex flex-col items-center"
                     >
                         <span>Design Your</span>
+                        <span aria-live="polite" aria-atomic="true">
                         <AnimatePresence mode="wait">
                             <motion.span
                                 key={subjects[index]}
@@ -77,6 +78,7 @@ export default function Hero() {
                                 {subjects[index]}
                             </motion.span>
                         </AnimatePresence>
+                        </span>
                         <span>Curriculum</span>
                     </motion.h1>
 
@@ -112,13 +114,13 @@ export default function Hero() {
                     </motion.div>
 
                     {}
-                    <div className="hidden lg:block absolute top-1/2 -left-12 -translate-y-1/2 w-24 h-24 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl rotate-12 flex items-center justify-center animate-float" style={{ animationDelay: '0s' }}>
+                    <div className="hidden lg:block absolute top-1/2 -left-12 -translate-y-1/2 w-24 h-24 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl rotate-12 flex items-center justify-center animate-float" style={{ animationDelay: '0s' }} aria-hidden="true">
                         <Brain className="w-10 h-10 text-indigo-500" />
                     </div>
-                    <div className="hidden lg:block absolute top-1/3 -right-4 w-20 h-20 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl -rotate-6 flex items-center justify-center animate-float" style={{ animationDelay: '2s' }}>
+                    <div className="hidden lg:block absolute top-1/3 -right-4 w-20 h-20 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl -rotate-6 flex items-center justify-center animate-float" style={{ animationDelay: '2s' }} aria-hidden="true">
                         <BookOpen className="w-8 h-8 text-violet-500" />
                     </div>
-                    <div className="hidden lg:block absolute bottom-1/4 left-10 w-16 h-16 bg-white dark:bg-zinc-900 rounded-2xl shadow-xl rotate-6 flex items-center justify-center animate-float" style={{ animationDelay: '3s' }}>
+                    <div className="hidden lg:block absolute bottom-1/4 left-10 w-16 h-16 bg-white dark:bg-zinc-900 rounded-2xl shadow-xl rotate-6 flex items-center justify-center animate-float" style={{ animationDelay: '3s' }} aria-hidden="true">
                         <GraduationCap className="w-6 h-6 text-fuchsia-500" />
                     </div>
 

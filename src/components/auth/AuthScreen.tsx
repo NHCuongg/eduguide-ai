@@ -306,7 +306,6 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
                                                         autoCorrect="off"
                                                         disabled={isPending}
                                                         className="h-12 border-2 border-slate-200 dark:border-slate-700 focus:border-indigo-500 dark:focus:border-indigo-500 dark:bg-slate-900 rounded-xl shadow-sm hover:shadow-md transition-all"
-                                                        defaultValue="demo@eduguide.ai"
                                                     />
                                                 </div>
                                                 <div className="grid gap-2">
@@ -322,7 +321,6 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
                                                         autoCorrect="off"
                                                         disabled={isPending}
                                                         className="h-12 border-2 border-slate-200 dark:border-slate-700 focus:border-indigo-500 dark:focus:border-indigo-500 dark:bg-slate-900 rounded-xl shadow-sm hover:shadow-md transition-all"
-                                                        defaultValue="password123"
                                                     />
                                                 </div>
                                                 <Button
@@ -479,10 +477,10 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
                                         <Sparkles className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
                                     </div>
                                     <h1 className="text-4xl font-serif font-black tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-200 bg-clip-text text-transparent">
-                                        Khôi phục mật khẩu
+                                        Reset Password
                                     </h1>
                                     <p className="text-base text-slate-600 dark:text-slate-400 font-medium">
-                                        Nhập email của bạn để nhận liên kết khôi phục
+                                        Enter your email to receive a recovery link
                                     </p>
                                 </div>
 
@@ -513,7 +511,7 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
                                                     {isForgotPasswordPending ? (
                                                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                                                     ) : (
-                                                        <span className="flex items-center gap-2">Gửi liên kết khôi phục <Sparkles className="w-5 h-5" /></span>
+                                                        <span className="flex items-center gap-2">Send Recovery Link <Sparkles className="w-5 h-5" /></span>
                                                     )}
                                                 </Button>
                                             </div>

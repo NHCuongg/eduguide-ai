@@ -45,20 +45,20 @@ export default function RightWidgets() {
     }
 
     return (
-        <div className="w-[300px] border-l border-slate-200 bg-white p-6 hidden xl:flex flex-col h-[calc(100vh-60px)]">
+        <div className="w-[300px] border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 hidden xl:flex flex-col h-[calc(100vh-60px)]">
 
             {}
             <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-bold text-slate-900 flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-indigo-600" /> Focus Timer
+                    <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Focus Timer
                     </h3>
-                    <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400">
+                    <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 dark:text-slate-500">
                         <MoreHorizontal className="w-4 h-4" />
                     </Button>
                 </div>
 
-                <div className="bg-slate-900 rounded-2xl p-5 text-white shadow-xl shadow-slate-200">
+                <div className="bg-slate-900 dark:bg-slate-800 rounded-2xl p-5 text-white shadow-xl shadow-slate-200 dark:shadow-slate-950/50">
                     <div className="flex flex-col items-center justify-center py-4">
                         <div className="text-5xl font-mono font-bold tracking-wider mb-2">{formatTime(timeLeft)}</div>
                         <div className="text-slate-400 text-sm font-medium">
@@ -85,7 +85,7 @@ export default function RightWidgets() {
                         </Button>
                     </div>
 
-                    <div className="mt-4 pt-4 border-t border-slate-800 flex justify-between text-xs text-slate-400">
+                    <div className="mt-4 pt-4 border-t border-slate-800 dark:border-slate-700 flex justify-between text-xs text-slate-400">
                         <span>Sessions today: <b>0/4</b></span>
                         <span>Streak: <b>5</b> 🔥</span>
                     </div>
@@ -93,32 +93,32 @@ export default function RightWidgets() {
             </div>
 
             {}
-            <div className="mb-8 p-4 bg-slate-50 border border-slate-100 rounded-xl space-y-3">
+            <div className="mb-8 p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 rounded-xl space-y-3">
                 <div className="flex justify-between items-center text-sm">
-                    <span className="text-slate-500 font-medium">Daily Goal</span>
-                    <span className="font-bold text-slate-900">85%</span>
+                    <span className="text-slate-500 dark:text-slate-400 font-medium">Daily Goal</span>
+                    <span className="font-bold text-slate-900 dark:text-white">85%</span>
                 </div>
-                <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+                <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                     <div className="h-full w-[85%] bg-green-500 rounded-full" />
                 </div>
             </div>
 
             {}
             <div className="mb-6">
-                <h3 className="font-bold text-slate-900 mb-4">Daily Focus</h3>
-                <div className="bg-red-50 text-red-900 rounded-xl p-4 flex items-start gap-3 border border-red-100">
-                    <div className="p-2 bg-white rounded-lg shadow-sm">
-                        <Bell className="h-4 w-4 text-red-500" />
+                <h3 className="font-bold text-slate-900 dark:text-white mb-4">Daily Focus</h3>
+                <div className="bg-red-50 dark:bg-red-900/20 text-red-900 dark:text-red-200 rounded-xl p-4 flex items-start gap-3 border border-red-100 dark:border-red-800/50">
+                    <div className="p-2 bg-white dark:bg-red-900/30 rounded-lg shadow-sm">
+                        <Bell className="h-4 w-4 text-red-500 dark:text-red-400" />
                     </div>
                     <div>
                         <div className="text-sm font-bold">3 Overdue Sessions</div>
-                        <div className="text-xs text-red-700/80 mt-1">Try to catch up this weekend to stay on track.</div>
+                        <div className="text-xs text-red-700/80 dark:text-red-300/70 mt-1">Try to catch up this weekend to stay on track.</div>
                     </div>
                 </div>
             </div>
 
             {}
-            <div className="mt-auto bg-gradient-to-br from-violet-600 to-indigo-700 rounded-2xl p-6 text-white relative overflow-hidden shadow-lg shadow-indigo-200/50 hover:shadow-indigo-300/50 transition-shadow">
+            <div className="mt-auto bg-gradient-to-br from-violet-600 to-indigo-700 rounded-2xl p-6 text-white relative overflow-hidden shadow-lg shadow-indigo-200/50 dark:shadow-indigo-900/30 hover:shadow-indigo-300/50 dark:hover:shadow-indigo-800/40 transition-shadow">
                 <div className="relative z-10">
                     <h3 className="font-extrabold text-xl mb-2 tracking-tight">Keep it up! 🔥</h3>
                     <p className="text-indigo-100 text-sm mb-5 leading-relaxed font-medium">Consistency is the key to mastery. Complete today&apos;s session to earn a streak.</p>

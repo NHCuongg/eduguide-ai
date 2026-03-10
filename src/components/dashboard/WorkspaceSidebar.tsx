@@ -6,12 +6,12 @@ import { LayoutDashboard, BookOpen, GraduationCap, FileText, UserCircle, Setting
 import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { useWizardStore } from "@/lib/store"
-import { signOut } from "next-auth/react"
+import { signOut, useSession } from "next-auth/react"
 
 const navItems = [
-    { icon: LayoutDashboard, label: "Tổng quan", href: "/dashboard", wip: true },
-    { icon: BookOpen, label: "Study plan", href: "/dashboard/plan" },
-    { icon: GraduationCap, label: "My courses", href: "/dashboard/courses" },
+    { icon: LayoutDashboard, label: "Overview", href: "/dashboard", wip: true },
+    { icon: BookOpen, label: "Study Plan", href: "/dashboard/plan" },
+    { icon: GraduationCap, label: "My Courses", href: "/dashboard/courses" },
     { icon: FileText, label: "Test Practice", href: "/dashboard/tests", wip: true },
     { icon: UserCircle, label: "Learning Profile", href: "/dashboard/profile", wip: true },
 ]
@@ -19,6 +19,10 @@ const navItems = [
 export default function WorkspaceSidebar() {
 
     const pathname = usePathname()
+    const { data: session } = useSession()
+
+    const userName = session?.user?.name || 'Learner'
+    const userInitials = userName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
 
     return (
         <div className="w-[260px] bg-[#0f172a] text-slate-300 flex flex-col h-[calc(100vh-60px)] border-r border-slate-800">
@@ -26,11 +30,11 @@ export default function WorkspaceSidebar() {
             <div className="p-6">
                 <div className="flex items-center gap-3 mb-8">
                     <div className="h-10 w-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold text-lg">
-                        JD
+                        {userInitials}
                     </div>
                     <div>
-                        <div className="text-white font-bold text-sm">Dr. James Dalton</div>
-                        <div className="text-xs text-slate-400">Science Stream</div>
+                        <div className="text-white font-bold text-sm truncate max-w-[160px]">{userName}</div>
+                        <div className="text-xs text-slate-400">{session?.user?.email || 'Student'}</div>
                     </div>
                 </div>
 

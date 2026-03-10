@@ -46,7 +46,7 @@ export default function ChatPanel() {
     }, [messages])
 
     const suggestions = [
-        { label: "Summerize this lesson", icon: BookOpen, prompt: `Can you summarize the key takeaways from ${currentContext}?` },
+        { label: "Summarize this lesson", icon: BookOpen, prompt: `Can you summarize the key takeaways from ${currentContext}?` },
         { label: "Create a micro-quiz", icon: BrainCircuit, prompt: `Generate 3 multiple-choice questions about ${currentContext} to test my understanding.` },
         { label: "Explain like I'm 5", icon: HelpCircle, prompt: `Explain the concept of ${currentContext} in simple terms.` },
     ]

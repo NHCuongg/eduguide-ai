@@ -1,19 +1,27 @@
 'use client'
 
+import { Suspense } from "react"
 import { motion } from "framer-motion"
+import dynamic from "next/dynamic"
 import Hero from "@/components/landing/Hero"
 import Navbar from "@/components/landing/Navbar"
-import Features from "@/components/landing/Features"
-import CTASection from "@/components/landing/CTASection"
-import VideoSection from "@/components/landing/VideoSection"
-import PricingSection from "@/components/landing/PricingSection"
-import HowItWorksSection from "@/components/landing/HowItWorksSection"
-import TestimonialSection from "@/components/landing/TestimonialSection"
-import PrivacySection from "@/components/landing/PrivacySection"
-import BlogSection from "@/components/landing/BlogSection"
-import FAQSection from "@/components/landing/FAQSection"
-import Footer from "@/components/landing/Footer"
-import ScrollToTop from "@/components/landing/ScrollToTop"
+
+// Lazy-load below-fold sections to reduce initial bundle size
+const Features = dynamic(() => import("@/components/landing/Features"), { ssr: true })
+const VideoSection = dynamic(() => import("@/components/landing/VideoSection"), { ssr: true })
+const HowItWorksSection = dynamic(() => import("@/components/landing/HowItWorksSection"), { ssr: true })
+const TestimonialSection = dynamic(() => import("@/components/landing/TestimonialSection"), { ssr: true })
+const PricingSection = dynamic(() => import("@/components/landing/PricingSection"), { ssr: true })
+const CTASection = dynamic(() => import("@/components/landing/CTASection"), { ssr: true })
+const PrivacySection = dynamic(() => import("@/components/landing/PrivacySection"), { ssr: true })
+const FAQSection = dynamic(() => import("@/components/landing/FAQSection"), { ssr: true })
+const BlogSection = dynamic(() => import("@/components/landing/BlogSection"), { ssr: true })
+const Footer = dynamic(() => import("@/components/landing/Footer"), { ssr: true })
+const ScrollToTop = dynamic(() => import("@/components/landing/ScrollToTop"), { ssr: false })
+
+function SectionFallback() {
+  return <div className="w-full h-48 animate-pulse bg-slate-100 dark:bg-slate-900 rounded-lg" />
+}
 
 export default function Home() {
   return (
@@ -28,16 +36,36 @@ export default function Home() {
         <Navbar />
 
         <Hero />
-        <Features />
-        <VideoSection />
-        <HowItWorksSection />
-        <TestimonialSection />
-        <PricingSection />
-        <CTASection />
-        <PrivacySection />
-        <FAQSection />
-        <BlogSection />
-        <Footer />
+        <Suspense fallback={<SectionFallback />}>
+          <Features />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <VideoSection />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <HowItWorksSection />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <TestimonialSection />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <PricingSection />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <CTASection />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <PrivacySection />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <FAQSection />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <BlogSection />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <Footer />
+        </Suspense>
       </motion.main>
       <ScrollToTop />
     </>

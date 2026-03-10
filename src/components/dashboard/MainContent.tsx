@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useCallback } from "react"
+import { useEffect, useMemo, useCallback, Suspense } from "react"
 import { useRouter } from "next/navigation"
 import { useWizardStore } from "@/lib/store"
 
@@ -12,6 +12,29 @@ import { StaggerContainer, StaggerItem, HoverCard, FadeIn } from "@/components/u
 import dynamic from "next/dynamic"
 import { ExportButton } from "./export/ExportButton"
 import { useGamificationStore, getLevelTitle, getNextLevelXP } from "@/lib/useGamificationStore"
+
+// Skeleton fallback for study tool sections
+function StudyToolSkeleton() {
+    return (
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 animate-pulse">
+            <div className="h-4 w-32 bg-slate-200 dark:bg-slate-700 rounded mb-4" />
+            <div className="h-24 bg-slate-100 dark:bg-slate-800 rounded-xl" />
+        </div>
+    )
+}
+
+function FlashcardSkeleton() {
+    return (
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 animate-pulse">
+            <div className="h-4 w-40 bg-slate-200 dark:bg-slate-700 rounded mb-4" />
+            <div className="h-48 bg-slate-100 dark:bg-slate-800 rounded-xl" />
+            <div className="flex gap-3 mt-4">
+                <div className="h-10 flex-1 bg-slate-200 dark:bg-slate-700 rounded-lg" />
+                <div className="h-10 flex-1 bg-slate-200 dark:bg-slate-700 rounded-lg" />
+            </div>
+        </div>
+    )
+}
 
 const QuizModal = dynamic(() => import("./quiz/QuizModal").then(mod => mod.QuizModal), { ssr: false })
 const CalendarView = dynamic(() => import("./schedule/CalendarView").then(mod => mod.CalendarView), { ssr: false })
@@ -238,13 +261,19 @@ export default function MainContent() {
                         </h3>
                     </FadeIn>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <PomodoroTimer />
-                        <NotesPanel />
+                        <Suspense fallback={<StudyToolSkeleton />}>
+                            <PomodoroTimer />
+                        </Suspense>
+                        <Suspense fallback={<StudyToolSkeleton />}>
+                            <NotesPanel />
+                        </Suspense>
                     </div>
                     <div className="w-full">
                         <Card className="rounded-2xl border-none shadow-sm hover:shadow-md transition-shadow">
                             <CardContent className="p-0">
-                                <FlashcardDeck />
+                                <Suspense fallback={<FlashcardSkeleton />}>
+                                    <FlashcardDeck />
+                                </Suspense>
                             </CardContent>
                         </Card>
                     </div>
