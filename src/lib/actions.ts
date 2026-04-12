@@ -13,9 +13,9 @@ export async function authenticate(
         if (error instanceof AuthError) {
             switch (error.type) {
                 case 'CredentialsSignin':
-                    return 'Invalid credentials.'
+                    return 'Email hoặc mật khẩu không chính xác.'
                 default:
-                    return 'Something went wrong.'
+                    return 'Có lỗi xảy ra, vui lòng thử lại.'
             }
         }
         

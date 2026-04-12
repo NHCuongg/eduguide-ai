@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react"
+import React, { useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,7 +11,19 @@ import { showToast } from "@/lib/toast"
 import Link from "next/link"
 import { resetPassword } from "@/app/actions/auth"
 
-export default function ResetPasswordScreen() {
+export default function ResetPasswordPage() {
+    return (
+        <Suspense fallback={
+            <div className="w-full min-h-screen flex items-center justify-center p-8 bg-slate-50 dark:bg-slate-950">
+                <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+            </div>
+        }>
+            <ResetPasswordScreen />
+        </Suspense>
+    )
+}
+
+function ResetPasswordScreen() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const token = searchParams.get('token')

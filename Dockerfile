@@ -21,6 +21,12 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED 1
 
 # Build the app
+ENV AUTH_SECRET="dummy_secret_for_build"
+ENV OPENAI_API_KEY="dummy_openai_key"
+ENV GEMINI_API_KEY="dummy_gemini_key"
+ENV RESEND_API_KEY="dummy_resend_key"
+ENV NEXT_PUBLIC_SUPABASE_URL="https://dummy.supabase.co"
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY="dummy_anon_key"
 RUN npm run build
 
 # 4. Runner
