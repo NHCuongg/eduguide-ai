@@ -15,54 +15,56 @@ export async function saveOnboardingData(onboardingData: OnboardingData, roadmap
 
         const userId = session.user.id
 
-        await db.insert(profiles).values({
-            userId,
-            targetSkill: onboardingData.targetSkill,
-            currentLevel: onboardingData.currentLevel,
-            onboardingData: onboardingData,
-        }).onConflictDoUpdate({
-            target: profiles.userId,
-            set: {
+        const newRoadmapId = await db.transaction(async (tx) => {
+            await tx.insert(profiles).values({
+                userId,
                 targetSkill: onboardingData.targetSkill,
                 currentLevel: onboardingData.currentLevel,
                 onboardingData: onboardingData,
-                updatedAt: new Date()
+            }).onConflictDoUpdate({
+                target: profiles.userId,
+                set: {
+                    targetSkill: onboardingData.targetSkill,
+                    currentLevel: onboardingData.currentLevel,
+                    onboardingData: onboardingData,
+                    updatedAt: new Date()
+                }
+            })
+
+            const [insertedRoadmap] = await tx.insert(roadmaps).values({
+                userId,
+                title: roadmapData.title,
+                content: roadmapData,
+                status: "active"
+            }).returning({ id: roadmaps.id })
+
+            if (!insertedRoadmap) {
+                throw new Error("Failed to create roadmap record")
             }
+
+            const modulesToInsert = []
+            let globalModuleIndex = 0
+
+            for (let p = 0; p < roadmapData.phases.length; p++) {
+                const phase = roadmapData.phases[p]
+                for (let m = 0; m < phase.modules.length; m++) {
+                    const module = phase.modules[m]
+                    modulesToInsert.push({
+                        roadmapId: insertedRoadmap.id,
+                        moduleIndex: globalModuleIndex,
+                        title: module.title,
+                        isCompleted: false,
+                    })
+                    globalModuleIndex++
+                }
+            }
+
+            if (modulesToInsert.length > 0) {
+                await tx.insert(studyModules).values(modulesToInsert)
+            }
+
+            return insertedRoadmap.id
         })
-
-        const [insertedRoadmap] = await db.insert(roadmaps).values({
-            userId,
-            title: roadmapData.title,
-            content: roadmapData, 
-            status: "active"
-        }).returning({ id: roadmaps.id })
-
-        if (!insertedRoadmap) {
-            throw new Error("Failed to create roadmap record")
-        }
-
-        const newRoadmapId = insertedRoadmap.id
-
-        const modulesToInsert = []
-        let globalModuleIndex = 0
-
-        for (let p = 0; p < roadmapData.phases.length; p++) {
-            const phase = roadmapData.phases[p]
-            for (let m = 0; m < phase.modules.length; m++) {
-                const module = phase.modules[m]
-                modulesToInsert.push({
-                    roadmapId: newRoadmapId,
-                    moduleIndex: globalModuleIndex,
-                    title: module.title,
-                    isCompleted: false,
-                })
-                globalModuleIndex++
-            }
-        }
-
-        if (modulesToInsert.length > 0) {
-            await db.insert(studyModules).values(modulesToInsert)
-        }
 
         return { success: true, roadmapId: newRoadmapId }
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react"
+import { useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,7 +11,15 @@ import { showToast } from "@/lib/toast"
 import Link from "next/link"
 import { resetPassword } from "@/app/actions/auth"
 
-export default function ResetPasswordScreen() {
+export default function ResetPasswordPage() {
+    return (
+        <Suspense fallback={<div className="w-full min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-indigo-500" /></div>}>
+            <ResetPasswordScreen />
+        </Suspense>
+    )
+}
+
+function ResetPasswordScreen() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const token = searchParams.get('token')
@@ -23,8 +31,8 @@ export default function ResetPasswordScreen() {
         e.preventDefault()
 
         if (!token) {
-            showToast.error("Lỗi", "Không có token xác thực hơp lệ.")
-            setErrorMessage("Liên kết khôi phục không hợp lệ hoặc đã hết hạn.")
+            showToast.error("Error", "No valid reset token provided.")
+            setErrorMessage("This reset link is invalid or has expired.")
             return
         }
 
@@ -37,7 +45,7 @@ export default function ResetPasswordScreen() {
             const confirmPassword = formData.get('confirmPassword') as string
 
             if (password !== confirmPassword) {
-                setErrorMessage("Mật khẩu xác nhận không khớp.")
+                setErrorMessage("Passwords do not match.")
                 setIsPending(false)
                 return
             }
@@ -47,14 +55,14 @@ export default function ResetPasswordScreen() {
             const result = await resetPassword(formData)
             if (result?.error) {
                 setErrorMessage(result.error)
-                showToast.error("Thất bại", result.error)
+                showToast.error("Failed", result.error)
             } else if (result?.success) {
-                showToast.success("Thành công!", "Mật khẩu của bạn đã được cập nhật.")
+                showToast.success("Success!", "Your password has been updated.")
                 setTimeout(() => router.push('/login'), 2000)
             }
         } catch (error) {
             console.error("Reset password error:", error)
-            setErrorMessage("Đã có lỗi xảy ra. Hãy thử lại.")
+            setErrorMessage("Something went wrong. Please try again.")
         } finally {
             setIsPending(false)
         }
@@ -64,7 +72,7 @@ export default function ResetPasswordScreen() {
         <div className="w-full min-h-screen flex items-center justify-center p-8 bg-slate-50 dark:bg-slate-950">
             <Link href="/login" className="absolute top-8 left-8 z-50">
                 <Button variant="ghost" className="gap-2">
-                    <ArrowLeft className="w-4 h-4" /> Quay lại Đăng nhập
+                    <ArrowLeft className="w-4 h-4" /> Back to Sign in
                 </Button>
             </Link>
 
@@ -80,17 +88,17 @@ export default function ResetPasswordScreen() {
                             <Sparkles className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
                         </div>
                         <h1 className="text-3xl font-serif font-black tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-200 bg-clip-text text-transparent">
-                            Tạo mật khẩu mới
+                            Create a new password
                         </h1>
                         <p className="text-sm text-slate-600 dark:text-slate-400 font-medium pb-2">
-                            Vui lòng nhập mật khẩu mới của bạn bên dưới
+                            Please enter your new password below.
                         </p>
                     </div>
 
                     <form onSubmit={handleSubmit}>
                         <div className="grid gap-4">
                             <div className="grid gap-2">
-                                <Label className="dark:text-slate-200 font-semibold text-slate-700" htmlFor="password">Mật khẩu mới</Label>
+                                <Label className="dark:text-slate-200 font-semibold text-slate-700" htmlFor="password">New password</Label>
                                 <Input
                                     id="password"
                                     name="password"
@@ -103,7 +111,7 @@ export default function ResetPasswordScreen() {
                                 />
                             </div>
                             <div className="grid gap-2">
-                                <Label className="dark:text-slate-200 font-semibold text-slate-700" htmlFor="confirmPassword">Xác nhận mật khẩu</Label>
+                                <Label className="dark:text-slate-200 font-semibold text-slate-700" htmlFor="confirmPassword">Confirm password</Label>
                                 <Input
                                     id="confirmPassword"
                                     name="confirmPassword"
@@ -123,7 +131,7 @@ export default function ResetPasswordScreen() {
                                 {isPending ? (
                                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                                 ) : (
-                                    <span>Lưu mật khẩu mới</span>
+                                    <span>Save new password</span>
                                 )}
                             </Button>
                         </div>
@@ -137,7 +145,7 @@ export default function ResetPasswordScreen() {
                                         className="flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 px-3 py-2 rounded-lg border border-amber-100 text-amber-600 w-full"
                                     >
                                         <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                                        <span>Không tìm thấy Token. Vui lòng bấm vào liên kết trong email.</span>
+                                        <span>No token found. Please click the reset link in your email.</span>
                                     </motion.div>
                                 )}
                                 {errorMessage && (

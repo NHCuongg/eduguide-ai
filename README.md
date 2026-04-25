@@ -1,98 +1,269 @@
-# EduGuide AI 🎓
+# EduGuide AI — Tổng hợp Tính năng & Công nghệ
 
-> Nền tảng học tập cá nhân hoá sử dụng AI để tạo lộ trình, quiz và flashcard — xây dựng trên Next.js 16 & React 19.
+## Tổng quan Kiến trúc
 
-## ✨ Tính năng nổi bật
+```mermaid
+graph TB
+    subgraph Client["Giao diện (React 19 + Next.js 16)"]
+        LP["Trang chủ<br/>16 sections"]
+        OB["Wizard Khởi tạo<br/>4 bước"]
+        AUTH["Xác thực<br/>Đăng nhập / Đăng ký / Quên MK"]
+        DASH["Dashboard"]
+    end
 
-### 🤖 AI-Powered Learning
-- **Tạo lộ trình tự động** — GPT-4o-mini phân tích profile → chương trình 3 giai đoạn
-- **Quiz thông minh** — 5 câu trắc nghiệm tuỳ chỉnh theo chủ đề & trình độ
-- **Flashcard AI** — Google Gemini tạo 5-10 thẻ ghi nhớ theo bài học
-- **Chat trợ lý** — Hỏi đáp AI theo ngữ cảnh bài học đang xem
+    subgraph DashFeatures["Tính năng Dashboard"]
+        CHAT["Chat AI"]
+        ROAD["Lộ trình học tập"]
+        FLASH["Flashcards AI"]
+        QUIZ["Quiz AI"]
+        POMO["Pomodoro Timer"]
+        NOTES["Ghi chú"]
+        GAMIFY["Gamification - XP/Streak"]
+        SCHEDULE["Lịch học"]
+    end
 
-### 📊 Dashboard toàn diện
-- Sidebar điều hướng với thông tin user từ session
-- Pomodoro Timer (đếm giờ tập trung)
-- Ghi chú theo chủ đề
-- Lịch học tích hợp calendar
-- Widget: streak, XP, mục tiêu hàng ngày
+    subgraph Backend["Backend - Next.js API Routes"]
+        API_ROAD["POST /api/generate-roadmap"]
+        API_QUIZ["POST /api/generate-quiz"]
+        API_FLASH["POST /api/generate-flashcards"]
+        API_AUTH["NextAuth /api/auth"]
+        API_INN["POST /api/inngest"]
+    end
 
-### 🎮 Gamification
-- Hệ thống **XP & Level** (15 cấp: Novice → Master)
-- **Streak** theo dõi chuỗi ngày học liên tiếp
-- Bản đồ học tập trực quan (Gamified Map)
+    subgraph AI["Nhà cung cấp AI"]
+        OPENAI["OpenAI GPT-4o-mini"]
+        GEMINI["Google Gemini"]
+    end
 
-### 🔐 Xác thực & Bảo mật
-- Đăng nhập bằng email/mật khẩu (bcryptjs)
-- OAuth Google & GitHub
+    subgraph Infra["Hạ tầng"]
+        DB["PostgreSQL - Supabase"]
+        RESEND["Resend - Email"]
+        INNGEST["Inngest - Background Jobs"]
+    end
+
+    DASH --> API_ROAD & API_QUIZ & API_FLASH
+    API_ROAD --> OPENAI
+    API_QUIZ --> OPENAI
+    API_FLASH --> GEMINI
+    API_AUTH --> DB
+    API_INN --> INNGEST
+    INNGEST --> RESEND
+    INNGEST --> DB
+```
+
+---
+
+## Danh sách Tính năng
+
+### 1. Trang chủ (Landing Page) — 16 sections
+
+| Section | Mô tả |
+|---------|-------|
+| Navbar | Điều hướng responsive, nút chuyển theme sáng/tối |
+| Hero | Animation xoay chủ đề, nút CTA, hiệu ứng particles |
+| TrustedBy | Logo đối tác |
+| Features | Card tính năng nổi bật |
+| HowItWorks | Quy trình hoạt động theo bước |
+| VideoSection | Demo sản phẩm |
+| TestimonialSection | Đánh giá người dùng |
+| PricingSection | Bảng giá theo gói |
+| BlogSection | Bài viết blog |
+| FAQSection | Câu hỏi thường gặp (Accordion) |
+| CTASection | Nút kêu gọi hành động |
+| PrivacySection | Chính sách bảo mật |
+| Footer | Links, mạng xã hội |
+| ScrollToTop | Nút cuộn lên đầu trang |
+
+### 2. Hệ thống Xác thực
+- Đăng nhập bằng email + mật khẩu (mã hoá bcryptjs)
+- Đăng nhập qua **Google** và **GitHub** (OAuth)
+- Đăng ký tài khoản với validate email
 - Quên / đặt lại mật khẩu qua email
-- Rate limiting cho API AI (5 req/phút)
+- Gửi email chào mừng tự động khi đăng ký (Inngest → Resend)
 
-### 🌐 Landing Page cao cấp
-- 16 sections responsive (Hero, Features, Pricing, FAQ, Testimonials...)
-- Animation mượt mà (Framer Motion)
-- Dark/Light mode
-- SEO-optimized
+### 3. Wizard Khởi tạo (Onboarding) — 4 bước
+Thu thập thông tin người dùng để cá nhân hoá chương trình học:
+
+| Bước | Dữ liệu thu thập |
+|------|-------------------|
+| Bước 1 — Nền tảng | Kỹ năng mục tiêu, trình độ hiện tại |
+| Bước 2 — Mục tiêu | Mục tiêu chính (Sự nghiệp/Học thuật/Sở thích), phong cách học |
+| Bước 3 — Sở thích | Lĩnh vực quan tâm, loại nội dung ưa thích |
+| Bước 4 — Chi tiết | Thời gian dành cho học, deadline, điểm mạnh/yếu |
+
+### 4. Tạo Lộ trình học bằng AI
+- **Model:** OpenAI GPT-4o-mini
+- **Quy trình:** Dữ liệu onboarding → prompt engineering → JSON có cấu trúc
+- **Kết quả:** Tiêu đề khoá học, 3 giai đoạn, mỗi giai đoạn 3-4 module
+- **Tính năng:** Rate limiting (5 req/phút), cache 24h, xác thực Zod
+
+### 5. Tạo Quiz bằng AI
+- **Model:** OpenAI GPT-4o-mini
+- **Kết quả:** 5 câu hỏi trắc nghiệm theo chủ đề
+- **Tính năng:** Rate limiting, cache 1h, dữ liệu mock khi lỗi
+
+### 6. Tạo Flashcards bằng AI
+- **Model:** Google Gemini
+- **Kết quả:** 5-10 flashcard mỗi chủ đề (mặt trước/sau)
+- **Tính năng:** Rate limiting, cache 1h, validate bằng Zod
+
+### 7. Dashboard
+- **Sidebar** — Điều hướng, thông tin user từ session
+- **Nội dung chính** — Công cụ học (Pomodoro, Ghi chú, Flashcard)
+- **Chat AI** — Trợ lý AI với gợi ý theo ngữ cảnh
+- **Widget phải** — Timer, mục tiêu hàng ngày, streak, CTA
+- **Kế hoạch học** — Chương trình học đầy đủ theo giai đoạn
+- **Lộ trình** — Hiển thị roadmap trực quan
+- **Bản đồ Gamified** — Đường học tập có tiến trình
+- **Lịch** — Tích hợp calendar (react-day-picker)
+
+### 8. Hệ thống Gamification
+- **XP** — Nhận điểm kinh nghiệm khi hoàn thành bài học
+- **Cấp độ** — 15 bậc (Novice → Master)
+- **Streak** — Chuỗi ngày hoạt động liên tiếp
+- **Lưu trữ** qua Zustand + localStorage
+
+### 9. Công cụ Học tập
+- **Pomodoro Timer** — Đếm giờ tập trung, đếm phiên học
+- **Ghi chú** — Ghi chú theo chủ đề
+- **Flashcard** — Lật thẻ, theo dõi mức độ thành thạo
+- **Quiz** — Trắc nghiệm, chấm điểm tự động
+
+### 10. Tác vụ nền (Inngest)
+- **Email chào mừng** — Kích hoạt khi đăng ký (`user/signup`)
+- **Phát kết quả** — Cập nhật realtime qua Supabase channels
 
 ---
 
-## 🛠 Công nghệ
+## Công nghệ Sử dụng
 
-| Phân loại | Công nghệ |
-|-----------|-----------|
-| **Framework** | Next.js 16.1.1 (App Router, Turbopack) |
-| **Frontend** | React 19, TypeScript 5, Tailwind CSS 4 |
-| **UI Components** | shadcn/ui (Radix UI), Lucide Icons, Framer Motion |
-| **AI** | OpenAI GPT-4o-mini, Google Gemini |
-| **Database** | PostgreSQL (Supabase) + Drizzle ORM |
-| **Auth** | NextAuth v5 (Credentials + OAuth) |
-| **State** | Zustand (persist middleware) |
-| **Email** | Resend |
-| **Background Jobs** | Inngest |
-| **Validation** | Zod |
+### Framework & Ngôn ngữ
+
+| Công nghệ | Phiên bản | Vai trò |
+|-----------|-----------|---------|
+| **Next.js** | 16.1.1 | Full-stack React framework (App Router, Turbopack) |
+| **React** | 19.2.3 | Thư viện giao diện |
+| **TypeScript** | 5.x | An toàn kiểu dữ liệu |
+| **Tailwind CSS** | 4.x | CSS utility-first |
+
+### Giao diện (UI)
+
+| Công nghệ | Vai trò |
+|-----------|---------|
+| **shadcn/ui** (Radix UI) | Component accessible (Dialog, Accordion, Popover...) |
+| **Lucide React** | Thư viện icon |
+| **Framer Motion** | Animation chuyển trang, micro-interactions |
+| **Sonner** | Thông báo toast |
+| **react-day-picker** | Calendar/date picker |
+
+### Trí tuệ Nhân tạo (AI)
+
+| Công nghệ | Model | Sử dụng cho |
+|-----------|-------|-------------|
+| **OpenAI** | GPT-4o-mini | Tạo lộ trình, tạo quiz, chat |
+| **Google Generative AI** | Gemini | Tạo flashcard |
+
+### Cơ sở Dữ liệu
+
+| Công nghệ | Vai trò |
+|-----------|---------|
+| **PostgreSQL** (Supabase) | Database chính |
+| **Drizzle ORM** | Query builder type-safe |
+| **Drizzle Kit** | Migration (`db:generate`, `db:push`, `db:studio`) |
+
+### Xác thực & Bảo mật
+
+| Công nghệ | Vai trò |
+|-----------|---------|
+| **NextAuth v5** | Framework xác thực (Credentials + OAuth) |
+| **bcryptjs** | Mã hoá mật khẩu |
+| **Zod** | Validate dữ liệu runtime |
+
+### Quản lý Trạng thái
+
+| Công nghệ | Vai trò |
+|-----------|---------|
+| **Zustand** | State client-side (wizard, gamification, notes, pomodoro) |
+| Zustand `persist` | Lưu trạng thái vào localStorage |
+
+### Dịch vụ Backend
+
+| Công nghệ | Vai trò |
+|-----------|---------|
+| **Inngest** | Xử lý tác vụ nền |
+| **Resend** | Gửi email giao dịch |
+| **Supabase** | PostgreSQL + realtime channels |
 
 ---
 
-## 📁 Cấu trúc Dự án
+## Sơ đồ Cơ sở Dữ liệu (8 bảng)
+
+| Bảng | Mô tả | Quan hệ |
+|------|-------|---------|
+| `user` | Người dùng (id, name, email, password) | Gốc |
+| `account` | Tài khoản OAuth (Google, GitHub) | → user |
+| `session` | Phiên đăng nhập | → user |
+| `verificationToken` | Token xác thực email | — |
+| `profile` | Hồ sơ học tập (skill, level, XP, streak) | → user |
+| `roadmap` | Lộ trình học (content JSON, trạng thái) | → user |
+| `study_module` | Module trong lộ trình (tiến trình hoàn thành) | → roadmap |
+| `flashcard_deck` | Bộ flashcard theo chủ đề | → user |
+| `flashcard` | Thẻ flashcard (mặt trước/sau, trạng thái) | → flashcard_deck |
+
+---
+
+## API Endpoints
+
+| Method | Endpoint | Auth | AI Model | Rate Limit | Cache |
+|--------|----------|------|----------|------------|-------|
+| POST | `/api/generate-roadmap` | ✅ | GPT-4o-mini | 5/phút | 24h |
+| POST | `/api/generate-quiz` | ❌ | GPT-4o-mini | 5/phút | 1h |
+| POST | `/api/generate-flashcards` | ❌ | Gemini | 5/phút | 1h |
+| ALL | `/api/auth/[...nextauth]` | — | — | — | — |
+| POST | `/api/inngest` | — | — | — | — |
+
+---
+
+## Cấu trúc Dự án
 
 ```
 src/
 ├── app/
 │   ├── api/                    # API Routes
 │   │   ├── auth/[...nextauth]/ # NextAuth endpoints
-│   │   ├── generate-roadmap/   # AI roadmap generation
-│   │   ├── generate-quiz/      # AI quiz generation
-│   │   ├── generate-flashcards/# AI flashcard generation
+│   │   ├── generate-roadmap/   # Tạo lộ trình AI
+│   │   ├── generate-quiz/      # Tạo quiz AI
+│   │   ├── generate-flashcards/# Tạo flashcard AI
 │   │   └── inngest/            # Background job handler
-│   ├── dashboard/              # Dashboard pages
+│   ├── dashboard/              # Trang dashboard
 │   │   ├── loading.tsx         # Skeleton loading UI
 │   │   └── error.tsx           # Error boundary
-│   ├── login/                  # Login page
-│   ├── register/               # Register page
-│   ├── onboarding/             # Onboarding wizard
-│   ├── reset-password/         # Password reset
+│   ├── login/                  # Trang đăng nhập
+│   ├── register/               # Trang đăng ký
+│   ├── onboarding/             # Wizard khởi tạo
+│   ├── reset-password/         # Đặt lại mật khẩu
 │   ├── globals.css             # Design system & animations
 │   ├── layout.tsx              # Root layout (theme, session)
-│   └── page.tsx                # Landing page
+│   └── page.tsx                # Trang chủ
 ├── components/
 │   ├── auth/                   # AuthScreen
 │   ├── dashboard/              # Dashboard components
-│   │   ├── ChatPanel.tsx       # AI chat
-│   │   ├── MainContent.tsx     # Main area
+│   │   ├── ChatPanel.tsx       # Chat AI
+│   │   ├── MainContent.tsx     # Nội dung chính
 │   │   ├── WorkspaceSidebar.tsx# Sidebar
-│   │   ├── RightWidgets.tsx    # Right panel widgets
-│   │   ├── StudyPlan.tsx       # Study plan view
+│   │   ├── RightWidgets.tsx    # Widget phải
+│   │   ├── StudyPlan.tsx       # Kế hoạch học
 │   │   ├── flashcards/         # Flashcard components
 │   │   ├── quiz/               # Quiz components
 │   │   ├── pomodoro/           # Pomodoro timer
-│   │   ├── notes/              # Notes
-│   │   └── schedule/           # Calendar
+│   │   ├── notes/              # Ghi chú
+│   │   └── schedule/           # Lịch
 │   ├── landing/                # 16 landing page sections
 │   ├── onboarding/             # Wizard steps
 │   └── ui/                     # shadcn/ui primitives
 └── lib/
     ├── db/                     # Drizzle schema & queries
-    │   └── schema.ts           # 8 database tables
+    │   └── schema.ts           # 8 bảng database
     ├── inngest/                # Background job definitions
     ├── store.ts                # Zustand wizard store
     ├── useGamificationStore.ts # XP/Level/Streak store
@@ -109,7 +280,7 @@ src/
 
 ---
 
-## 🚀 Bắt đầu
+## Bắt đầu
 
 ### Yêu cầu
 - Node.js 18+
@@ -128,7 +299,6 @@ npm install
 
 # Cấu hình biến môi trường
 cp .env.example .env.local
-# Sửa file .env.local với các API keys
 
 # Khởi tạo database
 npm run db:push
@@ -163,22 +333,6 @@ npm run lint       # Run ESLint
 
 ---
 
-## 📊 Database Schema
-
-| Bảng | Mô tả |
-|------|-------|
-| `user` | Người dùng (id, name, email, password) |
-| `account` | Tài khoản OAuth (Google, GitHub) |
-| `session` | Phiên đăng nhập |
-| `verificationToken` | Token xác thực email |
-| `profile` | Hồ sơ học tập (skill, level, XP, streak) |
-| `roadmap` | Lộ trình học (nội dung JSON, trạng thái) |
-| `study_module` | Module trong lộ trình |
-| `flashcard_deck` | Bộ flashcard theo chủ đề |
-| `flashcard` | Thẻ nhớ (mặt trước/sau, trạng thái thành thạo) |
-
----
-
-## 📄 License
+## License
 
 MIT

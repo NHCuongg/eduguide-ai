@@ -1,87 +1,68 @@
-import { NextResponse } from 'next/server'
-import { geminiModel } from "@/lib/gemini"
-import { cache } from "@/lib/cache"
-import { rateLimit, aiRateLimiter } from "@/lib/rate-limit"
+import { createGeneratorRoute } from "@/lib/api-generator"
+import { llmModels } from "@/lib/llm"
 import { z } from "zod"
 
 const FlashcardSchema = z.object({
-    front: z.string(),
-    back: z.string(),
+  front: z.string().min(1),
+  back: z.string().min(1),
+})
+
+const flashcardRequestSchema = z.object({
+  topic: z.string().trim().min(1, "Topic is required"),
+  context: z.string().trim().optional(),
 })
 
 const FlashcardsResponseSchema = z.object({
-    topic: z.string(),
-    flashcards: z.array(FlashcardSchema),
+  topic: z.string().min(1),
+  flashcards: z.array(FlashcardSchema).min(5).max(10),
 })
 
-export async function POST(req: Request) {
-    try {
-        
-        const rateLimitResult = await rateLimit(req, aiRateLimiter)
-        if (rateLimitResult && !rateLimitResult.allowed) {
-            return NextResponse.json(
-                {
-                    error: 'Rate limit exceeded',
-                    retryAfter: Math.ceil((rateLimitResult.resetAt - Date.now()) / 1000)
-                },
-                {
-                    status: 429,
-                    headers: {
-                        'X-RateLimit-Limit': '5',
-                        'X-RateLimit-Remaining': '0',
-                        'X-RateLimit-Reset': rateLimitResult.resetAt.toString(),
-                        'Retry-After': Math.ceil((rateLimitResult.resetAt - Date.now()) / 1000).toString()
-                    }
-                }
-            )
-        }
+const FLASHCARDS_JSON_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    topic: {
+      type: "string",
+      minLength: 1,
+      description: "The topic the flashcards are about",
+    },
+    flashcards: {
+      type: "array",
+      minItems: 5,
+      maxItems: 10,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          front: { type: "string", minLength: 1, description: "Question, prompt, or term" },
+          back: { type: "string", minLength: 1, description: "Answer, definition, or explanation" },
+        },
+        required: ["front", "back"],
+      },
+    },
+  },
+  required: ["topic", "flashcards"],
+} as const
 
-        const { topic, context } = await req.json()
+export const POST = createGeneratorRoute({
+  namespace: "flashcards",
+  schemaName: "flashcard_deck",
+  jsonSchema: FLASHCARDS_JSON_SCHEMA,
+  validator: FlashcardsResponseSchema,
+  inputSchema: flashcardRequestSchema,
+  model: llmModels.flashcards,
+  systemPrompt: "You create concise, high-retention study flashcards and return only valid JSON.",
+  invalidRequestMessage: "Invalid flashcard request",
+  logLabel: "Flashcards",
+  buildCachePayload: ({ topic, context }) => ({ topic, context: context || "" }),
+  buildUserPrompt: ({ topic, context }) => `
+Create a set of 5-10 high-quality flashcards for the topic: "${topic}".
+${context ? `Context: ${context}` : ""}
 
-        if (!topic) {
-            return NextResponse.json({ error: 'Topic is required' }, { status: 400 })
-        }
-
-        const cacheKey = cache.generateKey(`flashcards:${topic}`, context)
-
-        const parsedData = await cache.getOrSet(
-            cacheKey,
-            async () => {
-                const prompt = `
-      Create a set of 5-10 high-quality flashcards for the topic: "${topic}".
-      ${context ? `Context: ${context}` : ''}
-      
-      Each flashcard should have a "front" (question/term) and a "back" (answer/definition).
-      Keep them concise and effective for learning.
-      
-      Return ONLY valid JSON in the following format:
-      {
-        "topic": "${topic}",
-        "flashcards": [
-          { "front": "Question 1", "back": "Answer 1" },
-          { "front": "Question 2", "back": "Answer 2" }
-        ]
-      }
-    `
-
-                const result = await geminiModel.generateContent({
-                    contents: [{ role: "user", parts: [{ text: prompt }] }],
-                    generationConfig: { responseMimeType: "application/json" }
-                })
-                const response = await result.response
-                const text = response.text()
-
-                const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim()
-
-                const data = JSON.parse(cleanText)
-                return FlashcardsResponseSchema.parse(data)
-            },
-            60 * 60 * 1000 
-        )
-
-        return NextResponse.json(parsedData)
-    } catch (error) {
-        console.error('Error generating flashcards:', error)
-        return NextResponse.json({ error: 'Failed to generate flashcards' }, { status: 500 })
-    }
-}
+Rules:
+- Each flashcard must have a "front" and a "back".
+- Keep each card concise, specific, and useful for spaced repetition.
+- Prefer definitions, contrasts, key facts, and short concept checks.
+- The topic field must remain "${topic}".
+          `,
+})

@@ -1,90 +1,80 @@
-import { openai } from "@/lib/openai"
-import { cache } from "@/lib/cache"
-import { rateLimit, aiRateLimiter } from "@/lib/rate-limit"
-import { NextResponse } from "next/server"
+import { createGeneratorRoute } from "@/lib/api-generator"
+import { llmModels } from "@/lib/llm"
 import { z } from "zod"
 
 const quizSchema = z.object({
-  topic: z.string(),
-  skillLevel: z.string().optional().default("Intermediate"),
+  topic: z.string().trim().min(1, "Topic is required"),
+  skillLevel: z.string().trim().min(1).optional().default("Intermediate"),
 })
 
-export async function POST(req: Request) {
-  try {
-    
-    const rateLimitResult = await rateLimit(req, aiRateLimiter)
-    if (rateLimitResult && !rateLimitResult.allowed) {
-      return NextResponse.json(
-        {
-          error: 'Rate limit exceeded',
-          retryAfter: Math.ceil((rateLimitResult.resetAt - Date.now()) / 1000)
-        },
-        {
-          status: 429,
-          headers: {
-            'X-RateLimit-Limit': '5',
-            'X-RateLimit-Remaining': '0',
-            'X-RateLimit-Reset': rateLimitResult.resetAt.toString(),
-            'Retry-After': Math.ceil((rateLimitResult.resetAt - Date.now()) / 1000).toString()
-          }
-        }
-      )
-    }
-
-    const body = await req.json()
-    const { topic, skillLevel } = quizSchema.parse(body)
-
-    const cacheKey = cache.generateKey(`quiz:${topic}`, skillLevel)
-
-    const data = await cache.getOrSet(
-      cacheKey,
-      async () => {
-        const prompt = `
-          You are an expert examiner. Create a 5-question multiple-choice quiz about: ${topic}.
-          Target Audience Level: ${skillLevel}.
-          
-          Return JSON format ONLY (raw JSON, no markdown):
-          {
-            "questions": [
-              {
-                "id": 1,
-                "text": "Question text here?",
-                "options": ["Option A", "Option B", "Option C", "Option D"],
-                "correctAnswer": "Option A" // Must match one of the options exactly
-              }
-            ]
-          }
-        `
-
-        const completion = await openai.chat.completions.create({
-          model: "gpt-4o-mini",
-          messages: [{ role: "system", content: "You are an expert examiner that outputs JSON." }, { role: "user", content: prompt }],
-          response_format: { type: "json_object" }
+const QuizResponseSchema = z.object({
+  questions: z
+    .array(
+      z
+        .object({
+          id: z.number().int().positive(),
+          text: z.string().min(1),
+          options: z.array(z.string().min(1)).length(4),
+          correctAnswer: z.string().min(1),
         })
-        const text = completion.choices[0].message.content || ""
-
-        const jsonString = text.replace(/```json/g, '').replace(/```/g, '').trim()
-
-        return JSON.parse(jsonString)
-      },
-      60 * 60 * 1000 
+        .refine((question) => question.options.includes(question.correctAnswer), {
+          message: "correctAnswer must match one of the options",
+        })
     )
+    .length(5),
+})
 
-    return NextResponse.json(data)
-  } catch (error) {
-    console.error("Quiz Generation Error:", error)
-    return NextResponse.json({
-      error: "Failed to generate quiz",
-      
-      mock: true,
-      questions: [
-        {
-          id: 1,
-          text: `What is a fundamental concept of this topic?`,
-          options: ["Concept A", "Concept B", "Concept C", "Concept D"],
-          correctAnswer: "Concept A"
-        }
-      ]
-    }, { status: 500 })
-  }
-}
+const QUIZ_JSON_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    questions: {
+      type: "array",
+      minItems: 5,
+      maxItems: 5,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          id: { type: "integer", minimum: 1, description: "Sequential question number" },
+          text: { type: "string", minLength: 1, description: "Question text" },
+          options: {
+            type: "array",
+            minItems: 4,
+            maxItems: 4,
+            items: { type: "string", minLength: 1, description: "Answer option" },
+          },
+          correctAnswer: {
+            type: "string",
+            minLength: 1,
+            description: "Must exactly match one of the options",
+          },
+        },
+        required: ["id", "text", "options", "correctAnswer"],
+      },
+    },
+  },
+  required: ["questions"],
+} as const
+
+export const POST = createGeneratorRoute({
+  namespace: "quiz",
+  schemaName: "topic_quiz",
+  jsonSchema: QUIZ_JSON_SCHEMA,
+  validator: QuizResponseSchema,
+  inputSchema: quizSchema,
+  model: llmModels.quiz,
+  systemPrompt: "You are an expert examiner. Return only valid JSON that matches the provided schema.",
+  invalidRequestMessage: "Invalid quiz request",
+  logLabel: "Quiz",
+  buildUserPrompt: ({ topic, skillLevel }) => `
+Create a 5-question multiple-choice quiz about: ${topic}
+Target audience level: ${skillLevel}
+
+Rules:
+- Produce exactly 5 questions.
+- Each question must have exactly 4 answer options.
+- correctAnswer must exactly match one of the options.
+- Keep the difficulty aligned to the requested skill level.
+          `,
+})

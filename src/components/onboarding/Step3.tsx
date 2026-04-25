@@ -3,7 +3,7 @@
 import { useWizardStore } from "@/lib/store"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
-import { Loader2, Ticket, CheckCircle2, AlertCircle } from "lucide-react"
+import { Loader2, Ticket, CheckCircle2, AlertCircle, RefreshCw } from "lucide-react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { saveOnboardingData } from "@/app/actions/onboarding"
@@ -27,7 +27,13 @@ export default function Step3() {
             })
 
             if (!response.ok) {
-                throw new Error('Failed to generate roadmap from AI')
+                const errorData = await response.json().catch(() => ({}))
+
+                if (response.status === 429) {
+                    throw new Error(`Rate limit exceeded. Please wait ${errorData.retryAfter || 60} seconds and try again.`)
+                }
+
+                throw new Error(errorData.error || 'Failed to generate roadmap from AI')
             }
 
             const roadmapData = await response.json()
@@ -114,9 +120,29 @@ export default function Step3() {
             </div>
 
             {error && (
-                <div className="flex items-center gap-2 p-4 text-sm text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400 rounded-xl border border-red-200 dark:border-red-900">
-                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                    {error}
+                <div
+                    role="alert"
+                    aria-live="assertive"
+                    className="flex flex-col gap-3 p-4 text-sm text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400 rounded-xl border border-red-200 dark:border-red-900"
+                >
+                    <div className="flex items-start gap-2">
+                        <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                        <div className="space-y-1">
+                            <div className="font-semibold">We couldn&apos;t build your syllabus.</div>
+                            <p className="text-xs opacity-90">{error}</p>
+                        </div>
+                    </div>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleSubmit}
+                        disabled={isLoading}
+                        className="self-start gap-2 border-red-300 dark:border-red-800 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/40 focus-visible:ring-2 focus-visible:ring-red-500"
+                    >
+                        <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} aria-hidden="true" />
+                        Try again
+                    </Button>
                 </div>
             )}
 
