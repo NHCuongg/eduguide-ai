@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useMemo } from "react"
+import { useState, useCallback, type ReactNode } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
@@ -18,7 +18,13 @@ interface Question {
     correctAnswer: string
 }
 
-export function QuizModal({ moduleTitle, difficulty = "Intermediate" }: { moduleTitle: string, difficulty?: string }) {
+interface QuizModalProps {
+    moduleTitle: string
+    difficulty?: string
+    trigger?: ReactNode
+}
+
+export function QuizModal({ moduleTitle, difficulty = "Intermediate", trigger }: QuizModalProps) {
     const [isOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const [questions, setQuestions] = useState<Question[]>([])
@@ -79,14 +85,6 @@ export function QuizModal({ moduleTitle, difficulty = "Intermediate" }: { module
         }
     }, [currentQuestion, questions.length])
 
-    const currentQuestionData = useMemo(() => {
-        return questions[currentQuestion]
-    }, [questions, currentQuestion])
-
-    const isLastQuestion = useMemo(() => {
-        return currentQuestion === questions.length - 1
-    }, [currentQuestion, questions.length])
-
     const { addXP } = useGamificationStore()
     const [xpClaimed, setXpClaimed] = useState(false)
 
@@ -100,15 +98,16 @@ export function QuizModal({ moduleTitle, difficulty = "Intermediate" }: { module
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-indigo-600 dark:text-indigo-400 border-2 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:border-indigo-300 dark:hover:border-indigo-700 font-semibold transition-all hover:scale-105"
-                    onClick={fetchQuiz}
-                >
-                    <Trophy className="w-4 h-4 mr-2" /> Test Knowledge
-                </Button>
+            <DialogTrigger asChild onClick={fetchQuiz}>
+                {trigger ?? (
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg gap-2 font-semibold"
+                    >
+                        <Trophy className="w-4 h-4" /> Quiz
+                    </Button>
+                )}
             </DialogTrigger>
             <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader className="pb-4 border-b border-slate-100 dark:border-slate-800">

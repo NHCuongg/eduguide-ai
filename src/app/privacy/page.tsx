@@ -48,7 +48,7 @@ export default function PrivacyPage() {
                             We **do not** sell your personal data to advertisers.
                         </p>
                         <p>
-                            In order to generate your curriculum, certain anonymized educational prompts (e.g., "Student wants to learn React, currently knows HTML") are sent to our LLM partners (like Google Gemini). We do not send your name or contact information to these AI providers.
+                            In order to generate your curriculum, certain anonymized educational prompts (e.g., &quot;Student wants to learn React, currently knows HTML&quot;) are sent to our LLM partners (like Google Gemini). We do not send your name or contact information to these AI providers.
                         </p>
                     </section>
 

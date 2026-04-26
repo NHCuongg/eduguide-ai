@@ -7,15 +7,22 @@ interface WizardState {
     currentStep: number
     data: Partial<OnboardingData>
     roadmap: Roadmap | null
+    activeRoadmapId: string | null
     completedModules: string[]
     activeModuleId: string | null
     setData: (data: Partial<OnboardingData>) => void
-    setRoadmap: (roadmap: Roadmap) => void
+    setRoadmap: (roadmap: Roadmap, roadmapId?: string | null) => void
     toggleModule: (moduleId: string) => void
     setActiveModule: (moduleId: string) => void
     nextStep: () => void
     prevStep: () => void
     reset: () => void
+    hydrateFromServer: (payload: {
+        data?: Partial<OnboardingData> | null
+        roadmap?: Roadmap | null
+        roadmapId?: string | null
+        completedModules?: string[]
+    }) => void
 }
 
 export const useWizardStore = create<WizardState>()(
@@ -24,10 +31,11 @@ export const useWizardStore = create<WizardState>()(
             currentStep: 1,
             data: {},
             roadmap: null,
+            activeRoadmapId: null,
             completedModules: [],
             activeModuleId: null,
             setData: (newData: Partial<OnboardingData>) => set((state) => ({ data: { ...state.data, ...newData } })),
-            setRoadmap: (roadmap: Roadmap) => set({ roadmap }),
+            setRoadmap: (roadmap: Roadmap, roadmapId?: string | null) => set({ roadmap, activeRoadmapId: roadmapId ?? null }),
             toggleModule: (moduleId: string) => set((state) => {
                 const exists = state.completedModules.includes(moduleId)
                 return {
@@ -43,15 +51,23 @@ export const useWizardStore = create<WizardState>()(
                 currentStep: 1,
                 data: {},
                 roadmap: null,
+                activeRoadmapId: null,
                 completedModules: [],
                 activeModuleId: null
             }),
+            hydrateFromServer: ({ data: serverData, roadmap, roadmapId, completedModules }) => set((state) => ({
+                data: serverData ? { ...state.data, ...serverData } : state.data,
+                roadmap: roadmap ?? state.roadmap,
+                activeRoadmapId: roadmapId ?? state.activeRoadmapId,
+                completedModules: completedModules ?? state.completedModules,
+            })),
         }),
         {
             name: 'wizard-storage',
             partialize: (state) => ({
                 data: state.data,
                 roadmap: state.roadmap,
+                activeRoadmapId: state.activeRoadmapId,
                 completedModules: state.completedModules,
                 currentStep: state.currentStep,
             }),

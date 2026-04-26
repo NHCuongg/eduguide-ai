@@ -1,5 +1,4 @@
 
-import { supabase } from '../supabase'
 import { QuizRecord } from './types'
 import { cache } from '../cache'
 
@@ -33,17 +32,16 @@ export async function saveQuiz(
 }
 
 export async function getQuizByTopic(
-    userId: string,
+    _userId: string,
     topic: string,
     skillLevel: string
 ): Promise<QuizRecord | null> {
-
-    const cacheKey = cache.generateKey(`quiz:${topic}`, skillLevel)
-
+    void topic
+    void skillLevel
     return null
 }
 
 export async function getUserQuizzes(userId: string): Promise<QuizRecord[]> {
-
+    void userId
     return []
 }

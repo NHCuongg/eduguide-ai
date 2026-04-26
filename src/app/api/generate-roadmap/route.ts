@@ -113,7 +113,7 @@ function buildRoadmapCachePayload(data: z.infer<typeof onboardingSchema>) {
   return {
     targetSkill: data.targetSkill,
     currentLevel: data.currentLevel,
-    learningStyle: data.learningStyle,
+    learningStyle: [...data.learningStyle].sort(),
     availability: data.availability,
     deadline: data.deadline,
     primaryGoal: data.primaryGoal,
@@ -182,7 +182,7 @@ Create a rigorous, structured syllabus for a university-level course.
 USER PROFILE:
 - Wants to learn: ${data.targetSkill}
 - Current Level: ${data.currentLevel}
-- Learning Style: ${data.learningStyle}
+- Learning Styles (mix all of these): ${data.learningStyle.join(", ")}
 - Available time per week: ${data.availability} hours
 - Timeframe: ${data.deadline}
 - Primary Goal: ${data.primaryGoal}
@@ -199,6 +199,7 @@ Rules:
 - Each module description should be 2-3 concise academic sentences.
 - Include realistic time estimates like 30m, 45m, 1h, or 2h.
 - Resource types must only be Flashcard, Quiz, Reading, or Exercise.
+- Match resource mix to the user's selected learning styles: include Flashcards if "Flashcard" is selected, Exercises/Quizzes if "Hands-on" is selected, Readings if "Reading" is selected. When multiple styles are selected, blend them across modules.
 - Do not suggest video materials.
 - Use direct HTTPS URLs when known; otherwise provide concise search keywords in the url field.
           `,

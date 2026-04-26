@@ -1,3 +1,4 @@
+import { auth } from "@/auth"
 import { createGeneratorRoute } from "@/lib/api-generator"
 import { llmModels } from "@/lib/llm"
 import { z } from "zod"
@@ -54,6 +55,10 @@ export const POST = createGeneratorRoute({
   systemPrompt: "You create concise, high-retention study flashcards and return only valid JSON.",
   invalidRequestMessage: "Invalid flashcard request",
   logLabel: "Flashcards",
+  requireAuth: async () => {
+    const session = await auth()
+    return session?.user ? { allowed: true, userId: session.user.id } : { allowed: false }
+  },
   buildCachePayload: ({ topic, context }) => ({ topic, context: context || "" }),
   buildUserPrompt: ({ topic, context }) => `
 Create a set of 5-10 high-quality flashcards for the topic: "${topic}".

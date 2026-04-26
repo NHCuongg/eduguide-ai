@@ -1,0 +1,131 @@
+{
+  "common": {
+    "resume": "Resume",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "continue": "Continue",
+    "search": "Search",
+    "loading": "Loading…",
+    "all": "All",
+    "tryAgain": "Try again",
+    "home": "Home"
+  },
+  "nav": {
+    "overview": "Overview",
+    "studyPlan": "Study Plan",
+    "myCourses": "My Courses",
+    "testPractice": "Test Practice",
+    "profile": "Learning Profile",
+    "settings": "Settings",
+    "signOut": "Sign out"
+  },
+  "dashboard": {
+    "workspaceEyebrow": "Workspace",
+    "yourStudies": "Your studies",
+    "subtitle": "Continue your personalized roadmap.",
+    "stats": {
+      "streak": "Streak",
+      "modules": "Modules",
+      "level": "Level",
+      "xp": "XP",
+      "days": "days",
+      "of": "of"
+    },
+    "hero": {
+      "inProgress": "In progress",
+      "fallbackTitle": "Continue your {subject}",
+      "subtitle": "Your personalized AI curriculum. Finish the next module to push your progress.",
+      "resume": "Resume",
+      "allCourses": "All courses",
+      "complete": "Complete"
+    },
+    "studyTools": "Study tools",
+    "learningPath": "Learning path",
+    "viewFullCurriculum": "View full curriculum →",
+    "noModules": "No modules yet",
+    "createRoadmap": "Create roadmap",
+    "greetingMorning": "Good morning",
+    "greetingAfternoon": "Good afternoon",
+    "greetingEvening": "Good evening"
+  },
+  "courses": {
+    "eyebrow": "Library",
+    "title": "My courses",
+    "subtitle": "All AI roadmaps you've created. Only one is active at a time.",
+    "newCourse": "New course",
+    "tabs": {
+      "all": "All",
+      "active": "Active",
+      "completed": "Completed",
+      "archived": "Archived"
+    },
+    "continueLearning": "Continue learning",
+    "allCourses": "All courses",
+    "noCoursesTitle": "No courses yet",
+    "noCoursesBody": "Create your first course — we'll design a roadmap tailored to your level, goal and weekly availability.",
+    "startWizard": "Start the wizard",
+    "modules": "{count} modules",
+    "completedCount": "{count} completed",
+    "noResults": "No matching courses",
+    "noResultsQuery": "No results for \"{query}\".",
+    "noResultsFilter": "No courses with status \"{filter}\"."
+  },
+  "tests": {
+    "eyebrow": "Practice",
+    "title": "Test practice",
+    "subtitle": "Each module has an AI-generated quiz based on your roadmap.",
+    "quickPractice": "Quick practice",
+    "quickPracticeTitle": "Test what you just learned",
+    "quickPracticeBody": "AI will generate 5 questions for your most recent unfinished module.",
+    "startPractice": "Start practice",
+    "random": "Random",
+    "tabs": {
+      "all": "All",
+      "todo": "To do",
+      "done": "Done"
+    },
+    "practicingFor": "Practicing for course {course}.",
+    "noActiveTitle": "No course to practice yet",
+    "noActiveBody": "Create an AI roadmap first to unlock per-module practice quizzes.",
+    "createFirst": "Create a new roadmap",
+    "viewExisting": "View existing courses",
+    "noModulesTitle": "Active course has no modules"
+  },
+  "profile": {
+    "eyebrow": "Profile",
+    "title": "Learning profile",
+    "studying": "Studying {subject}",
+    "noSubject": "No subject chosen yet",
+    "verified": "Verified account",
+    "level": "Level: {level}",
+    "stats": {
+      "courses": "Courses",
+      "modules": "Modules",
+      "completed": "Completed",
+      "created": "created"
+    },
+    "manageCourses": "Manage courses"
+  },
+  "studyPlan": {
+    "eyebrow": "Study plan",
+    "subtitle": "{total} modules · {completed} completed · {progress}%",
+    "resumeNext": "Resume next",
+    "allDone": "All done",
+    "tabs": {
+      "today": "Today",
+      "fullRoadmap": "Full roadmap"
+    },
+    "upNext": "Up next",
+    "phase": "Phase {n}",
+    "moduleCount": "{count} modules",
+    "noModules": "No roadmap yet",
+    "noModulesBody": "Build a personalized AI roadmap. It takes ~2 minutes to answer 7 questions.",
+    "createRoadmap": "Create roadmap"
+  },
+  "language": {
+    "label": "Language",
+    "vi": "Vietnamese",
+    "en": "English"
+  }
+}

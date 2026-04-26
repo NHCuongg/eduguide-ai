@@ -1,17 +1,23 @@
 'use client';
 
-import { useEffect, useMemo, useCallback, Suspense } from "react"
+import { useEffect, useMemo, useCallback, useState, useTransition, Suspense } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
+import { useTranslations } from "next-intl"
 import { useWizardStore } from "@/lib/store"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { Play, TrendingUp, Calendar, Zap, BookOpen, Search, Filter, MoreHorizontal, Clock, CheckCircle2, Trophy, Hammer } from "lucide-react"
-import { StaggerContainer, StaggerItem, HoverCard, FadeIn } from "@/components/ui/motion-primitives"
+import { Play, Clock, CheckCircle2, Plus, Loader2 } from "lucide-react"
+import { FadeIn } from "@/components/ui/motion-primitives"
 import dynamic from "next/dynamic"
 import { ExportButton } from "./export/ExportButton"
 import { useGamificationStore, getLevelTitle, getNextLevelXP } from "@/lib/useGamificationStore"
+import { ErrorBoundary } from "@/components/ErrorBoundary"
+import { setModuleCompletion } from "@/app/actions/modules"
+import { showToast } from "@/lib/toast"
 
 // Skeleton fallback for study tool sections
 function StudyToolSkeleton() {
@@ -37,17 +43,102 @@ function FlashcardSkeleton() {
 }
 
 const QuizModal = dynamic(() => import("./quiz/QuizModal").then(mod => mod.QuizModal), { ssr: false })
-const CalendarView = dynamic(() => import("./schedule/CalendarView").then(mod => mod.CalendarView), { ssr: false })
 const ResourceModal = dynamic(() => import("./resources/ResourceModal").then(mod => mod.ResourceModal), { ssr: false })
 
-const PomodoroTimer = dynamic(() => import("./pomodoro/PomodoroTimer").then(mod => mod.PomodoroTimer), { ssr: false })
 const NotesPanel = dynamic(() => import("./notes/NotesPanel").then(mod => mod.NotesPanel), { ssr: false })
 const FlashcardDeck = dynamic(() => import("./flashcards/FlashcardDeck").then(mod => mod.FlashcardDeck), { ssr: false })
 
 export default function MainContent() {
     const router = useRouter()
-    const { data } = useWizardStore()
-    const { xp, level, streak, checkStreak } = useGamificationStore()
+    const { data, roadmap, activeRoadmapId, completedModules, toggleModule } = useWizardStore()
+    const { xp, level, streak, checkStreak, addXP } = useGamificationStore()
+    const { data: session } = useSession()
+    const t = useTranslations("dashboard")
+    const [pendingModuleIds, setPendingModuleIds] = useState<Set<string>>(new Set())
+    const [, startTransition] = useTransition()
+
+    const flatModules = useMemo(() => {
+        if (!roadmap) return []
+        const items: {
+            id: string
+            phaseIndex: number
+            phaseName: string
+            globalIndex: number
+            title: string
+            description: string
+            estimatedTime: string
+            resources: { title: string; url: string; type: string }[]
+        }[] = []
+        let globalIndex = 0
+        for (let p = 0; p < roadmap.phases.length; p++) {
+            const phase = roadmap.phases[p]
+            for (let m = 0; m < phase.modules.length; m++) {
+                const mod = phase.modules[m]
+                items.push({
+                    id: `${p}-${m}`,
+                    phaseIndex: p,
+                    phaseName: phase.name,
+                    globalIndex,
+                    title: mod.title,
+                    description: mod.description,
+                    estimatedTime: mod.estimatedTime,
+                    resources: mod.resources,
+                })
+                globalIndex++
+            }
+        }
+        return items
+    }, [roadmap])
+
+    const handleToggleModule = useCallback(
+        (item: { id: string; globalIndex: number }) => {
+            if (!activeRoadmapId) {
+                toggleModule(item.id)
+                return
+            }
+            const wasCompleted = completedModules.includes(item.id)
+            const nextCompleted = !wasCompleted
+
+            // Optimistic update
+            toggleModule(item.id)
+            setPendingModuleIds((prev) => new Set(prev).add(item.id))
+
+            startTransition(async () => {
+                const result = await setModuleCompletion({
+                    roadmapId: activeRoadmapId,
+                    moduleIndex: item.globalIndex,
+                    isCompleted: nextCompleted,
+                })
+                setPendingModuleIds((prev) => {
+                    const next = new Set(prev)
+                    next.delete(item.id)
+                    return next
+                })
+                if (!result.success) {
+                    // revert
+                    toggleModule(item.id)
+                    showToast.error("Không thể lưu tiến độ", result.error ?? "Vui lòng thử lại.")
+                    return
+                }
+                if (nextCompleted) addXP(20)
+            })
+        },
+        [activeRoadmapId, completedModules, toggleModule, addXP]
+    )
+
+    const totalModuleCount = flatModules.length
+    const completedCount = useMemo(
+        () => flatModules.filter((mod) => completedModules.includes(mod.id)).length,
+        [flatModules, completedModules]
+    )
+    const progressByModules = totalModuleCount > 0
+        ? Math.round((completedCount / totalModuleCount) * 100)
+        : 0
+
+    const nextModules = useMemo(() => {
+        const incomplete = flatModules.filter((mod) => !completedModules.includes(mod.id))
+        return (incomplete.length > 0 ? incomplete : flatModules).slice(0, 3)
+    }, [flatModules, completedModules])
 
     const progressPercentage = useMemo(() => {
         return Math.min(100, Math.round((xp / getNextLevelXP(level)) * 100))
@@ -56,10 +147,6 @@ export default function MainContent() {
     const progressValue = useMemo(() => {
         return (xp / getNextLevelXP(level)) * 100
     }, [xp, level])
-
-    const strokeDashoffset = useMemo(() => {
-        return 364 - (364 * progressPercentage) / 100
-    }, [progressPercentage])
 
     const handleRedirect = useCallback(() => {
         if (!data?.targetSkill) {
@@ -75,205 +162,121 @@ export default function MainContent() {
         handleRedirect()
     }, [handleRedirect])
 
-    if (!data?.targetSkill) return null 
+    if (!data?.targetSkill) {
+        return (
+            <main className="flex-1 overflow-y-auto bg-white dark:bg-slate-950 p-6 xl:p-10">
+                <div className="max-w-6xl mx-auto space-y-8" aria-busy="true" aria-live="polite">
+                    <div className="h-10 w-72 bg-slate-200 dark:bg-slate-800 rounded-xl animate-pulse" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {[0, 1, 2, 3].map((i) => (
+                            <div key={i} className="h-36 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 animate-pulse" />
+                        ))}
+                    </div>
+                    <div className="h-64 rounded-3xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 animate-pulse" />
+                    <p className="sr-only">Loading your learning workspace…</p>
+                </div>
+            </main>
+        )
+    }
 
     return (
-        <main className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-6 xl:p-10 scroll-smooth">
+        <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-950 p-6 xl:p-10 scroll-smooth">
             <div className="max-w-6xl mx-auto space-y-10">
 
                 {}
-                <FadeIn className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight font-serif mb-2">
-                            Welcome back, <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">Learner</span>
+                <FadeIn className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+                    <div className="space-y-2">
+                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                            {greeting(t)}, {firstName(session?.user?.name) ?? "Learner"}
+                        </p>
+                        <h1 className="text-3xl md:text-4xl font-semibold text-slate-900 dark:text-white tracking-tight">
+                            {data.targetSkill ?? t("yourStudies")}
                         </h1>
-                        <p className="text-slate-700 dark:text-slate-200 font-semibold text-lg">
-                            Ready to continue your mastery in <span className="text-indigo-700 dark:text-indigo-400 font-bold">{data.targetSkill}</span>?
+                        <p className="text-slate-600 dark:text-slate-300 text-sm md:text-base">
+                            {t("subtitle")}
                         </p>
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex gap-2">
                         <ExportButton />
-                        <div className="relative group">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 dark:text-slate-400 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors z-10" />
-                            <input
-                                placeholder="Search topics..."
-                                className="pl-11 pr-4 h-12 rounded-xl border-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 shadow-md hover:shadow-lg hover:border-indigo-400 dark:hover:border-indigo-500 w-full md:w-72 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all font-semibold text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
-                            />
-                        </div>
-                        <Button variant="outline" size="icon" className="h-12 w-12 rounded-xl border-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 shadow-md hover:shadow-lg text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all">
-                            <Filter className="w-5 h-5" />
-                        </Button>
                     </div>
                 </FadeIn>
 
                 {}
-                <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <StaggerItem>
-                        <Card className="rounded-3xl border-none shadow-lg hover:shadow-2xl transition-all duration-500 group cursor-pointer bg-gradient-to-br from-white to-amber-50/30 dark:from-slate-900 dark:to-amber-950/20 card-hover card-glow overflow-hidden relative h-full">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-200/20 dark:bg-amber-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-700" />
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
-                                <CardTitle className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">Daily Streak</CardTitle>
-                                <div className="p-2 rounded-xl bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900/50 dark:to-amber-800/50 group-hover:from-amber-500 group-hover:to-amber-600 dark:group-hover:from-amber-500 dark:group-hover:to-amber-600 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg group-hover:shadow-xl">
-                                    <Zap className="h-4 w-4 text-amber-600 dark:text-amber-400 group-hover:text-white group-hover:fill-current transition-all duration-300" />
-                                </div>
-                            </CardHeader>
-                            <CardContent className="relative z-10">
-                                <div className="text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-2">{streak} <span className="text-lg text-slate-400 dark:text-slate-500 font-semibold">Days</span></div>
-                                <p className="text-xs text-amber-600 dark:text-amber-400 font-bold mt-2 flex items-center gap-2 px-2 py-1 rounded-lg bg-amber-100/50 dark:bg-amber-900/30 w-fit">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse shadow-lg shadow-amber-500/50" />
-                                    On fire! Keep it up!
-                                </p>
-                            </CardContent>
-                        </Card>
-                    </StaggerItem>
-
-                    <StaggerItem>
-                        <Card className="rounded-3xl border-none shadow-lg hover:shadow-2xl transition-all duration-500 group cursor-pointer bg-gradient-to-br from-white to-blue-50/30 dark:from-slate-900 dark:to-blue-950/20 card-hover card-glow overflow-hidden relative h-full">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-200/20 dark:bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-700" />
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
-                                <CardTitle className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Hours Learned</CardTitle>
-                                <div className="p-2 rounded-xl bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/50 dark:to-blue-800/50 group-hover:from-blue-500 group-hover:to-blue-600 dark:group-hover:from-blue-500 dark:group-hover:to-blue-600 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg group-hover:shadow-xl">
-                                    <Clock className="h-4 w-4 text-blue-600 dark:text-blue-400 group-hover:text-white transition-all duration-300" />
-                                </div>
-                            </CardHeader>
-                            <CardContent className="relative z-10">
-                                <div className="text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-2">48.5<span className="text-lg text-slate-400 dark:text-slate-500 font-semibold">h</span></div>
-                                <p className="text-xs text-emerald-600 dark:text-emerald-400 font-bold mt-2 inline-flex items-center px-2 py-1 rounded-lg bg-emerald-100/50 dark:bg-emerald-900/30">
-                                    <TrendingUp className="w-3 h-3 mr-1.5" /> +2.5h this week
-                                </p>
-                            </CardContent>
-                        </Card>
-                    </StaggerItem>
-
-                    <StaggerItem>
-                        <Card className="rounded-3xl border-none shadow-lg hover:shadow-2xl transition-all duration-500 group cursor-pointer bg-gradient-to-br from-white to-emerald-50/30 dark:from-slate-900 dark:to-emerald-950/20 card-hover card-glow overflow-hidden relative h-full">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-200/20 dark:bg-emerald-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-700" />
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
-                                <CardTitle className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">Modules Done</CardTitle>
-                                <div className="p-2 rounded-xl bg-gradient-to-br from-emerald-100 to-emerald-200 dark:from-emerald-900/50 dark:to-emerald-800/50 group-hover:from-emerald-500 group-hover:to-emerald-600 dark:group-hover:from-emerald-500 dark:group-hover:to-emerald-600 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg group-hover:shadow-xl">
-                                    <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400 group-hover:text-white transition-all duration-300" />
-                                </div>
-                            </CardHeader>
-                            <CardContent className="relative z-10">
-                                <div className="text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-3">8<span className="text-xl text-slate-300 dark:text-slate-600 font-normal">/</span>12</div>
-                                <div className="mt-3">
-                                    <Progress value={66} className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden" indicatorClassName="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full shadow-lg shadow-emerald-500/50" />
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </StaggerItem>
-
-                    <StaggerItem>
-                        <Card className="rounded-3xl border-none shadow-lg hover:shadow-2xl transition-all duration-500 group cursor-pointer bg-gradient-to-br from-white to-fuchsia-50/30 dark:from-slate-900 dark:to-fuchsia-950/20 card-hover card-glow overflow-hidden relative h-full">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-fuchsia-200/20 dark:bg-fuchsia-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-700" />
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
-                                <CardTitle className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider group-hover:text-fuchsia-600 dark:group-hover:text-fuchsia-400 transition-colors">Current Level</CardTitle>
-                                <div className="p-2 rounded-xl bg-gradient-to-br from-fuchsia-100 to-fuchsia-200 dark:from-fuchsia-900/50 dark:to-fuchsia-800/50 group-hover:from-fuchsia-500 group-hover:to-fuchsia-600 dark:group-hover:from-fuchsia-500 dark:group-hover:to-fuchsia-600 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg group-hover:shadow-xl">
-                                    <Trophy className="h-4 w-4 text-fuchsia-600 dark:text-fuchsia-400 group-hover:text-white transition-all duration-300" />
-                                </div>
-                            </CardHeader>
-                            <CardContent className="relative z-10">
-                                <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight truncate mb-2">{getLevelTitle(level)}</div>
-                                <div className="flex items-center justify-between mt-2 mb-2">
-                                    <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">Lvl {level}</p>
-                                    <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold">{xp}/{getNextLevelXP(level)} XP</p>
-                                </div>
-                                <Progress value={progressValue} className="h-2 bg-fuchsia-100 dark:bg-fuchsia-900/30 rounded-full overflow-hidden" indicatorClassName="bg-gradient-to-r from-fuchsia-500 to-fuchsia-600 rounded-full shadow-lg shadow-fuchsia-500/50" />
-                            </CardContent>
-                        </Card>
-                    </StaggerItem>
-                </StaggerContainer>
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 divide-y md:divide-y-0 md:divide-x divide-slate-200 dark:divide-slate-800 grid grid-cols-2 md:grid-cols-4">
+                    <Stat label={t("stats.streak")} value={streak} suffix={t("stats.days")} />
+                    <Stat label={t("stats.modules")} value={completedCount} suffix={`${t("stats.of")} ${totalModuleCount || 0}`} progress={progressByModules} />
+                    <Stat label={t("stats.level")} value={level} suffix={getLevelTitle(level)} />
+                    <Stat label={t("stats.xp")} value={xp} suffix={`/ ${getNextLevelXP(level)}`} progress={progressValue} />
+                </div>
 
                 {}
-                <FadeIn delay={0.2}>
-                    <HoverCard>
-                        <Card className="group relative overflow-hidden border-none shadow-2xl hover:shadow-[0_20px_50px_rgba(79,70,229,0.4)] transition-all duration-500 rounded-[2.5rem] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white isolate">
-                            {}
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-500/30 via-slate-900 to-slate-900" />
-                            <div className="absolute inset-0 opacity-50 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] contrast-125 brightness-100" />
-
-                            <div className="absolute -top-24 -right-24 w-96 h-96 bg-indigo-500/30 rounded-full blur-3xl group-hover:bg-indigo-500/40 transition-all duration-700 animate-pulse" />
-                            <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-violet-600/20 rounded-full blur-3xl mix-blend-overlay animate-float" />
-
-                            <CardContent className="p-8 md:p-12 relative z-10 flex flex-col md:flex-row gap-10 items-center justify-between">
-                                <div className="space-y-8 max-w-2xl">
-                                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/20 backdrop-blur-md border border-indigo-500/30 text-xs font-bold uppercase tracking-widest text-indigo-200 shadow-inner">
-                                        <div className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse shadow-[0_0_10px_currentColor]" />
-                                        In Progress
-                                    </div>
-
-                                    <div className="space-y-4">
-                                        <h2 className="text-4xl md:text-5xl font-black tracking-tight leading-[1.1]">
-                                            Continue your <br />
-                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 via-white to-indigo-200 animate-gradient-x">{data.targetSkill} Fundamentals</span>
-                                        </h2>
-                                        <p className="text-indigo-100/70 text-lg leading-relaxed font-medium max-w-lg">
-                                            Your personalized AI curriculum is ready. Dive back in to reach your daily goal.
-                                        </p>
-                                    </div>
-
-                                    <div className="flex flex-wrap items-center gap-6">
-                                        <Button size="lg" className="h-16 px-10 rounded-2xl bg-gradient-to-r from-white to-indigo-50 text-indigo-950 hover:from-indigo-50 hover:to-indigo-100 font-bold text-lg shadow-[0_10px_30px_-10px_rgba(255,255,255,0.3)] hover:shadow-[0_15px_40px_-10px_rgba(255,255,255,0.4)] hover:scale-105 hover:-translate-y-1 transition-all duration-300 border-2 border-white/20">
-                                            <Play className="w-6 h-6 mr-3 fill-indigo-600 text-indigo-600" /> Resume Learning
-                                        </Button>
-                                        <div className="flex items-center gap-3 text-indigo-200/80 font-medium px-4 py-2 rounded-xl bg-white/5 border border-white/5 backdrop-blur-sm">
-                                            <Calendar className="w-4 h-4" />
-                                            <span>~4 weeks left</span>
-                                        </div>
-                                    </div>
+                <FadeIn delay={0.1}>
+                    <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+                        <CardContent className="p-6 md:p-10 flex flex-col md:flex-row gap-8 items-start md:items-center justify-between">
+                            <div className="space-y-4 max-w-2xl">
+                                <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-300 uppercase tracking-wider">{t("hero.inProgress")}</p>
+                                <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900 dark:text-white leading-tight">
+                                    {roadmap?.title ?? t("hero.fallbackTitle", { subject: data.targetSkill ?? t("yourStudies") })}
+                                </h2>
+                                <p className="text-slate-600 dark:text-slate-300 text-sm md:text-base max-w-lg">
+                                    {t("hero.subtitle")}
+                                </p>
+                                <div className="flex flex-wrap items-center gap-3 pt-1">
+                                    <Button asChild className="h-11 px-5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 font-semibold">
+                                        <Link href="/dashboard/plan">
+                                            <Play className="w-4 h-4 mr-2" /> {t("hero.resume")}
+                                        </Link>
+                                    </Button>
+                                    <Button asChild variant="ghost" className="h-11 px-4 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+                                        <Link href="/dashboard/courses">{t("hero.allCourses")}</Link>
+                                    </Button>
                                 </div>
+                            </div>
 
-                                {}
-                                <div className="relative group-hover:scale-105 transition-transform duration-500">
-                                    <div className="relative w-48 h-48 md:w-56 md:h-56 flex items-center justify-center">
-                                        {}
-                                        <div className="absolute inset-0 bg-indigo-500/20 blur-3xl rounded-full" />
-
-                                        <svg className="w-full h-full -rotate-90 drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]">
-                                            <circle cx="50%" cy="50%" r="42%" className="stroke-indigo-950" strokeWidth="12" fill="none" />
-                                            <circle
-                                                cx="50%" cy="50%" r="42%"
-                                                className="stroke-indigo-500"
-                                                strokeWidth="12"
-                                                fill="none"
-                                                strokeDasharray="364"
-                                                strokeDashoffset={strokeDashoffset}
-                                                strokeLinecap="round"
-                                            />
-                                        </svg>
-                                        <div className="absolute flex flex-col items-center">
-                                            <span className="text-5xl font-black tracking-tighter text-white drop-shadow-lg">{progressPercentage}%</span>
-                                            <span className="text-xs font-bold text-indigo-300 uppercase tracking-widest mt-1">Complete</span>
-                                        </div>
-                                    </div>
+                            <div className="relative w-32 h-32 md:w-40 md:h-40 shrink-0">
+                                <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
+                                    <circle cx="60" cy="60" r="52" className="stroke-slate-200 dark:stroke-slate-800" strokeWidth="8" fill="none" />
+                                    <circle
+                                        cx="60" cy="60" r="52"
+                                        className="stroke-indigo-500"
+                                        strokeWidth="8"
+                                        fill="none"
+                                        strokeDasharray={2 * Math.PI * 52}
+                                        strokeDashoffset={(2 * Math.PI * 52) * (1 - progressPercentage / 100)}
+                                        strokeLinecap="round"
+                                    />
+                                </svg>
+                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                    <span className="text-3xl md:text-4xl font-semibold tracking-tight text-slate-900 dark:text-white">{progressPercentage}%</span>
+                                    <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-0.5">{t("hero.complete")}</span>
                                 </div>
-                            </CardContent>
-                        </Card>
-                    </HoverCard>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </FadeIn>
 
                 {}
                 <div className="space-y-6">
                     <FadeIn delay={0.25} className="flex items-center justify-between">
-                        <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-3">
-                            <Hammer className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
-                            Study Tools
+                        <h3 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
+                            {t("studyTools")}
                         </h3>
                     </FadeIn>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <Suspense fallback={<StudyToolSkeleton />}>
-                            <PomodoroTimer />
-                        </Suspense>
-                        <Suspense fallback={<StudyToolSkeleton />}>
-                            <NotesPanel />
-                        </Suspense>
+                    <div className="w-full">
+                        <ErrorBoundary>
+                            <Suspense fallback={<StudyToolSkeleton />}>
+                                <NotesPanel />
+                            </Suspense>
+                        </ErrorBoundary>
                     </div>
                     <div className="w-full">
-                        <Card className="rounded-2xl border-none shadow-sm hover:shadow-md transition-shadow">
+                        <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-shadow">
                             <CardContent className="p-0">
-                                <Suspense fallback={<FlashcardSkeleton />}>
-                                    <FlashcardDeck />
-                                </Suspense>
+                                <ErrorBoundary>
+                                    <Suspense fallback={<FlashcardSkeleton />}>
+                                        <FlashcardDeck />
+                                    </Suspense>
+                                </ErrorBoundary>
                             </CardContent>
                         </Card>
                     </div>
@@ -282,67 +285,147 @@ export default function MainContent() {
                 {}
                 <div className="space-y-6">
                     <FadeIn delay={0.3} className="flex items-center justify-between">
-                        <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-3">
-                            <BookOpen className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
-                            Your Learning Path
+                        <h3 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
+                            {t("learningPath")}
                         </h3>
-                        <Button variant="ghost" className="text-indigo-600 dark:text-indigo-400 font-bold hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors text-base">
-                            View Full Curriculum {'->'}
-                        </Button>
+                        <Link href="/dashboard/plan" className="text-sm text-indigo-600 dark:text-indigo-300 font-semibold hover:underline transition-colors">
+                            {t("viewFullCurriculum")}
+                        </Link>
                     </FadeIn>
 
-                    <StaggerContainer delay={0.4} className="space-y-4">
-                        {[1, 2, 3].map((i) => (
-                            <StaggerItem key={i}>
-                                <div className="group bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-800/50 rounded-2xl p-6 border-2 border-slate-100 dark:border-slate-800 shadow-md hover:shadow-2xl hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-500 flex flex-col md:flex-row items-start md:items-center gap-6 cursor-pointer relative overflow-hidden card-hover">
-                                    {}
-                                    <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 shadow-lg" />
-                                    {}
-                                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/0 via-indigo-500/5 to-indigo-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    {nextModules.length === 0 ? (
+                        <div className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-10 text-center">
+                            <p className="text-slate-700 dark:text-slate-200 font-semibold mb-2">{t("noModules")}</p>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{t("subtitle")}</p>
+                            <Button asChild className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl">
+                                <Link href="/onboarding?fresh=1">
+                                    <Plus className="w-4 h-4 mr-2" /> {t("createRoadmap")}
+                                </Link>
+                            </Button>
+                        </div>
+                    ) : (
+                        <ol className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden divide-y divide-slate-200 dark:divide-slate-800">
+                            {nextModules.map((mod, idx) => {
+                                const isCompleted = completedModules.includes(mod.id)
+                                const isCurrent = !isCompleted && idx === 0
+                                const isPending = pendingModuleIds.has(mod.id)
+                                return (
+                                    <li
+                                        key={mod.id}
+                                        className={[
+                                            "flex flex-col md:flex-row md:items-center gap-4 px-5 md:px-6 py-5 transition-colors",
+                                            isCurrent ? "bg-indigo-50/50 dark:bg-indigo-900/10" : "hover:bg-slate-50 dark:hover:bg-slate-800/50",
+                                        ].join(" ")}
+                                    >
+                                        <div className="flex items-start gap-4 flex-1 min-w-0">
+                                            <button
+                                                type="button"
+                                                aria-label={isCompleted ? "Mark module incomplete" : "Mark module complete"}
+                                                aria-pressed={isCompleted}
+                                                disabled={isPending}
+                                                onClick={() => handleToggleModule(mod)}
+                                                className={[
+                                                    "h-9 w-9 rounded-full flex items-center justify-center shrink-0 transition-colors",
+                                                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900",
+                                                    isCompleted
+                                                        ? "bg-emerald-500 text-white hover:bg-emerald-600"
+                                                        : isCurrent
+                                                            ? "border-2 border-indigo-500 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                                                            : "border border-slate-300 dark:border-slate-600 text-slate-400 hover:border-indigo-300 hover:text-indigo-500",
+                                                ].join(" ")}
+                                            >
+                                                {isPending ? (
+                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                ) : isCompleted ? (
+                                                    <CheckCircle2 className="w-4 h-4" />
+                                                ) : (
+                                                    <span className="text-xs font-semibold">{String(idx + 1).padStart(2, "0")}</span>
+                                                )}
+                                            </button>
 
-                                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center group-hover:from-indigo-100 group-hover:to-violet-100 dark:group-hover:from-indigo-900/50 dark:group-hover:to-violet-900/50 transition-all duration-300 shrink-0 shadow-sm group-hover:shadow-md group-hover:scale-110">
-                                        <span className="text-3xl font-black text-slate-400 dark:text-slate-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">0{i}</span>
-                                    </div>
-                                    <div className="flex-1 space-y-3 relative z-10">
-                                        <div className="flex flex-wrap justify-between items-start gap-2">
-                                            <h4 className="text-xl font-bold text-slate-900 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                                                {i === 1 ? `Introduction to ${data.targetSkill}` : i === 2 ? `Intermediate ${data.targetSkill}` : `Advanced ${data.targetSkill} Concepts`}
-                                            </h4>
-                                            <span className="text-[10px] font-extrabold bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 uppercase tracking-widest border border-slate-200 dark:border-slate-700 group-hover:border-indigo-300 dark:group-hover:border-indigo-600 group-hover:from-indigo-100 group-hover:to-violet-100 dark:group-hover:from-indigo-900/50 dark:group-hover:to-violet-900/50 transition-all shadow-sm">Module {i}</span>
+                                            <div className="flex-1 space-y-1 min-w-0">
+                                                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                                                    <h4 className={[
+                                                        "text-base font-semibold tracking-tight",
+                                                        isCompleted
+                                                            ? "text-slate-500 dark:text-slate-400 line-through"
+                                                            : "text-slate-900 dark:text-white",
+                                                    ].join(" ")}>
+                                                        {mod.title}
+                                                    </h4>
+                                                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500 dark:text-slate-400 shrink-0">
+                                                        <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800">Phase {mod.phaseIndex + 1}</span>
+                                                        <span className="inline-flex items-center gap-1">
+                                                            <Clock className="w-3 h-3" /> {mod.estimatedTime}
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                                <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-1">
+                                                    {mod.description}
+                                                </p>
+                                            </div>
                                         </div>
-                                        <p className="text-slate-600 dark:text-slate-300 text-sm font-medium leading-relaxed max-w-2xl">
-                                            Core concepts and practical applications of {data.targetSkill} for {data.currentLevel || 'beginners'}.
-                                        </p>
-                                    </div>
-                                    <div className="hidden lg:flex items-center gap-6 text-sm font-semibold text-slate-400 shrink-0">
-                                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50">
-                                            <Clock className="w-4 h-4" /> 2h 15m
+
+                                        <div className="flex items-center gap-2 md:ml-3 shrink-0">
+                                            <ResourceModal moduleTitle={mod.title} resources={mod.resources} />
+                                            <QuizModal moduleTitle={mod.title} />
                                         </div>
-                                    </div>
-                                    <div className="flex items-center gap-2 w-full md:w-auto mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-none border-slate-100">
-                                        <ResourceModal moduleTitle={i === 1 ? `Introduction to ${data.targetSkill}` : i === 2 ? `Intermediate ${data.targetSkill}` : `Advanced ${data.targetSkill}`} />
-                                        <QuizModal moduleTitle={i === 1 ? `Introduction to ${data.targetSkill}` : i === 2 ? `Intermediate ${data.targetSkill}` : `Advanced ${data.targetSkill}`} />
-                                        <Button size="icon" variant="ghost" className="hidden md:flex text-slate-300 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all">
-                                            <Play className="w-6 h-6 fill-current" />
-                                        </Button>
-                                    </div>
-                                </div>
-                            </StaggerItem>
-                        ))}
-                    </StaggerContainer>
+                                    </li>
+                                )
+                            })}
+                        </ol>
+                    )}
                 </div>
 
-                {}
-                <FadeIn delay={0.5}>
-                    <div className="flex items-center justify-between mb-6 mt-12">
-                        <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-3">
-                            <Calendar className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
-                            Smart Schedule
-                        </h3>
-                    </div>
-                    <CalendarView />
-                </FadeIn>
             </div>
         </main>
+    )
+}
+
+function greeting(t: (key: string) => string): string {
+    const hour = new Date().getHours()
+    if (hour < 12) return t("greetingMorning")
+    if (hour < 18) return t("greetingAfternoon")
+    return t("greetingEvening")
+}
+
+function firstName(fullName: string | null | undefined): string | null {
+    if (!fullName) return null
+    const trimmed = fullName.trim()
+    if (!trimmed) return null
+    return trimmed.split(/\s+/)[0]
+}
+
+interface StatProps {
+    label: string
+    value: string | number
+    suffix?: string
+    progress?: number
+}
+
+function Stat({ label, value, suffix, progress }: StatProps) {
+    return (
+        <div className="p-5 md:p-6 flex flex-col gap-2">
+            <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                {label}
+            </p>
+            <div className="flex items-baseline gap-2">
+                <span className="text-3xl md:text-4xl font-semibold tracking-tight text-slate-900 dark:text-white">
+                    {value}
+                </span>
+                {suffix ? (
+                    <span className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate">
+                        {suffix}
+                    </span>
+                ) : null}
+            </div>
+            {typeof progress === "number" ? (
+                <Progress
+                    value={progress}
+                    className="h-1 mt-1 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden"
+                    indicatorClassName="bg-indigo-500 rounded-full"
+                />
+            ) : null}
+        </div>
     )
 }

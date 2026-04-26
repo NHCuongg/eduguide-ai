@@ -75,7 +75,9 @@ export default function Navbar() {
                             {!mounted && <Moon className="w-5 h-5" />}
                         </button>
 
-                        {status === 'authenticated' ? (
+                        {!mounted || status === 'loading' ? (
+                            <div aria-hidden className="h-10 w-28 rounded-full bg-zinc-100 dark:bg-zinc-800 animate-pulse" />
+                        ) : status === 'authenticated' ? (
                             <Link href="/dashboard">
                                 <Button className="rounded-full px-6 bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-500/20 transition-all duration-300 gap-2">
                                     <LayoutDashboard className="w-4 h-4" />

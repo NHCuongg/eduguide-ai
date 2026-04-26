@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input'
 import { Flashcard } from './Flashcard'
 import { Sparkles, ArrowLeft, ArrowRight, BookOpen, Loader2 } from 'lucide-react'
 import { showToast } from '@/lib/toast'
-import { AnimatePresence, motion } from 'framer-motion'
 
 interface Card {
     front: string

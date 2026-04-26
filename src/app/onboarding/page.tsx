@@ -1,23 +1,32 @@
+import { Suspense } from "react"
+import Link from "next/link"
 import Wizard from "@/components/onboarding/Wizard"
+import WizardResetGuard from "@/components/onboarding/WizardResetGuard"
 
 export default function OnboardingPage() {
     return (
-        <main className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4 relative overflow-hidden">
-            {}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-950 via-slate-950 to-black pointer-events-none" />
-            <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid.svg')] opacity-[0.02] pointer-events-none" />
+        <main className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col">
+            <Suspense fallback={null}>
+                <WizardResetGuard />
+            </Suspense>
 
-            {}
-            <div className="z-10 w-full max-w-4xl relative">
-                <div className="absolute -inset-1 rounded-[2.5rem] bg-gradient-to-b from-white/10 to-transparent opacity-50 blur-sm pointer-events-none" />
-                <div className="mb-8 text-center">
-                    <div className="inline-flex items-center gap-2 font-serif font-black text-2xl mb-2">
-                        <span className="text-3xl bg-clip-text text-transparent bg-gradient-to-tr from-indigo-400 to-purple-400">❖</span>
-                        <span className="text-white">EduGuide AI</span>
-                    </div>
+            <header className="px-6 md:px-10 py-6 flex items-center justify-between">
+                <Link href="/" className="inline-flex items-center gap-2 text-slate-900 dark:text-white">
+                    <span className="text-2xl bg-clip-text text-transparent bg-gradient-to-tr from-indigo-500 to-violet-500">❖</span>
+                    <span className="font-serif font-semibold text-base tracking-tight">EduGuide AI</span>
+                </Link>
+                <Link
+                    href="/dashboard"
+                    className="text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors uppercase tracking-wider"
+                >
+                    Skip for now
+                </Link>
+            </header>
+
+            <div className="flex-1 flex items-start justify-center px-6 md:px-10 pb-16">
+                <div className="w-full max-w-2xl">
+                    <Wizard />
                 </div>
-
-                <Wizard />
             </div>
         </main>
     )

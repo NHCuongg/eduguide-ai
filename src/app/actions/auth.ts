@@ -35,10 +35,14 @@ export async function registerUser(formData: FormData) {
             password: hashedPassword
         })
 
-        await inngest.send({
-            name: "user/signup",
-            data: { email, name }
-        });
+        try {
+            await inngest.send({
+                name: "user/signup",
+                data: { email, name }
+            });
+        } catch (inngestError) {
+            console.warn('Inngest signup event failed (non-blocking):', inngestError)
+        }
 
     } catch (error: unknown) {
         console.error('Failed to register user:', error)
@@ -74,34 +78,31 @@ export async function sendResetPasswordEmail(formData: FormData) {
     try {
         const existingUsers = await db.select().from(users).where(eq(users.email, email)).limit(1)
 
-        if (existingUsers.length === 0) {
-            return { error: 'Tài khoản không tồn tại trong hệ thống.' }
+        if (existingUsers.length > 0) {
+            const token = crypto.randomUUID()
+            const expires = new Date(Date.now() + 3600 * 1000)
+
+            await db.insert(verificationTokens).values({
+                identifier: email,
+                token,
+                expires
+            })
+
+            await inngest.send({
+                name: "user/password-reset",
+                data: { email, token }
+            })
         }
-
-        const token = crypto.randomUUID()
-        const expires = new Date(Date.now() + 3600 * 1000) 
-
-        await db.insert(verificationTokens).values({
-            identifier: email,
-            token,
-            expires
-        })
-
-        await inngest.send({
-            name: "user/password-reset",
-            data: { email, token }
-        })
 
         return { success: true }
     } catch (error: unknown) {
-        console.error('Failed to process forgot password:', error)
         if (typeof error === 'object' && error !== null) {
             const err = error as { code?: string, message?: string }
             if (err.code === 'ECONNREFUSED' || err.message?.includes('ECONNREFUSED')) {
-                return { error: 'Không thể kết nối đến máy chủ CSDL. Vui lòng thử lại sau.' };
+                return { error: 'Không thể kết nối đến máy chủ. Vui lòng thử lại sau.' };
             }
         }
-        return { error: 'Không thể gửi yêu cầu lúc này. Xin vui lòng thử lại sau.' }
+        return { error: 'Không thể gửi yêu cầu lúc này. Vui lòng thử lại sau.' }
     }
 }
 

@@ -1,35 +1,78 @@
-
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/petmanager}
+        AUTH_SECRET: ${AUTH_SECRET:-docker-dev-secret-key-change-in-production}
+    image: pet-manager-app:local
     container_name: pet-manager-app
-    restart: always
+    restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "${APP_PORT:-3002}:3000"
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/petmanager
-      - NEXTAUTH_URL=http://localhost:3000
-      - NEXTAUTH_SECRET=changeme
-      # Add other env vars here or use env_file
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/petmanager}
+      AUTH_SECRET: ${AUTH_SECRET:-docker-dev-secret-key-change-in-production}
+      AUTH_TRUST_HOST: "true"
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3002}
+      NODE_ENV: production
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OPENROUTER_BASE_URL: ${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
+      OPENROUTER_SITE_URL: ${OPENROUTER_SITE_URL:-http://localhost:3002}
+      OPENROUTER_SITE_NAME: ${OPENROUTER_SITE_NAME:-Pet Manager}
+      OPENROUTER_MODEL_ROADMAP: ${OPENROUTER_MODEL_ROADMAP:-openai/gpt-4o-mini}
+      OPENROUTER_MODEL_QUIZ: ${OPENROUTER_MODEL_QUIZ:-openai/gpt-4o-mini}
+      OPENROUTER_MODEL_FLASHCARDS: ${OPENROUTER_MODEL_FLASHCARDS:-google/gemini-2.5-flash-lite}
+      RESEND_API_KEY: ${RESEND_API_KEY:-re_dummy}
+      INNGEST_EVENT_KEY: ${INNGEST_EVENT_KEY:-}
+      INNGEST_SIGNING_KEY: ${INNGEST_SIGNING_KEY:-}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - pet-manager-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:3000/api/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  redis:
+    image: redis:7-alpine
+    container_name: pet-manager-redis
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    networks:
+      - pet-manager-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   postgres:
     image: postgres:15-alpine
     container_name: pet-manager-db
-    restart: always
+    restart: unless-stopped
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=petmanager
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-petmanager}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5433}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-petmanager}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     networks:
       - pet-manager-network
 
@@ -39,3 +82,4 @@ networks:
 
 volumes:
   pgdata:
+    name: pet-manager-pgdata

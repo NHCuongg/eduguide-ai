@@ -43,3 +43,8 @@ next-env.d.ts
 
 .agent/
 *.txt
+
+# local tooling artifacts
+.codex
+.lk/
+.claude/

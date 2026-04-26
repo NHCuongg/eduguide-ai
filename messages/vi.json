@@ -1,0 +1,131 @@
+{
+  "common": {
+    "resume": "Tiếp tục",
+    "save": "Lưu",
+    "cancel": "Huỷ",
+    "back": "Quay lại",
+    "continue": "Tiếp tục",
+    "search": "Tìm kiếm",
+    "loading": "Đang tải…",
+    "all": "Tất cả",
+    "tryAgain": "Thử lại",
+    "home": "Trang chủ"
+  },
+  "nav": {
+    "overview": "Tổng quan",
+    "studyPlan": "Lộ trình học",
+    "myCourses": "Khóa học",
+    "testPractice": "Luyện tập",
+    "profile": "Hồ sơ học tập",
+    "settings": "Cài đặt",
+    "signOut": "Đăng xuất"
+  },
+  "dashboard": {
+    "workspaceEyebrow": "Workspace",
+    "yourStudies": "Studies của bạn",
+    "subtitle": "Tiếp tục lộ trình cá nhân hóa của bạn.",
+    "stats": {
+      "streak": "Streak",
+      "modules": "Mô-đun",
+      "level": "Cấp độ",
+      "xp": "XP",
+      "days": "ngày",
+      "of": "của"
+    },
+    "hero": {
+      "inProgress": "Đang học",
+      "fallbackTitle": "Tiếp tục với {subject}",
+      "subtitle": "Lộ trình AI cá nhân hóa. Hoàn thành mô-đun tiếp theo để tăng tiến độ.",
+      "resume": "Tiếp tục",
+      "allCourses": "Tất cả khóa học",
+      "complete": "hoàn thành"
+    },
+    "studyTools": "Công cụ học tập",
+    "learningPath": "Lộ trình",
+    "viewFullCurriculum": "Xem toàn bộ →",
+    "noModules": "Chưa có mô-đun",
+    "createRoadmap": "Tạo lộ trình",
+    "greetingMorning": "Chào buổi sáng",
+    "greetingAfternoon": "Chào buổi chiều",
+    "greetingEvening": "Chào buổi tối"
+  },
+  "courses": {
+    "eyebrow": "Thư viện",
+    "title": "Khóa học của tôi",
+    "subtitle": "Tất cả lộ trình AI bạn đã tạo. Chỉ một khóa active tại một thời điểm.",
+    "newCourse": "Tạo khóa mới",
+    "tabs": {
+      "all": "Tất cả",
+      "active": "Đang học",
+      "completed": "Đã xong",
+      "archived": "Lưu trữ"
+    },
+    "continueLearning": "Tiếp tục học",
+    "allCourses": "Tất cả khóa",
+    "noCoursesTitle": "Chưa có khóa học nào",
+    "noCoursesBody": "Tạo khóa học đầu tiên — chúng tôi sẽ thiết kế lộ trình theo trình độ, mục tiêu và quỹ thời gian của bạn.",
+    "startWizard": "Bắt đầu wizard",
+    "modules": "{count} mô-đun",
+    "completedCount": "{count} hoàn thành",
+    "noResults": "Không có khóa học phù hợp",
+    "noResultsQuery": "Không có kết quả cho \"{query}\".",
+    "noResultsFilter": "Chưa có khóa nào ở trạng thái \"{filter}\"."
+  },
+  "tests": {
+    "eyebrow": "Luyện tập",
+    "title": "Test practice",
+    "subtitle": "Mỗi mô-đun có một bộ quiz được AI sinh động dựa trên lộ trình của bạn.",
+    "quickPractice": "Quick practice",
+    "quickPracticeTitle": "Test ngay những gì vừa học",
+    "quickPracticeBody": "AI sẽ tạo 5 câu hỏi cho mô-đun gần nhất chưa hoàn thành.",
+    "startPractice": "Bắt đầu luyện",
+    "random": "Random",
+    "tabs": {
+      "all": "Tất cả",
+      "todo": "Cần làm",
+      "done": "Đã xong"
+    },
+    "practicingFor": "Đang luyện cho khóa {course}.",
+    "noActiveTitle": "Chưa có khóa học nào để luyện tập",
+    "noActiveBody": "Tạo lộ trình AI trước để mở khóa các bộ quiz luyện tập theo từng mô-đun.",
+    "createFirst": "Tạo lộ trình mới",
+    "viewExisting": "Xem khóa hiện có",
+    "noModulesTitle": "Khóa active chưa có mô-đun"
+  },
+  "profile": {
+    "eyebrow": "Hồ sơ",
+    "title": "Hồ sơ học tập",
+    "studying": "Đang học {subject}",
+    "noSubject": "Chưa chọn chủ đề học",
+    "verified": "Tài khoản xác thực",
+    "level": "Cấp độ: {level}",
+    "stats": {
+      "courses": "Khóa học",
+      "modules": "Mô-đun",
+      "completed": "Đã hoàn thành",
+      "created": "đã tạo"
+    },
+    "manageCourses": "Quản lý khóa học"
+  },
+  "studyPlan": {
+    "eyebrow": "Lộ trình học",
+    "subtitle": "{total} mô-đun · {completed} đã hoàn thành · {progress}%",
+    "resumeNext": "Tiếp tục",
+    "allDone": "Đã xong tất cả",
+    "tabs": {
+      "today": "Hôm nay",
+      "fullRoadmap": "Toàn bộ"
+    },
+    "upNext": "Tiếp theo",
+    "phase": "Phase {n}",
+    "moduleCount": "{count} mô-đun",
+    "noModules": "Chưa có lộ trình",
+    "noModulesBody": "Hãy tạo lộ trình học cá nhân hóa từ AI. Chỉ mất 2 phút trả lời 7 câu hỏi.",
+    "createRoadmap": "Tạo lộ trình"
+  },
+  "language": {
+    "label": "Ngôn ngữ",
+    "vi": "Tiếng Việt",
+    "en": "English"
+  }
+}

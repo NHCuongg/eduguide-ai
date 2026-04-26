@@ -1,18 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans, Outfit } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import "./globals.css";
 
-const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  variable: "--font-sans",
-  display: "swap",
-});
-
-const outfit = Outfit({
-  subsets: ["latin"],
-  variable: "--font-heading",
-  display: "swap",
-})
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: "EduGuide AI - Master Any Subject",
@@ -40,21 +31,20 @@ export const viewport: Viewport = {
   ],
 }
 
-import { Providers } from "./providers";
-
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${plusJakarta.variable} ${outfit.variable} antialiased bg-background text-foreground font-sans`}
-      >
-        <Providers>
-          {children}
-        </Providers>
+    <html lang={locale} suppressHydrationWarning>
+      <body className="antialiased bg-background text-foreground font-sans">
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <Providers>{children}</Providers>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

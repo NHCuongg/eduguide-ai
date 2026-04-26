@@ -1,564 +1,515 @@
 'use client'
 
-import { useWizardStore } from "@/lib/store"
+import { useCallback, useMemo, useRef, useState, useTransition } from "react"
+import Link from "next/link"
+import { motion } from "framer-motion"
+import {
+    ArrowRight,
+    CheckCircle2,
+    Clock,
+    Loader2,
+    Plus,
+    Search,
+    Sparkles,
+    X,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
-import {
-    Calendar,
-    LayoutGrid,
-    List,
-    Clock,
-    MoreHorizontal,
-    Sparkles,
-    Zap,
-    Circle,
-    Search,
-    Filter,
-    CheckCircle2,
-    Play,
-    BookOpen,
-    TrendingUp,
-    ArrowRight,
-    X
-} from "lucide-react"
-import { useState, useMemo } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { useWizardStore } from "@/lib/store"
+import { setModuleCompletion } from "@/app/actions/modules"
 import { useGamificationStore } from "@/lib/useGamificationStore"
+import { showToast } from "@/lib/toast"
+import { ResourceModal } from "./resources/ResourceModal"
+import { QuizModal } from "./quiz/QuizModal"
 
-type ViewMode = 'grid' | 'list'
-type SortOption = 'default' | 'phase' | 'completed'
+const TODAY_LIMIT = 5
+
+interface FlatModule {
+    id: string
+    phaseIndex: number
+    phaseName: string
+    moduleIndex: number
+    globalIndex: number
+    title: string
+    description: string
+    estimatedTime: string
+    resources: { title: string; url: string; type: string }[]
+}
 
 export default function StudyPlan() {
-    const { roadmap, completedModules, toggleModule, setActiveModule } = useWizardStore()
-    const { streak } = useGamificationStore()
+    const { roadmap, activeRoadmapId, completedModules, toggleModule, setActiveModule, activeModuleId } = useWizardStore()
+    const { addXP } = useGamificationStore()
 
-    const [activeTab, setActiveTab] = useState<'today' | 'roadmap'>('today')
-    const [viewMode, setViewMode] = useState<ViewMode>('grid')
-    const [searchQuery, setSearchQuery] = useState('')
-    const [sortBy, setSortBy] = useState<SortOption>('default')
-    const [showFilters, setShowFilters] = useState(false)
+    const [activeTab, setActiveTab] = useState<"today" | "roadmap">("today")
+    const [searchQuery, setSearchQuery] = useState("")
+    const [pendingIds, setPendingIds] = useState<Set<string>>(new Set())
+    const [, startTransition] = useTransition()
 
-    const allSessions = useMemo(() => {
-        const sessions = roadmap?.phases?.flatMap((phase, phaseIdx: number) =>
-            phase.modules?.map((module, modIdx: number) => ({
-                ...module,
-                id: `${phaseIdx}-${modIdx}`,
-                phaseName: phase.name,
-                phaseIdx,
-                modIdx,
-                isCompleted: completedModules.includes(`${phaseIdx}-${modIdx}`)
-            })) || []
-        ) || []
+    const moduleRefs = useRef<Map<string, HTMLLIElement | null>>(new Map())
 
-        let filtered = sessions
-        if (searchQuery.trim()) {
-            filtered = sessions.filter(session =>
-                session.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                session.phaseName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                session.description?.toLowerCase().includes(searchQuery.toLowerCase())
-            )
+    const flatModules = useMemo<FlatModule[]>(() => {
+        if (!roadmap) return []
+        const items: FlatModule[] = []
+        let globalIndex = 0
+        for (let p = 0; p < roadmap.phases.length; p++) {
+            const phase = roadmap.phases[p]
+            for (let m = 0; m < phase.modules.length; m++) {
+                const mod = phase.modules[m]
+                items.push({
+                    id: `${p}-${m}`,
+                    phaseIndex: p,
+                    phaseName: phase.name,
+                    moduleIndex: m,
+                    globalIndex,
+                    title: mod.title,
+                    description: mod.description,
+                    estimatedTime: mod.estimatedTime,
+                    resources: mod.resources,
+                })
+                globalIndex++
+            }
         }
+        return items
+    }, [roadmap])
 
-        if (activeTab === 'today') {
-            
-            filtered = filtered.filter(s => !s.isCompleted).slice(0, 6)
+    const totalModules = flatModules.length
+    const completedCount = useMemo(
+        () => flatModules.filter((m) => completedModules.includes(m.id)).length,
+        [flatModules, completedModules]
+    )
+    const progress = totalModules > 0 ? Math.round((completedCount / totalModules) * 100) : 0
+
+    const firstIncomplete = useMemo(
+        () => flatModules.find((m) => !completedModules.includes(m.id)) ?? null,
+        [flatModules, completedModules]
+    )
+
+    const filteredModules = useMemo(() => {
+        const query = searchQuery.trim().toLowerCase()
+        if (!query) return flatModules
+        return flatModules.filter(
+            (m) =>
+                m.title.toLowerCase().includes(query) ||
+                m.description.toLowerCase().includes(query) ||
+                m.phaseName.toLowerCase().includes(query)
+        )
+    }, [flatModules, searchQuery])
+
+    const todayModules = useMemo(() => {
+        const incomplete = filteredModules.filter((m) => !completedModules.includes(m.id))
+        return incomplete.slice(0, TODAY_LIMIT)
+    }, [filteredModules, completedModules])
+
+    const phaseGroups = useMemo(() => {
+        const groups = new Map<number, { phaseName: string; modules: FlatModule[] }>()
+        for (const mod of filteredModules) {
+            if (!groups.has(mod.phaseIndex)) {
+                groups.set(mod.phaseIndex, { phaseName: mod.phaseName, modules: [] })
+            }
+            groups.get(mod.phaseIndex)!.modules.push(mod)
         }
+        return [...groups.entries()].sort(([a], [b]) => a - b)
+    }, [filteredModules])
 
-        if (sortBy === 'phase') {
-            filtered = [...filtered].sort((a, b) => a.phaseIdx - b.phaseIdx)
-        } else if (sortBy === 'completed') {
-            filtered = [...filtered].sort((a, b) => {
-                if (a.isCompleted === b.isCompleted) return 0
-                return a.isCompleted ? 1 : -1
+    const handleToggle = useCallback(
+        (mod: FlatModule) => {
+            const wasCompleted = completedModules.includes(mod.id)
+            const nextCompleted = !wasCompleted
+
+            toggleModule(mod.id)
+
+            if (!activeRoadmapId) return
+            setPendingIds((prev) => new Set(prev).add(mod.id))
+            startTransition(async () => {
+                const result = await setModuleCompletion({
+                    roadmapId: activeRoadmapId,
+                    moduleIndex: mod.globalIndex,
+                    isCompleted: nextCompleted,
+                })
+                setPendingIds((prev) => {
+                    const next = new Set(prev)
+                    next.delete(mod.id)
+                    return next
+                })
+                if (!result.success) {
+                    toggleModule(mod.id)
+                    showToast.error("Không thể lưu tiến độ", result.error ?? "Vui lòng thử lại.")
+                    return
+                }
+                if (nextCompleted) addXP(20)
             })
-        }
+        },
+        [activeRoadmapId, completedModules, toggleModule, addXP]
+    )
 
-        return filtered
-    }, [roadmap, completedModules, searchQuery, activeTab, sortBy])
+    const handleResume = useCallback(() => {
+        if (!firstIncomplete) return
+        setActiveModule(firstIncomplete.id)
+        setActiveTab("roadmap")
+        // Allow tab content to render before scrolling
+        requestAnimationFrame(() => {
+            const node = moduleRefs.current.get(firstIncomplete.id)
+            if (node) {
+                node.scrollIntoView({ behavior: "smooth", block: "center" })
+            }
+        })
+    }, [firstIncomplete, setActiveModule])
 
-    const totalSessions = roadmap?.phases?.reduce((acc, phase) => acc + (phase.modules?.length || 0), 0) || 0
-    const completedCount = completedModules.length
-    const progressPercentage = totalSessions > 0 ? Math.round((completedCount / totalSessions) * 100) : 0
-
-    const currentSession = allSessions.find(s => !s.isCompleted) || allSessions[0]
-
-    const handleSessionClick = (sessionId: string) => {
-        setActiveModule(sessionId)
-        
+    if (!roadmap) {
+        return <EmptyState />
     }
 
     return (
-        <div className="flex-1 bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 relative">
-            {}
-            <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 px-6 md:px-8 py-6 sticky top-0 z-30 transition-all duration-300 shadow-sm">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                    <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                            <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                <Circle className="w-2 h-2 fill-green-500 text-green-500 animate-pulse" />
-                                Current Course
-                            </div>
-                            {roadmap && (
-                                <Badge variant="secondary" className="text-xs font-semibold">
-                                    {progressPercentage}% Complete
-                                </Badge>
-                            )}
+        <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-950">
+            <div className="max-w-5xl mx-auto px-6 md:px-10 py-8 md:py-10 space-y-8">
+                <header className="space-y-6">
+                    <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+                        <div className="space-y-2">
+                            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                Study plan
+                            </p>
+                            <h1 className="font-serif text-3xl md:text-4xl font-semibold tracking-tight text-slate-900 dark:text-white">
+                                {roadmap.title}
+                            </h1>
+                            <p className="text-sm md:text-base text-slate-600 dark:text-slate-300">
+                                {totalModules} mô-đun · {completedCount} đã hoàn thành · {progress}%
+                            </p>
                         </div>
-                        <h1 className="font-serif text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
-                            {roadmap?.title || 'Advanced AI Engineering'}
-                        </h1>
+                        <div className="flex gap-2">
+                            <Button
+                                onClick={handleResume}
+                                disabled={!firstIncomplete}
+                                className="rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 font-semibold h-11 px-5 disabled:opacity-50"
+                            >
+                                <Sparkles className="w-4 h-4 mr-2" />
+                                {firstIncomplete ? "Resume next" : "All done"}
+                            </Button>
+                        </div>
                     </div>
-                    <div className="flex gap-2">
-                        <Button
-                            variant="outline"
-                            className="gap-2 hidden md:flex border-2 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold"
-                        >
-                            <List className="h-4 w-4" /> Curriculum
-                        </Button>
-                        <Button
-                            className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 gap-2 transition-all hover:-translate-y-0.5 active:translate-y-0 font-bold"
-                            onClick={() => currentSession && handleSessionClick(currentSession.id)}
-                        >
-                            <Zap className="h-4 w-4 fill-white" /> Smart Resume
-                        </Button>
-                    </div>
-                </div>
 
-                {}
-                {roadmap && totalSessions > 0 && (
-                    <div className="mb-6">
-                        <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                Progress
-                            </span>
-                            <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
-                                {completedCount} / {totalSessions} sessions
-                            </span>
-                        </div>
-                        <div className="h-3 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div className="space-y-2">
+                        <div className="h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                             <motion.div
+                                className="h-full bg-indigo-500 rounded-full"
                                 initial={{ width: 0 }}
-                                animate={{ width: `${progressPercentage}%` }}
-                                transition={{ duration: 0.8, ease: "easeOut" }}
-                                className="h-full bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 rounded-full shadow-lg"
+                                animate={{ width: `${progress}%` }}
+                                transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
                             />
                         </div>
                     </div>
-                )}
 
-                {}
-                <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mb-6 p-6 rounded-2xl bg-gradient-to-r from-violet-600 via-indigo-600 to-blue-600 text-white shadow-2xl shadow-indigo-500/20 relative overflow-hidden group hover:shadow-indigo-500/30 transition-all duration-500"
-                >
-                    <div className="relative z-10 flex items-start gap-5">
-                        <div className="p-3.5 bg-white/10 rounded-xl backdrop-blur-md border border-white/20 shadow-inner group-hover:scale-110 transition-transform duration-500">
-                            <Sparkles className="h-6 w-6 text-yellow-300" />
-                        </div>
-                        <div className="flex-1">
-                            <h3 className="font-bold text-xl mb-2 tracking-tight">
-                                Good Morning! ☀️
-                            </h3>
-                            <p className="text-indigo-50 text-sm max-w-2xl leading-relaxed font-medium">
-                                You&apos;re on a <span className="font-bold text-white border-b border-white/30">{streak}-day streak</span>!
-                                {currentSession
-                                    ? ` Continue with "${currentSession.title}" to maintain your momentum.`
-                                    : ' Great job completing all sessions!'}
-                            </p>
-                        </div>
-                    </div>
-                    <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-white/15 transition-colors duration-700" />
-                    <div className="absolute bottom-0 left-0 w-40 h-40 bg-indigo-900/20 rounded-full blur-2xl translate-y-1/2 -translate-x-1/4" />
-                </motion.div>
-
-                {}
-                <div className="flex flex-col md:flex-row gap-3 mb-4">
-                    <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                        <Input
-                            placeholder="Search sessions..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-10 h-11 border-2 border-slate-200 dark:border-slate-700 focus:border-indigo-500 dark:focus:border-indigo-500 rounded-xl font-medium"
-                        />
-                        {searchQuery && (
-                            <button
-                                onClick={() => setSearchQuery('')}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
-                            >
-                                <X className="w-4 h-4 text-slate-400" />
-                            </button>
-                        )}
-                    </div>
-                    <div className="flex gap-2">
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => setShowFilters(!showFilters)}
-                            className={cn(
-                                "h-11 w-11 border-2 rounded-xl",
-                                showFilters && "bg-indigo-50 dark:bg-indigo-900/20 border-indigo-300 dark:border-indigo-700"
-                            )}
-                        >
-                            <Filter className="h-4 w-4" />
-                        </Button>
-                        <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => setViewMode('grid')}
-                                className={cn(
-                                    "h-9 w-9 rounded-lg",
-                                    viewMode === 'grid' && "bg-white dark:bg-slate-700 shadow-sm"
-                                )}
-                            >
-                                <LayoutGrid className="h-4 w-4" />
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => setViewMode('list')}
-                                className={cn(
-                                    "h-9 w-9 rounded-lg",
-                                    viewMode === 'list' && "bg-white dark:bg-slate-700 shadow-sm"
-                                )}
-                            >
-                                <List className="h-4 w-4" />
-                            </Button>
+                    <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+                        <Tabs activeTab={activeTab} onChange={setActiveTab} todayCount={todayModules.length} />
+                        <div className="relative w-full md:w-72">
+                            <Search aria-hidden className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <Input
+                                placeholder="Search modules…"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="h-10 pl-9 pr-9 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-colors text-slate-900 dark:text-white"
+                            />
+                            {searchQuery ? (
+                                <button
+                                    type="button"
+                                    onClick={() => setSearchQuery("")}
+                                    aria-label="Clear search"
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
+                                >
+                                    <X className="w-3.5 h-3.5" />
+                                </button>
+                            ) : null}
                         </div>
                     </div>
-                </div>
+                </header>
 
-                {}
-                <AnimatePresence>
-                    {showFilters && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="overflow-hidden"
-                        >
-                            <div className="flex flex-wrap gap-3 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 mb-4">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Sort:</span>
-                                    <select
-                                        value={sortBy}
-                                        onChange={(e) => setSortBy(e.target.value as SortOption)}
-                                        className="px-3 py-1.5 rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-medium focus:border-indigo-500 dark:focus:border-indigo-500"
-                                    >
-                                        <option value="default">Default</option>
-                                        <option value="phase">By Phase</option>
-                                        <option value="completed">Completion Status</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
-                {}
-                <div className="flex items-center justify-between">
-                    <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
-                        <button
-                            onClick={() => setActiveTab('today')}
-                            className={cn(
-                                "px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300",
-                                activeTab === 'today'
-                                    ? "bg-white dark:bg-slate-700 text-indigo-900 dark:text-indigo-100 shadow-md"
-                                    : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50"
-                            )}
-                        >
-                            Today&apos;s Plan
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('roadmap')}
-                            className={cn(
-                                "px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300",
-                                activeTab === 'roadmap'
-                                    ? "bg-white dark:bg-slate-700 text-indigo-900 dark:text-indigo-100 shadow-md"
-                                    : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50"
-                            )}
-                        >
-                            Full Roadmap
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            {}
-            <div className="p-6 md:p-8 pb-32 overflow-y-auto h-[calc(100vh-280px)] scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700 scrollbar-track-transparent">
-                {allSessions.length === 0 ? (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="flex flex-col items-center justify-center py-20 px-6"
-                    >
-                        <div className="relative mb-6">
-                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-violet-500/20 rounded-full blur-2xl animate-pulse" />
-                            <div className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-indigo-100 to-violet-100 dark:from-indigo-900/30 dark:to-violet-900/30 flex items-center justify-center border-2 border-indigo-200 dark:border-indigo-800 shadow-lg">
-                                <BookOpen className="w-12 h-12 text-indigo-600 dark:text-indigo-400" />
-                            </div>
-                        </div>
-                        <div className="text-center space-y-3 max-w-md">
-                            <h3 className="text-2xl font-black text-slate-900 dark:text-white">
-                                {searchQuery ? 'No results found' : !roadmap ? 'No study plan available' : activeTab === 'today' ? 'All caught up!' : 'No sessions available'}
-                            </h3>
-                            <p className="text-base text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
-                                {searchQuery
-                                    ? `No sessions match "${searchQuery}". Try a different search term.`
-                                    : !roadmap
-                                        ? "You haven&apos;t created a study plan yet. Complete the onboarding to get started!"
-                                        : activeTab === 'today'
-                                            ? "You've completed all sessions for today! Great work! 🎉"
-                                            : "Your study plan is empty. Check back later for new sessions."}
-                            </p>
-                        </div>
-                        {!roadmap && (
-                            <Button
-                                className="mt-8 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all"
-                                onClick={() => window.location.href = '/onboarding'}
-                            >
-                                Create Study Plan
-                            </Button>
-                        )}
-                        {searchQuery && (
-                            <Button
-                                variant="outline"
-                                className="mt-4"
-                                onClick={() => setSearchQuery('')}
-                            >
-                                Clear Search
-                            </Button>
-                        )}
-                    </motion.div>
+                {activeTab === "today" ? (
+                    <TodaySection
+                        modules={todayModules}
+                        completedSet={completedModules}
+                        pendingSet={pendingIds}
+                        onToggle={handleToggle}
+                        activeModuleId={activeModuleId}
+                        moduleRefs={moduleRefs}
+                        firstIncompleteId={firstIncomplete?.id ?? null}
+                        searchQuery={searchQuery}
+                    />
                 ) : (
-                    <AnimatePresence mode="wait">
-                        {viewMode === 'grid' ? (
-                            <motion.div
-                                key="grid"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-                            >
-                                {allSessions.map((session, i: number) => {
-                                    const isCurrent = session.id === currentSession?.id && !session.isCompleted
-                                    return (
-                                        <motion.div
-                                            key={session.id}
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: i * 0.05 }}
-                                            onClick={() => handleSessionClick(session.id)}
-                                            className={cn(
-                                                "rounded-3xl border-2 p-6 transition-all duration-500 relative group cursor-pointer flex flex-col justify-between min-h-[280px]",
-                                                session.isCompleted
-                                                    ? "bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800"
-                                                    : isCurrent
-                                                        ? "bg-white dark:bg-slate-900 border-indigo-500 ring-4 ring-indigo-500/10 shadow-2xl shadow-indigo-500/20 scale-[1.02] z-10"
-                                                        : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-xl hover:shadow-indigo-500/10 hover:-translate-y-2"
-                                            )}
-                                        >
-                                            {}
-                                            {session.isCompleted && (
-                                                <div className="absolute top-4 right-4">
-                                                    <div className="p-2 rounded-xl bg-green-500 text-white shadow-lg">
-                                                        <CheckCircle2 className="w-5 h-5" />
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {}
-                                            {isCurrent && (
-                                                <span className="absolute top-4 right-4 flex h-4 w-4">
-                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                                                    <span className="relative inline-flex rounded-full h-4 w-4 bg-indigo-500 border-2 border-white"></span>
-                                                </span>
-                                            )}
-
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-3 mb-4">
-                                                    <div className={cn(
-                                                        "h-12 w-12 rounded-2xl flex items-center justify-center font-black text-base shadow-inner transition-all duration-300",
-                                                        session.isCompleted
-                                                            ? "bg-green-500 text-white"
-                                                            : isCurrent
-                                                                ? "bg-indigo-600 text-white shadow-indigo-700/50"
-                                                                : "bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/30 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
-                                                    )}>
-                                                        {i + 1}
-                                                    </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1">
-                                                            Session {i + 1}
-                                                        </span>
-                                                        <span className={cn(
-                                                            "text-xs font-bold truncate block",
-                                                            isCurrent ? "text-indigo-600 dark:text-indigo-400" : "text-slate-500 dark:text-slate-400"
-                                                        )}>
-                                                            {session.phaseName}
-                                                        </span>
-                                                    </div>
-                                                </div>
-
-                                                <h3 className={cn(
-                                                    "font-serif font-bold text-lg mb-3 line-clamp-2 leading-snug transition-colors",
-                                                    session.isCompleted
-                                                        ? "text-green-800 dark:text-green-200"
-                                                        : "text-slate-900 dark:text-slate-100 group-hover:text-indigo-700 dark:group-hover:text-indigo-300"
-                                                )}>
-                                                    {session.title}
-                                                </h3>
-
-                                                {session.description && (
-                                                    <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-4">
-                                                        {session.description}
-                                                    </p>
-                                                )}
-
-                                                <div className="flex flex-wrap gap-2">
-                                                    <Badge variant="secondary" className="text-[10px] font-bold uppercase tracking-wider">
-                                                        Concept
-                                                    </Badge>
-                                                    <Badge variant="secondary" className="text-[10px] font-bold uppercase tracking-wider bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300">
-                                                        Practice
-                                                    </Badge>
-                                                </div>
-                                            </div>
-
-                                            <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                                                <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-semibold">
-                                                    <Clock className="h-4 w-4" />
-                                                    45m
-                                                </div>
-                                                {session.isCompleted ? (
-                                                    <div className="flex items-center gap-1 text-xs font-bold text-green-600 dark:text-green-400">
-                                                        <CheckCircle2 className="w-4 h-4" />
-                                                        Completed
-                                                    </div>
-                                                ) : isCurrent ? (
-                                                    <Button
-                                                        size="sm"
-                                                        className="h-9 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white text-xs font-bold rounded-full px-5 shadow-lg hover:shadow-xl hover:scale-105 transition-all"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation()
-                                                            handleSessionClick(session.id)
-                                                        }}
-                                                    >
-                                                        <Play className="w-3 h-3 mr-1.5 fill-current" />
-                                                        Start Now
-                                                    </Button>
-                                                ) : (
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-9 w-9 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
-                                                    >
-                                                        <ArrowRight className="h-4 w-4" />
-                                                    </Button>
-                                                )}
-                                            </div>
-                                        </motion.div>
-                                    )
-                                })}
-                            </motion.div>
-                        ) : (
-                            <motion.div
-                                key="list"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                className="space-y-4"
-                            >
-                                {allSessions.map((session, i: number) => {
-                                    const isCurrent = session.id === currentSession?.id && !session.isCompleted
-                                    return (
-                                        <motion.div
-                                            key={session.id}
-                                            initial={{ opacity: 0, x: -20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: i * 0.03 }}
-                                            onClick={() => handleSessionClick(session.id)}
-                                            className={cn(
-                                                "rounded-2xl border-2 p-6 transition-all duration-300 group cursor-pointer",
-                                                session.isCompleted
-                                                    ? "bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800"
-                                                    : isCurrent
-                                                        ? "bg-white dark:bg-slate-900 border-indigo-500 ring-2 ring-indigo-500/20 shadow-lg"
-                                                        : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-md"
-                                            )}
-                                        >
-                                            <div className="flex items-center gap-4">
-                                                <div className={cn(
-                                                    "h-14 w-14 rounded-xl flex items-center justify-center font-black text-lg shadow-inner flex-shrink-0",
-                                                    session.isCompleted
-                                                        ? "bg-green-500 text-white"
-                                                        : isCurrent
-                                                            ? "bg-indigo-600 text-white"
-                                                            : "bg-slate-100 dark:bg-slate-800 text-slate-400"
-                                                )}>
-                                                    {i + 1}
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                                            {session.phaseName}
-                                                        </span>
-                                                        {session.isCompleted && (
-                                                            <Badge className="bg-green-500 text-white text-[10px] px-2 py-0">
-                                                                <CheckCircle2 className="w-3 h-3 mr-1" />
-                                                                Done
-                                                            </Badge>
-                                                        )}
-                                                        {isCurrent && (
-                                                            <Badge className="bg-indigo-500 text-white text-[10px] px-2 py-0">
-                                                                Current
-                                                            </Badge>
-                                                        )}
-                                                    </div>
-                                                    <h3 className={cn(
-                                                        "font-serif font-bold text-lg mb-1",
-                                                        session.isCompleted ? "text-green-800 dark:text-green-200" : "text-slate-900 dark:text-slate-100"
-                                                    )}>
-                                                        {session.title}
-                                                    </h3>
-                                                    {session.description && (
-                                                        <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-1">
-                                                            {session.description}
-                                                        </p>
-                                                    )}
-                                                </div>
-                                                <div className="flex items-center gap-4 flex-shrink-0">
-                                                    <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 font-semibold">
-                                                        <Clock className="h-4 w-4" />
-                                                        {session.estimatedTime || "45m"}
-                                                    </div>
-                                                    {session.isCompleted ? (
-                                                        <CheckCircle2 className="w-6 h-6 text-green-500" />
-                                                    ) : isCurrent ? (
-                                                        <Button
-                                                            size="sm"
-                                                            className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold"
-                                                        >
-                                                            <Play className="w-4 h-4 mr-2 fill-current" />
-                                                            Start
-                                                        </Button>
-                                                    ) : (
-                                                        <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-indigo-500 transition-colors" />
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </motion.div>
-                                    )
-                                })}
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
+                    <RoadmapSection
+                        groups={phaseGroups}
+                        completedSet={completedModules}
+                        pendingSet={pendingIds}
+                        onToggle={handleToggle}
+                        activeModuleId={activeModuleId}
+                        moduleRefs={moduleRefs}
+                        firstIncompleteId={firstIncomplete?.id ?? null}
+                        searchQuery={searchQuery}
+                    />
                 )}
             </div>
+        </main>
+    )
+}
+
+function Tabs({
+    activeTab,
+    onChange,
+    todayCount,
+}: {
+    activeTab: "today" | "roadmap"
+    onChange: (tab: "today" | "roadmap") => void
+    todayCount: number
+}) {
+    return (
+        <div className="inline-flex p-1 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 self-start">
+            <button
+                type="button"
+                onClick={() => onChange("today")}
+                className={cn(
+                    "h-9 px-4 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2",
+                    activeTab === "today"
+                        ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm"
+                        : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+                )}
+            >
+                Today
+                <span className={cn(
+                    "text-[10px] font-bold px-1.5 py-0.5 rounded-full",
+                    activeTab === "today" ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200" : "bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
+                )}>
+                    {todayCount}
+                </span>
+            </button>
+            <button
+                type="button"
+                onClick={() => onChange("roadmap")}
+                className={cn(
+                    "h-9 px-4 rounded-lg text-sm font-semibold transition-colors",
+                    activeTab === "roadmap"
+                        ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm"
+                        : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+                )}
+            >
+                Full roadmap
+            </button>
         </div>
+    )
+}
+
+interface ListProps {
+    completedSet: string[]
+    pendingSet: Set<string>
+    onToggle: (mod: FlatModule) => void
+    activeModuleId: string | null
+    moduleRefs: React.MutableRefObject<Map<string, HTMLLIElement | null>>
+    firstIncompleteId: string | null
+    searchQuery: string
+}
+
+function TodaySection({ modules, ...props }: { modules: FlatModule[] } & ListProps) {
+    if (modules.length === 0) {
+        return (
+            <EmptySection
+                title={props.searchQuery ? "Không tìm thấy mô-đun phù hợp" : "Bạn đã xong việc cho hôm nay"}
+                description={props.searchQuery
+                    ? `Không có kết quả cho "${props.searchQuery}".`
+                    : "Tất cả mô-đun gần nhất đã hoàn thành. Quay lại sau hoặc xem toàn bộ lộ trình."}
+            />
+        )
+    }
+    return (
+        <section>
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
+                Up next
+            </p>
+            <ol className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden divide-y divide-slate-200 dark:divide-slate-800">
+                {modules.map((mod, idx) => (
+                    <ModuleRow
+                        key={mod.id}
+                        mod={mod}
+                        index={idx}
+                        {...props}
+                    />
+                ))}
+            </ol>
+        </section>
+    )
+}
+
+function RoadmapSection({
+    groups,
+    ...props
+}: { groups: [number, { phaseName: string; modules: FlatModule[] }][] } & ListProps) {
+    if (groups.length === 0) {
+        return (
+            <EmptySection
+                title="Không có kết quả"
+                description={`Không có mô-đun nào khớp với "${props.searchQuery}".`}
+            />
+        )
+    }
+    return (
+        <div className="space-y-8">
+            {groups.map(([phaseIdx, group]) => (
+                <section key={phaseIdx}>
+                    <div className="flex items-baseline justify-between mb-3">
+                        <h2 className="text-base font-semibold text-slate-900 dark:text-white tracking-tight">
+                            <span className="text-indigo-600 dark:text-indigo-300 mr-2">Phase {phaseIdx + 1}</span>
+                            {group.phaseName}
+                        </h2>
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                            {group.modules.length} mô-đun
+                        </span>
+                    </div>
+                    <ol className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden divide-y divide-slate-200 dark:divide-slate-800">
+                        {group.modules.map((mod, idx) => (
+                            <ModuleRow
+                                key={mod.id}
+                                mod={mod}
+                                index={idx}
+                                {...props}
+                            />
+                        ))}
+                    </ol>
+                </section>
+            ))}
+        </div>
+    )
+}
+
+interface ModuleRowProps extends ListProps {
+    mod: FlatModule
+    index: number
+}
+
+function ModuleRow({
+    mod,
+    index,
+    completedSet,
+    pendingSet,
+    onToggle,
+    activeModuleId,
+    moduleRefs,
+    firstIncompleteId,
+}: ModuleRowProps) {
+    const isCompleted = completedSet.includes(mod.id)
+    const isCurrent = !isCompleted && mod.id === firstIncompleteId
+    const isFocused = mod.id === activeModuleId
+    const isPending = pendingSet.has(mod.id)
+
+    return (
+        <li
+            ref={(el) => {
+                moduleRefs.current.set(mod.id, el)
+            }}
+            className={cn(
+                "flex flex-col md:flex-row md:items-center gap-4 px-5 md:px-6 py-5 transition-colors",
+                isFocused
+                    ? "bg-indigo-100/50 dark:bg-indigo-900/20"
+                    : isCurrent
+                        ? "bg-indigo-50/40 dark:bg-indigo-900/10"
+                        : "hover:bg-slate-50 dark:hover:bg-slate-800/50"
+            )}
+        >
+            <div className="flex items-start gap-4 flex-1 min-w-0">
+                <button
+                    type="button"
+                    aria-label={isCompleted ? "Mark module incomplete" : "Mark module complete"}
+                    aria-pressed={isCompleted}
+                    disabled={isPending}
+                    onClick={() => onToggle(mod)}
+                    className={cn(
+                        "h-9 w-9 rounded-full flex items-center justify-center shrink-0 transition-colors",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900",
+                        isCompleted
+                            ? "bg-emerald-500 text-white hover:bg-emerald-600"
+                            : isCurrent
+                                ? "border-2 border-indigo-500 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                                : "border border-slate-300 dark:border-slate-600 text-slate-400 hover:border-indigo-300 hover:text-indigo-500"
+                    )}
+                >
+                    {isPending ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : isCompleted ? (
+                        <CheckCircle2 className="w-4 h-4" />
+                    ) : (
+                        <span className="text-xs font-semibold">{String(index + 1).padStart(2, "0")}</span>
+                    )}
+                </button>
+
+                <div className="flex-1 space-y-1 min-w-0">
+                    <div className="flex flex-wrap items-baseline justify-between gap-2">
+                        <h4
+                            className={cn(
+                                "text-base font-semibold tracking-tight",
+                                isCompleted
+                                    ? "text-slate-500 dark:text-slate-400 line-through"
+                                    : "text-slate-900 dark:text-white"
+                            )}
+                        >
+                            {mod.title}
+                        </h4>
+                        <span className="inline-flex items-center gap-2 text-[11px] font-semibold text-slate-500 dark:text-slate-400 shrink-0">
+                            <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800">
+                                Phase {mod.phaseIndex + 1}
+                            </span>
+                            <span className="inline-flex items-center gap-1">
+                                <Clock className="w-3 h-3" /> {mod.estimatedTime}
+                            </span>
+                        </span>
+                    </div>
+                    {mod.description ? (
+                        <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2">
+                            {mod.description}
+                        </p>
+                    ) : null}
+                </div>
+            </div>
+
+            <div className="flex items-center gap-2 md:ml-3 shrink-0">
+                <ResourceModal moduleTitle={mod.title} resources={mod.resources} />
+                <QuizModal moduleTitle={mod.title} />
+                {isCurrent ? (
+                    <Button
+                        size="sm"
+                        onClick={() => onToggle(mod)}
+                        disabled={isPending}
+                        className="hidden md:inline-flex h-9 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 font-semibold"
+                    >
+                        Mark done <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                    </Button>
+                ) : null}
+            </div>
+        </li>
+    )
+}
+
+function EmptySection({ title, description }: { title: string; description: string }) {
+    return (
+        <div className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-12 text-center">
+            <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-2">{title}</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-300 max-w-md mx-auto">{description}</p>
+        </div>
+    )
+}
+
+function EmptyState() {
+    return (
+        <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-950 p-6 md:p-10">
+            <div className="max-w-2xl mx-auto rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-12 text-center mt-12">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 mb-5">
+                    <Sparkles className="w-7 h-7 text-indigo-600 dark:text-indigo-300" />
+                </div>
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">Chưa có lộ trình</h2>
+                <p className="text-sm text-slate-600 dark:text-slate-300 max-w-md mx-auto mb-6">
+                    Hãy tạo lộ trình học cá nhân hóa từ AI. Chỉ mất 2 phút trả lời 7 câu hỏi.
+                </p>
+                <Button asChild className="h-11 px-5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 font-semibold">
+                    <Link href="/onboarding?fresh=1">
+                        <Plus className="w-4 h-4 mr-2" /> Tạo lộ trình
+                    </Link>
+                </Button>
+            </div>
+        </main>
     )
 }

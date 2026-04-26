@@ -93,8 +93,10 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
             } else if (result?.success) {
                 showToast.success("Tạo tài khoản thành công!", "Đang chuyển hướng...")
             }
-        } catch (error) {
-            console.error("Registration error:", error)
+        } catch {
+            const fallback = "Đã có lỗi xảy ra. Vui lòng thử lại."
+            setRegisterErrorMessage(fallback)
+            showToast.error("Đăng ký không thành công", fallback)
         } finally {
             setIsRegisterPending(false)
         }
@@ -115,11 +117,16 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
                 setForgotPasswordErrorMessage(result.error)
                 showToast.error("Gửi yêu cầu thất bại", result.error)
             } else if (result?.success) {
-                showToast.success("Đã gửi email khôi phục!", "Vui lòng kiểm tra hộp thư của bạn.")
-                setTimeout(() => switchMode('login'), 2000)
+                showToast.success(
+                    "Đã xử lý yêu cầu",
+                    "Nếu email tồn tại trong hệ thống, liên kết khôi phục sẽ được gửi đến hộp thư của bạn."
+                )
+                setTimeout(() => switchMode('login'), 2500)
             }
-        } catch (error) {
-            console.error("Forgot password error:", error)
+        } catch {
+            const fallback = "Đã có lỗi xảy ra. Vui lòng thử lại."
+            setForgotPasswordErrorMessage(fallback)
+            showToast.error("Gửi yêu cầu thất bại", fallback)
         } finally {
             setIsForgotPasswordPending(false)
         }
@@ -210,8 +217,8 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
 
                 <div className="relative z-10 flex gap-6 text-sm text-slate-400">
                     <span>© 2026 EduGuide Inc.</span>
-                    <Link href="#" className="hover:text-white transition-colors">Privacy</Link>
-                    <Link href="#" className="hover:text-white transition-colors">Terms</Link>
+                    <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+                    <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
                 </div>
             </div>
 

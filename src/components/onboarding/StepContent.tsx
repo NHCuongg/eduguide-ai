@@ -1,84 +1,49 @@
 'use client'
 
 import { useWizardStore } from "@/lib/store"
-import { Button } from "@/components/ui/button"
-import { motion } from "framer-motion"
-import { Book, FileText, MousePointerClick, Layers } from "lucide-react"
+import type { OnboardingData } from "@/lib/schemas"
+import { FileText, MousePointerClick, Layers } from "lucide-react"
+import { ChoiceCard, StepBody, StepFooter, StepHeading, StepLabel } from "./_StepShell"
 
 export default function StepContent() {
     const { data, setData, nextStep, prevStep } = useWizardStore()
 
-    const handleSelect = (pref: any) => {
-        setData({ contentPreference: pref })
-    }
-
-    const options = [
-        { id: "Text", icon: FileText, label: "Text Based", desc: "Read at your own pace" },
-        { id: "Interactive", icon: MousePointerClick, label: "Interactive", desc: "Quizzes and hands-on" },
-        { id: "Mixed", icon: Layers, label: "Mixed Media", desc: "A bit of everything" },
+    const options: Array<{
+        id: OnboardingData["contentPreference"]
+        Icon: typeof FileText
+        label: string
+        desc: string
+    }> = [
+        { id: "Text", Icon: FileText, label: "Text", desc: "Đọc lý thuyết theo nhịp riêng" },
+        { id: "Interactive", Icon: MousePointerClick, label: "Interactive", desc: "Quiz, bài tập, dự án" },
+        { id: "Mixed", Icon: Layers, label: "Mixed", desc: "Cân bằng cả hai" },
     ]
 
     return (
-        <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="space-y-8"
-        >
-            <div className="space-y-2 text-center">
-                <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Learning Format</h2>
-                <p className="text-slate-500 dark:text-slate-400">How do you prefer to consume content?</p>
+        <StepBody>
+            <StepHeading
+                eyebrow="Format"
+                title="How do you like content delivered?"
+                subtitle="Lựa chọn format ưu tiên — chúng tôi vẫn trộn nhẹ để bạn không chán."
+            />
+
+            <div>
+                <StepLabel>Content preference</StepLabel>
+                <div className="space-y-3" role="radiogroup">
+                    {options.map(({ id, Icon, label, desc }) => (
+                        <ChoiceCard
+                            key={id}
+                            label={label}
+                            description={desc}
+                            icon={<Icon className="w-4 h-4" />}
+                            selected={data.contentPreference === id}
+                            onSelect={() => setData({ contentPreference: id })}
+                        />
+                    ))}
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4">
-                {options.map((opt) => {
-                    const Icon = opt.icon
-                    const isSelected = data.contentPreference === opt.id
-                    return (
-                        <div
-                            key={opt.id}
-                            onClick={() => handleSelect(opt.id)}
-                            className={`
-                                cursor-pointer flex items-center p-4 rounded-xl border-2 transition-all duration-200
-                                ${isSelected
-                                    ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 shadow-md ring-1 ring-indigo-600"
-                                    : "border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700"
-                                }
-                            `}
-                        >
-                            <div className={`
-                                p-3 rounded-full mr-4
-                                ${isSelected ? "bg-indigo-600 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-500"}
-                            `}>
-                                <Icon className="w-5 h-5" />
-                            </div>
-                            <div className="flex-1">
-                                <h3 className="font-bold text-slate-900 dark:text-white">{opt.label}</h3>
-                                <p className="text-sm text-slate-500 dark:text-slate-400">{opt.desc}</p>
-                            </div>
-                            <div className={`
-                                w-5 h-5 rounded-full border-2 flex items-center justify-center
-                                ${isSelected ? "border-indigo-600 bg-indigo-600" : "border-slate-300 dark:border-slate-600"}
-                            `}>
-                                {isSelected && <div className="w-2 h-2 bg-white rounded-full" />}
-                            </div>
-                        </div>
-                    )
-                })}
-            </div>
-
-            <div className="flex justify-between pt-4">
-                <Button variant="ghost" onClick={prevStep} className="w-32">
-                    Back
-                </Button>
-                <Button
-                    onClick={nextStep}
-                    disabled={!data.contentPreference}
-                    className="w-32 bg-indigo-600 hover:bg-indigo-700 text-white"
-                >
-                    Next
-                </Button>
-            </div>
-        </motion.div>
+            <StepFooter onBack={prevStep} onNext={nextStep} nextDisabled={!data.contentPreference} />
+        </StepBody>
     )
 }

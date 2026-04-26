@@ -12,10 +12,12 @@ interface GamificationState {
 }
 
 const LEVEL_THRESHOLDS = [0, 100, 300, 600, 1000, 1500, 2100, 2800, 3600, 4500, 5500, 6600, 7800, 9100, 10000]
+const MAX_XP = 999_999
+const MAX_XP_PER_CALL = 1000
 
 export const useGamificationStore = create<GamificationState>()(
     persist(
-        (set, get) => ({
+        (set) => ({
             xp: 0,
             level: 1,
             streak: 0,
@@ -23,8 +25,10 @@ export const useGamificationStore = create<GamificationState>()(
 
             addXP: (amount) => {
                 set((state) => {
-                    const newXP = state.xp + amount
-                    
+                    if (!Number.isFinite(amount) || amount <= 0) return {}
+                    const safeAmount = Math.min(amount, MAX_XP_PER_CALL)
+                    const newXP = Math.min(state.xp + safeAmount, MAX_XP)
+
                     let newLevel = 1
                     for (let i = 0; i < LEVEL_THRESHOLDS.length; i++) {
                         if (newXP >= LEVEL_THRESHOLDS[i]) {
@@ -74,6 +78,7 @@ export const getLevelTitle = (level: number) => {
 }
 
 export const getNextLevelXP = (level: number) => {
-    if (level >= LEVEL_THRESHOLDS.length) return 1000000
-    return LEVEL_THRESHOLDS[level] 
+    const safeLevel = Math.max(1, Math.floor(level))
+    if (safeLevel >= LEVEL_THRESHOLDS.length) return MAX_XP
+    return LEVEL_THRESHOLDS[safeLevel]
 }

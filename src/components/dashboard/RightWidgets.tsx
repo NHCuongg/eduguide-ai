@@ -1,136 +1,94 @@
 'use client'
 
+import Link from "next/link"
+import { Flame, Target } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Bell, Clock, MoreHorizontal } from "lucide-react"
-import { useState, useEffect } from "react"
-import { cn } from "@/lib/utils"
+import { useWizardStore } from "@/lib/store"
+import { useGamificationStore, getNextLevelXP } from "@/lib/useGamificationStore"
+
+const DAILY_XP_TARGET = 100
 
 export default function RightWidgets() {
-    const [timeLeft, setTimeLeft] = useState(25 * 60)
-    const [isActive, setIsActive] = useState(false)
+    const { roadmap, completedModules } = useWizardStore()
+    const { xp, level, streak } = useGamificationStore()
 
-    useEffect(() => {
-        let interval: NodeJS.Timeout | undefined
+    const totalModules = roadmap?.phases.reduce((sum, p) => sum + p.modules.length, 0) ?? 0
+    const completedCount = completedModules.length
+    const progress = totalModules > 0 ? Math.round((completedCount / totalModules) * 100) : 0
 
-        if (isActive && timeLeft > 0) {
-            interval = setInterval(() => {
-                setTimeLeft((prev) => prev - 1)
-            }, 1000)
-        }
-
-        return () => {
-            if (interval) {
-                clearInterval(interval)
-            }
-        }
-    }, [isActive, timeLeft])
-
-    useEffect(() => {
-        if (timeLeft === 0 && isActive) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setIsActive(false)
-        }
-    }, [timeLeft, isActive])
-
-    const toggleTimer = () => setIsActive(!isActive)
-    const resetTimer = () => {
-        setIsActive(false)
-        setTimeLeft(25 * 60)
-    }
-
-    const formatTime = (seconds: number) => {
-        const mins = Math.floor(seconds / 60)
-        const secs = seconds % 60
-        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
-    }
+    const dailyProgress = Math.min(100, Math.round((xp % DAILY_XP_TARGET) / DAILY_XP_TARGET * 100)) || 0
+    const ringRadius = 36
+    const ringCircumference = 2 * Math.PI * ringRadius
+    const ringOffset = ringCircumference * (1 - dailyProgress / 100)
 
     return (
-        <div className="w-[300px] border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 hidden xl:flex flex-col h-[calc(100vh-60px)]">
-
-            {}
-            <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Focus Timer
-                    </h3>
-                    <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 dark:text-slate-500">
-                        <MoreHorizontal className="w-4 h-4" />
-                    </Button>
-                </div>
-
-                <div className="bg-slate-900 dark:bg-slate-800 rounded-2xl p-5 text-white shadow-xl shadow-slate-200 dark:shadow-slate-950/50">
-                    <div className="flex flex-col items-center justify-center py-4">
-                        <div className="text-5xl font-mono font-bold tracking-wider mb-2">{formatTime(timeLeft)}</div>
-                        <div className="text-slate-400 text-sm font-medium">
-                            {isActive ? "Focusing..." : "Deep Focus Mode"}
+        <aside className="w-[300px] border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 p-6 hidden xl:flex flex-col h-[calc(100vh-60px)] gap-6">
+            <section className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
+                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">
+                    Today
+                </p>
+                <div className="flex items-center gap-5">
+                    <div className="relative w-[88px] h-[88px] shrink-0">
+                        <svg className="w-full h-full -rotate-90" viewBox="0 0 88 88" aria-hidden>
+                            <circle cx="44" cy="44" r={ringRadius} className="stroke-slate-200 dark:stroke-slate-800" strokeWidth="6" fill="none" />
+                            <circle
+                                cx="44" cy="44" r={ringRadius}
+                                className="stroke-indigo-500"
+                                strokeWidth="6"
+                                fill="none"
+                                strokeDasharray={ringCircumference}
+                                strokeDashoffset={ringOffset}
+                                strokeLinecap="round"
+                            />
+                        </svg>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                            <span className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">
+                                {dailyProgress}%
+                            </span>
+                            <span className="text-[9px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Goal</span>
                         </div>
                     </div>
-
-                    <div className="grid grid-cols-2 gap-3 mt-2">
-                        <Button
-                            onClick={toggleTimer}
-                            className={cn(
-                                "text-white border-0 transition-all",
-                                isActive ? "bg-red-500 hover:bg-red-600" : "bg-indigo-500 hover:bg-indigo-600"
-                            )}
-                        >
-                            {isActive ? "Pause" : "Start"}
-                        </Button>
-                        <Button
-                            onClick={resetTimer}
-                            variant="outline"
-                            className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white"
-                        >
-                            Reset
-                        </Button>
-                    </div>
-
-                    <div className="mt-4 pt-4 border-t border-slate-800 dark:border-slate-700 flex justify-between text-xs text-slate-400">
-                        <span>Sessions today: <b>0/4</b></span>
-                        <span>Streak: <b>5</b> 🔥</span>
+                    <div className="space-y-1.5 min-w-0">
+                        <div className="flex items-center gap-2 text-sm">
+                            <Target className="w-3.5 h-3.5 text-slate-400" />
+                            <span className="font-semibold text-slate-900 dark:text-white">
+                                {xp % DAILY_XP_TARGET}/{DAILY_XP_TARGET} XP
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                            <Flame className="w-3.5 h-3.5 text-amber-500" />
+                            <span className="font-semibold text-slate-900 dark:text-white">{streak} day streak</span>
+                        </div>
+                        <div className="text-[11px] text-slate-500 dark:text-slate-400">Level {level}</div>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            {}
-            <div className="mb-8 p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 rounded-xl space-y-3">
-                <div className="flex justify-between items-center text-sm">
-                    <span className="text-slate-500 dark:text-slate-400 font-medium">Daily Goal</span>
-                    <span className="font-bold text-slate-900 dark:text-white">85%</span>
+            <section className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 space-y-3">
+                <div className="flex items-baseline justify-between">
+                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Course progress</span>
+                    <span className="text-sm font-semibold text-slate-900 dark:text-white">{progress}%</span>
                 </div>
-                <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                    <div className="h-full w-[85%] bg-green-500 rounded-full" />
+                <div className="h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div className="h-full bg-indigo-500 rounded-full transition-all" style={{ width: `${progress}%` }} />
                 </div>
-            </div>
+                <p className="text-xs text-slate-600 dark:text-slate-300">
+                    {completedCount} / {totalModules} mô-đun
+                </p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 pt-1">
+                    Level {level} · {xp} / {getNextLevelXP(level)} XP
+                </p>
+            </section>
 
-            {}
-            <div className="mb-6">
-                <h3 className="font-bold text-slate-900 dark:text-white mb-4">Daily Focus</h3>
-                <div className="bg-red-50 dark:bg-red-900/20 text-red-900 dark:text-red-200 rounded-xl p-4 flex items-start gap-3 border border-red-100 dark:border-red-800/50">
-                    <div className="p-2 bg-white dark:bg-red-900/30 rounded-lg shadow-sm">
-                        <Bell className="h-4 w-4 text-red-500 dark:text-red-400" />
-                    </div>
-                    <div>
-                        <div className="text-sm font-bold">3 Overdue Sessions</div>
-                        <div className="text-xs text-red-700/80 dark:text-red-300/70 mt-1">Try to catch up this weekend to stay on track.</div>
-                    </div>
-                </div>
-            </div>
-
-            {}
-            <div className="mt-auto bg-gradient-to-br from-violet-600 to-indigo-700 rounded-2xl p-6 text-white relative overflow-hidden shadow-lg shadow-indigo-200/50 dark:shadow-indigo-900/30 hover:shadow-indigo-300/50 dark:hover:shadow-indigo-800/40 transition-shadow">
-                <div className="relative z-10">
-                    <h3 className="font-extrabold text-xl mb-2 tracking-tight">Keep it up! 🔥</h3>
-                    <p className="text-indigo-100 text-sm mb-5 leading-relaxed font-medium">Consistency is the key to mastery. Complete today&apos;s session to earn a streak.</p>
-                    <Button size="sm" className="bg-white text-indigo-700 hover:bg-indigo-50 w-full font-bold shadow-md hover:shadow-lg transition-all border border-indigo-100">
-                        Continue Learning
-                    </Button>
-                </div>
-
-                {}
-                <div className="absolute -bottom-8 -right-8 w-32 h-32 bg-white/20 rounded-full blur-2xl" />
-                <div className="absolute -top-4 -right-4 w-20 h-20 bg-purple-500/30 rounded-full blur-xl" />
-            </div>
-        </div>
+            <section className="mt-auto rounded-2xl p-5 bg-slate-900 dark:bg-white text-white dark:text-slate-900">
+                <h3 className="font-semibold text-base mb-2 tracking-tight">Keep your streak alive</h3>
+                <p className="text-sm leading-relaxed text-slate-300 dark:text-slate-600 mb-4">
+                    Hoàn thành mô-đun tiếp theo để duy trì chuỗi ngày học.
+                </p>
+                <Button asChild size="sm" className="w-full h-9 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold">
+                    <Link href="/dashboard">Resume learning</Link>
+                </Button>
+            </section>
+        </aside>
     )
 }

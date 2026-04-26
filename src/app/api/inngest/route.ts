@@ -1,11 +1,8 @@
 import { serve } from "inngest/next";
 import { inngest } from "@/lib/inngest/client";
-import { helloWorld, sendWelcomeEmail } from "@/lib/inngest/functions";
+import { inngestFunctions } from "@/lib/inngest/function-registry";
 
 export const { GET, POST, PUT } = serve({
     client: inngest,
-    functions: [
-        helloWorld, 
-        sendWelcomeEmail,
-    ],
+    functions: inngestFunctions,
 });

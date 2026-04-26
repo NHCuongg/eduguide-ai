@@ -8,43 +8,54 @@ import StepInterests from "./StepInterests"
 import StepContent from "./StepContent"
 import Step3 from "./Step3"
 import StepBackground from "./StepBackground"
-import { AnimatePresence } from "framer-motion"
-import { cn } from "@/lib/utils"
+import { AnimatePresence, motion } from "framer-motion"
+
+const STEP_LABELS = [
+    "Subject",
+    "Schedule",
+    "Background",
+    "Goal",
+    "Interests",
+    "Format",
+    "Review",
+]
 
 export default function Wizard() {
     const { currentStep } = useWizardStore()
-    const totalSteps = 7
+    const totalSteps = STEP_LABELS.length
+    const safeStep = Math.min(Math.max(currentStep, 1), totalSteps)
+    const progress = (safeStep / totalSteps) * 100
 
     return (
-        <div className="w-full relative min-h-[500px]">
-            <div className="mb-10 max-w-md mx-auto">
-                <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4 px-2">
-                    <span className={cn(currentStep >= 1 ? "text-indigo-600 dark:text-indigo-400 font-extrabold" : "")}>Basics</span>
-                    <span className={cn(currentStep >= 3 ? "text-indigo-600 dark:text-indigo-400 font-extrabold" : "")}>Goals</span>
-                    <span className={cn(currentStep >= 5 ? "text-indigo-600 dark:text-indigo-400 font-extrabold" : "")}>Finish</span>
+        <div className="space-y-10">
+            <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                        Step {safeStep} of {totalSteps}
+                    </p>
+                    <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 tracking-tight">
+                        {STEP_LABELS[safeStep - 1]}
+                    </p>
                 </div>
-                <div className="w-full h-3 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden shadow-inner border border-slate-300 dark:border-slate-700">
-                    <div
-                        className="h-full bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 rounded-full transition-all duration-700 ease-out shadow-lg shadow-indigo-500/50 relative overflow-hidden"
-                        style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-                    >
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
-                    </div>
-                </div>
-                <div className="text-center mt-2 text-xs text-slate-400 font-medium">
-                    Step {currentStep} of {totalSteps}
+                <div className="h-1 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <motion.div
+                        className="h-full bg-indigo-500 rounded-full"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${progress}%` }}
+                        transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+                    />
                 </div>
             </div>
 
-            <div className="glass-card rounded-3xl p-8 md:p-12">
+            <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 md:p-10">
                 <AnimatePresence mode="wait">
-                    {currentStep === 1 && <Step1 key="step1" />}
-                    {currentStep === 2 && <Step2 key="step2" />}
-                    {currentStep === 3 && <StepBackground key="step3_bg" />}
-                    {currentStep === 4 && <StepGoals key="step4" />}
-                    {currentStep === 5 && <StepInterests key="step5" />}
-                    {currentStep === 6 && <StepContent key="step6" />}
-                    {currentStep === 7 && <Step3 key="step7" />}
+                    {safeStep === 1 && <Step1 key="step1" />}
+                    {safeStep === 2 && <Step2 key="step2" />}
+                    {safeStep === 3 && <StepBackground key="step3_bg" />}
+                    {safeStep === 4 && <StepGoals key="step4" />}
+                    {safeStep === 5 && <StepInterests key="step5" />}
+                    {safeStep === 6 && <StepContent key="step6" />}
+                    {safeStep === 7 && <Step3 key="step7" />}
                 </AnimatePresence>
             </div>
         </div>

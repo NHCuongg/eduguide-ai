@@ -1,7 +1,4 @@
-'use client'
-
 import { motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
 
 interface Particle {
     id: number
@@ -13,22 +10,14 @@ interface Particle {
 }
 
 export default function HeroParticles() {
-    const [particles, setParticles] = useState<Particle[]>([])
-
-    useEffect(() => {
-        
-        const generatedParticles = Array.from({ length: 20 }).map((_, i) => ({
-            id: i,
-            x: Math.random() * 100, 
-            y: Math.random() * 100, 
-            size: Math.random() * 4 + 2, 
-            duration: Math.random() * 10 + 10, 
-            delay: Math.random() * 5, 
-        }))
-        setParticles(generatedParticles)
-    }, [])
-
-    if (particles.length === 0) return null
+    const particles: Particle[] = Array.from({ length: 20 }).map((_, i) => ({
+        id: i,
+        x: ((i * 37) % 100) + 0.5,
+        y: ((i * 53) % 100) + 0.5,
+        size: 2 + (i % 5),
+        duration: 10 + (i % 8),
+        delay: (i % 6) * 0.4,
+    }))
 
     return (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">

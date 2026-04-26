@@ -4,8 +4,13 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import SectionWrapper from "./SectionWrapper"
 import { motion } from "framer-motion"
+import { useSession } from "next-auth/react"
 
 export default function CTASection() {
+    const { status } = useSession()
+    const ctaHref = status === 'authenticated' ? '/dashboard' : '/onboarding'
+    const ctaLabel = status === 'authenticated' ? 'Open my Workspace' : 'Try EduGuide Free'
+
     return (
         <section className="py-32 relative overflow-hidden bg-indigo-600 dark:bg-slate-900 transition-colors duration-500">
             {}
@@ -39,9 +44,9 @@ export default function CTASection() {
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                        <Link href="/onboarding">
+                        <Link href={ctaHref}>
                             <Button size="lg" className="h-16 px-10 text-lg bg-white text-indigo-600 dark:text-indigo-900 hover:bg-indigo-50 hover:scale-105 transition-all font-bold shadow-2xl rounded-full">
-                                Try EduGuide Free
+                                {ctaLabel}
                             </Button>
                         </Link>
                     </div>

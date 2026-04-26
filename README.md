@@ -76,7 +76,6 @@ graph TB
 
 ### 2. Hệ thống Xác thực
 - Đăng nhập bằng email + mật khẩu (mã hoá bcryptjs)
-- Đăng nhập qua **Google** và **GitHub** (OAuth)
 - Đăng ký tài khoản với validate email
 - Quên / đặt lại mật khẩu qua email
 - Gửi email chào mừng tự động khi đăng ký (Inngest → Resend)
@@ -201,7 +200,7 @@ Thu thập thông tin người dùng để cá nhân hoá chương trình học:
 | Bảng | Mô tả | Quan hệ |
 |------|-------|---------|
 | `user` | Người dùng (id, name, email, password) | Gốc |
-| `account` | Tài khoản OAuth (Google, GitHub) | → user |
+| `account` | Tài khoản liên kết (NextAuth) | → user |
 | `session` | Phiên đăng nhập | → user |
 | `verificationToken` | Token xác thực email | — |
 | `profile` | Hồ sơ học tập (skill, level, XP, streak) | → user |
@@ -317,8 +316,6 @@ npm run dev
 | `NEXT_PUBLIC_SUPABASE_URL` | Tuỳ chọn | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Tuỳ chọn | Supabase anon key |
 | `RESEND_API_KEY` | Tuỳ chọn | Resend API key (email) |
-| `GOOGLE_CLIENT_ID` | Tuỳ chọn | Google OAuth client ID |
-| `GITHUB_CLIENT_ID` | Tuỳ chọn | GitHub OAuth client ID |
 
 ### Scripts
 
@@ -330,6 +327,59 @@ npm run db:push    # Push schema to database
 npm run db:studio  # Open Drizzle Studio
 npm run lint       # Run ESLint
 ```
+
+---
+
+## Triển khai bằng Docker
+
+Toàn bộ stack (Next.js app + PostgreSQL 15 + schema khởi tạo từ `init.sql`) được đóng gói sẵn trong `docker-compose.yml`. Hai script tiện lợi nằm trong `scripts/`:
+
+| Hệ điều hành | Lệnh deploy nhanh |
+|--------------|-------------------|
+| Ubuntu / Debian / macOS | `bash scripts/deploy.sh` |
+| Windows (PowerShell) | `powershell -ExecutionPolicy Bypass -File scripts/deploy.ps1` |
+
+Script sẽ:
+1. Kiểm tra Docker daemon đang chạy.
+2. Tự sao chép `.env.example → .env` (nếu chưa có) và sinh `AUTH_SECRET` ngẫu nhiên.
+3. `docker compose build` rồi `up -d`.
+4. Đợi `pet-manager-db` và `pet-manager-app` báo *healthy* qua endpoint `/api/health`.
+5. In URL truy cập (mặc định http://localhost:3002).
+
+### Lệnh phụ trợ
+
+```bash
+# Linux / macOS
+bash scripts/deploy.sh up      # Build + chạy (mặc định)
+bash scripts/deploy.sh fresh   # Xoá volume DB + build lại sạch
+bash scripts/deploy.sh logs    # Tail log compose
+bash scripts/deploy.sh down    # Dừng container, giữ dữ liệu
+bash scripts/deploy.sh status  # Xem trạng thái dịch vụ
+
+# Windows
+powershell -ExecutionPolicy Bypass -File scripts/deploy.ps1 -Command fresh
+powershell -ExecutionPolicy Bypass -File scripts/deploy.ps1 -Command logs
+powershell -ExecutionPolicy Bypass -File scripts/deploy.ps1 -Command down
+```
+
+### Cổng và biến mặc định
+
+| Biến | Mặc định | Ghi chú |
+|------|----------|---------|
+| `APP_PORT` | `3002` | Cổng public của app trên host |
+| `POSTGRES_PORT` | `5433` | Cổng Postgres trên host |
+| `DATABASE_URL` | `postgresql://postgres:postgres@postgres:5432/petmanager` | Dùng hostname `postgres` trong network compose |
+| `AUTH_SECRET` | sinh tự động | Đặt giá trị riêng cho production |
+| `OPENROUTER_API_KEY` | trống | Cần để gọi LLM (roadmap / quiz / flashcards) |
+| `RESEND_API_KEY` | `re_dummy` | Để mock email log vào console |
+
+> ⚠️ Trước khi deploy production: đổi `POSTGRES_PASSWORD`, đặt `AUTH_SECRET` mạnh, cung cấp `OPENROUTER_API_KEY` & `RESEND_API_KEY` thật, đổi `NEXTAUTH_URL` về domain công khai và đứng sau reverse-proxy có HTTPS.
+
+### Cài Docker nhanh
+
+- **Ubuntu 22.04+**: `sudo apt update && sudo apt install -y docker.io docker-compose-plugin && sudo systemctl enable --now docker && sudo usermod -aG docker $USER` (logout/login lại để nhận group).
+- **Windows**: cài [Docker Desktop](https://www.docker.com/products/docker-desktop/) và bật WSL 2 backend.
+- **macOS**: cài [Docker Desktop](https://www.docker.com/products/docker-desktop/) (đã hỗ trợ Apple Silicon).
 
 ---
 

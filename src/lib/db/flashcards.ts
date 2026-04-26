@@ -1,5 +1,4 @@
 
-import { supabase } from '../supabase'
 import { FlashcardRecord } from './types'
 import { cache } from '../cache'
 
@@ -29,16 +28,16 @@ export async function saveFlashcards(
 }
 
 export async function getFlashcardsByTopic(
-    userId: string,
+    _userId: string,
     topic: string,
     context?: string
 ): Promise<FlashcardRecord[] | null> {
-
-    const cacheKey = cache.generateKey(`flashcards:${topic}`, context)
-
+    void topic
+    void context
     return null
 }
 
 export async function deleteFlashcards(userId: string, flashcardIds: string[]): Promise<void> {
-
+    void userId
+    void flashcardIds
 }

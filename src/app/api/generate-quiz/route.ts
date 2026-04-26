@@ -1,3 +1,4 @@
+import { auth } from "@/auth"
 import { createGeneratorRoute } from "@/lib/api-generator"
 import { llmModels } from "@/lib/llm"
 import { z } from "zod"
@@ -67,6 +68,10 @@ export const POST = createGeneratorRoute({
   systemPrompt: "You are an expert examiner. Return only valid JSON that matches the provided schema.",
   invalidRequestMessage: "Invalid quiz request",
   logLabel: "Quiz",
+  requireAuth: async () => {
+    const session = await auth()
+    return session?.user ? { allowed: true, userId: session.user.id } : { allowed: false }
+  },
   buildUserPrompt: ({ topic, skillLevel }) => `
 Create a 5-question multiple-choice quiz about: ${topic}
 Target audience level: ${skillLevel}
