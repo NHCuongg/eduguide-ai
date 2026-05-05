@@ -1,5 +1,7 @@
 'use server'
 
+import { child } from "@/lib/logger"
+const log = child("action:onboarding")
 import { and, eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import { auth } from "@/auth"
@@ -105,7 +107,7 @@ export async function saveOnboardingData(onboardingData: OnboardingData, roadmap
         revalidatePath("/dashboard/courses")
         return { success: true, roadmapId: newRoadmapId }
     } catch (error) {
-        console.error("Error saving onboarding data:", error)
+        log.error({ err: error }, "Error saving onboarding data:")
         return { success: false, error: "Internal Server Error" }
     }
 }
@@ -127,7 +129,7 @@ export async function createNewRoadmap(onboardingData: OnboardingData, roadmapDa
         revalidatePath("/dashboard/courses")
         return { success: true, roadmapId: newRoadmapId }
     } catch (error) {
-        console.error("Error creating new roadmap:", error)
+        log.error({ err: error }, "Error creating new roadmap:")
         return { success: false, error: "Internal Server Error" }
     }
 }
@@ -165,7 +167,7 @@ export async function setActiveRoadmap(roadmapId: string) {
         revalidatePath("/dashboard/courses")
         return { success: true }
     } catch (error) {
-        console.error("Error setting active roadmap:", error)
+        log.error({ err: error }, "Error setting active roadmap:")
         return { success: false, error: "Internal Server Error" }
     }
 }
@@ -191,7 +193,7 @@ export async function deleteRoadmap(roadmapId: string) {
         revalidatePath("/dashboard/courses")
         return { success: true }
     } catch (error) {
-        console.error("Error deleting roadmap:", error)
+        log.error({ err: error }, "Error deleting roadmap:")
         return { success: false, error: "Internal Server Error" }
     }
 }

@@ -1,9 +1,31 @@
 import { Suspense } from "react"
 import Link from "next/link"
+import { redirect } from "next/navigation"
+import { auth } from "@/auth"
+import { getUserRoadmaps } from "@/lib/db/roadmaps"
 import Wizard from "@/components/onboarding/Wizard"
 import WizardResetGuard from "@/components/onboarding/WizardResetGuard"
 
-export default function OnboardingPage() {
+interface OnboardingPageProps {
+    searchParams: Promise<{ fresh?: string }>
+}
+
+export default async function OnboardingPage({ searchParams }: OnboardingPageProps) {
+    const params = await searchParams
+    const isFresh = params.fresh === "1"
+
+    // Only force-onboarding when user has no roadmap yet, or when they
+    // explicitly opted-in via ?fresh=1 (e.g. "+ New course" button).
+    if (!isFresh) {
+        const session = await auth()
+        if (session?.user?.id) {
+            const roadmaps = await getUserRoadmaps(session.user.id)
+            if (roadmaps.length > 0) {
+                redirect("/dashboard")
+            }
+        }
+    }
+
     return (
         <main className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col">
             <Suspense fallback={null}>

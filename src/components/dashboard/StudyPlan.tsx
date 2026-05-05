@@ -10,7 +10,6 @@ import {
     Loader2,
     Plus,
     Search,
-    Sparkles,
     X,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -180,9 +179,8 @@ export default function StudyPlan() {
                             <Button
                                 onClick={handleResume}
                                 disabled={!firstIncomplete}
-                                className="rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 font-semibold h-11 px-5 disabled:opacity-50"
+                                size="lg"
                             >
-                                <Sparkles className="w-4 h-4 mr-2" />
                                 {firstIncomplete ? "Resume next" : "All done"}
                             </Button>
                         </div>
@@ -496,17 +494,17 @@ function EmptySection({ title, description }: { title: string; description: stri
 function EmptyState() {
     return (
         <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-950 p-6 md:p-10">
-            <div className="max-w-2xl mx-auto rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-12 text-center mt-12">
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 mb-5">
-                    <Sparkles className="w-7 h-7 text-indigo-600 dark:text-indigo-300" />
+            <div className="max-w-2xl mx-auto rounded-lg border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-12 text-center mt-12">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-md border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 mb-5">
+                    <Plus className="w-5 h-5 text-slate-600 dark:text-slate-300" />
                 </div>
-                <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">Chưa có lộ trình</h2>
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">No roadmap yet</h2>
                 <p className="text-sm text-slate-600 dark:text-slate-300 max-w-md mx-auto mb-6">
-                    Hãy tạo lộ trình học cá nhân hóa từ AI. Chỉ mất 2 phút trả lời 7 câu hỏi.
+                    Build your first plan in about two minutes.
                 </p>
-                <Button asChild className="h-11 px-5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 font-semibold">
+                <Button asChild size="lg">
                     <Link href="/onboarding?fresh=1">
-                        <Plus className="w-4 h-4 mr-2" /> Tạo lộ trình
+                        <Plus className="w-4 h-4 mr-2" /> Create roadmap
                     </Link>
                 </Button>
             </div>

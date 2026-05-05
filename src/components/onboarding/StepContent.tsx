@@ -14,9 +14,9 @@ export default function StepContent() {
         label: string
         desc: string
     }> = [
-        { id: "Text", Icon: FileText, label: "Text", desc: "Đọc lý thuyết theo nhịp riêng" },
-        { id: "Interactive", Icon: MousePointerClick, label: "Interactive", desc: "Quiz, bài tập, dự án" },
-        { id: "Mixed", Icon: Layers, label: "Mixed", desc: "Cân bằng cả hai" },
+        { id: "Text", Icon: FileText, label: "Text", desc: "Read theory at my own pace" },
+        { id: "Interactive", Icon: MousePointerClick, label: "Interactive", desc: "Quizzes, exercises, projects" },
+        { id: "Mixed", Icon: Layers, label: "Mixed", desc: "A bit of both" },
     ]
 
     return (
@@ -24,11 +24,11 @@ export default function StepContent() {
             <StepHeading
                 eyebrow="Format"
                 title="How do you like content delivered?"
-                subtitle="Lựa chọn format ưu tiên — chúng tôi vẫn trộn nhẹ để bạn không chán."
+                subtitle="Optional — we'll mix things up regardless to keep it fresh."
             />
 
             <div>
-                <StepLabel>Content preference</StepLabel>
+                <StepLabel>Content preference (optional)</StepLabel>
                 <div className="space-y-3" role="radiogroup">
                     {options.map(({ id, Icon, label, desc }) => (
                         <ChoiceCard
@@ -43,7 +43,7 @@ export default function StepContent() {
                 </div>
             </div>
 
-            <StepFooter onBack={prevStep} onNext={nextStep} nextDisabled={!data.contentPreference} />
+            <StepFooter onBack={prevStep} onNext={nextStep} />
         </StepBody>
     )
 }

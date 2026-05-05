@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useMemo, useState } from "react"
-import { Plus, Search, Sparkles, X } from "lucide-react"
+import { Plus, Search, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
@@ -267,17 +267,17 @@ function FilteredEmptyState({ query, filter }: { query: string; filter: Filter }
 
 function FullEmptyState() {
     return (
-        <section className="rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-12 text-center">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 mb-5">
-                <Sparkles className="w-7 h-7 text-indigo-600 dark:text-indigo-300" />
+        <section className="rounded-lg border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-12 text-center">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-md border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 mb-5">
+                <Plus className="w-5 h-5 text-slate-600 dark:text-slate-300" />
             </div>
-            <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">Chưa có khóa học nào</h2>
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">No courses yet</h2>
             <p className="text-sm text-slate-600 dark:text-slate-300 mb-6 max-w-md mx-auto">
-                Tạo khóa học đầu tiên — chúng tôi sẽ thiết kế lộ trình theo trình độ, mục tiêu và quỹ thời gian của bạn.
+                Build your first plan — we'll shape modules around your level, goal, and weekly hours.
             </p>
-            <Button asChild className="rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 font-semibold h-11 px-5">
+            <Button asChild size="lg">
                 <Link href="/onboarding?fresh=1">
-                    <Plus className="w-4 h-4 mr-2" /> Tạo khóa học đầu tiên
+                    <Plus className="w-4 h-4 mr-2" /> Create first course
                 </Link>
             </Button>
         </section>

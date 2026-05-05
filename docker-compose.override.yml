@@ -1,0 +1,15 @@
+# Local development overrides.
+#
+# Auto-loaded by `docker compose up` so you can run `npm run dev` / `npm run worker`
+# on the host while still using the containerised Postgres and Redis.
+#
+# For production deployment, ignore this file by passing the base compose only:
+#   docker compose -f docker-compose.yml up -d
+services:
+  postgres:
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+
+  redis:
+    ports:
+      - "${REDIS_PORT:-6379}:6379"

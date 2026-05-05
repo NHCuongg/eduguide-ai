@@ -94,3 +94,19 @@ ALTER TABLE "roadmap" ADD CONSTRAINT "roadmap_userId_user_id_fk" FOREIGN KEY ("u
 ALTER TABLE "flashcard_deck" ADD CONSTRAINT "flashcard_deck_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;
 ALTER TABLE "flashcard" ADD CONSTRAINT "flashcard_deck_id_flashcard_deck_id_fk" FOREIGN KEY ("deck_id") REFERENCES "public"."flashcard_deck"("id") ON DELETE cascade ON UPDATE no action;
 ALTER TABLE "study_module" ADD CONSTRAINT "study_module_roadmap_id_roadmap_id_fk" FOREIGN KEY ("roadmap_id") REFERENCES "public"."roadmap"("id") ON DELETE cascade ON UPDATE no action;
+
+CREATE TABLE IF NOT EXISTS "note" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"userId" text NOT NULL,
+	"title" text NOT NULL,
+	"content" text DEFAULT '' NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'note_userId_user_id_fk'
+  ) THEN
+    ALTER TABLE "note" ADD CONSTRAINT "note_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;
+  END IF;
+END $$;

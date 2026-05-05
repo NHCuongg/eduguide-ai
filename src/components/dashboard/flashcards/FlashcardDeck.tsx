@@ -6,10 +6,16 @@ import { Input } from '@/components/ui/input'
 import { Flashcard } from './Flashcard'
 import { Sparkles, ArrowLeft, ArrowRight, BookOpen, Loader2 } from 'lucide-react'
 import { showToast } from '@/lib/toast'
+import { useAsyncJob } from '@/lib/useAsyncJob'
 
 interface Card {
     front: string
     back: string
+}
+
+interface FlashcardsResult {
+    topic: string
+    flashcards: Card[]
 }
 
 export function FlashcardDeck() {
@@ -17,45 +23,33 @@ export function FlashcardDeck() {
     const [cards, setCards] = useState<Card[]>([])
     const [currentIndex, setCurrentIndex] = useState(0)
     const [isFlipped, setIsFlipped] = useState(false)
-    const [loading, setLoading] = useState(false)
+
+    const { state, submit } = useAsyncJob<{ topic: string }, FlashcardsResult>({
+        endpoint: '/api/generate-flashcards',
+        buildBody: (input) => input,
+    })
+    const loading = state.status === 'queued' || state.status === 'active'
 
     const generateCards = useCallback(async () => {
         if (!topic.trim()) {
             showToast.warning('Please enter a topic')
             return
         }
-        setLoading(true)
         try {
-            const response = await fetch('/api/generate-flashcards', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ topic }),
-            })
-
-            if (!response.ok) {
-                const errorData = await response.json()
-                if (response.status === 429) {
-                    showToast.error('Rate limit exceeded', `Please wait ${errorData.retryAfter || 60} seconds before trying again`)
-                } else {
-                    showToast.error('Failed to generate flashcards', errorData.error || 'Please try again')
-                }
+            const result = await submit({ topic })
+            if (!result?.flashcards?.length) {
+                showToast.error('Failed to generate flashcards', 'Empty response')
                 return
             }
-
-            const data = await response.json()
-            if (data.flashcards) {
-                setCards(data.flashcards)
-                setCurrentIndex(0)
-                setIsFlipped(false)
-                showToast.success(`Generated ${data.flashcards.length} flashcards!`)
-            }
+            setCards(result.flashcards)
+            setCurrentIndex(0)
+            setIsFlipped(false)
+            showToast.success(`Generated ${result.flashcards.length} flashcards!`)
         } catch (error) {
-            console.error(error)
-            showToast.error('Network error', 'Please check your connection and try again')
-        } finally {
-            setLoading(false)
+            const message = error instanceof Error ? error.message : 'Please try again'
+            showToast.error('Failed to generate flashcards', message)
         }
-    }, [topic])
+    }, [topic, submit])
 
     const handleNext = useCallback(() => {
         if (currentIndex < cards.length - 1) {
@@ -78,14 +72,11 @@ export function FlashcardDeck() {
     return (
         <div className="flex flex-col h-full max-w-2xl mx-auto py-6">
             <div className="mb-8 text-center space-y-6">
-                <div className="space-y-2">
-                    <h2 className="text-3xl font-black flex items-center justify-center gap-3 bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 bg-clip-text text-transparent">
-                        <div className="p-2 rounded-xl bg-gradient-to-br from-indigo-100 to-violet-100 dark:from-indigo-900/30 dark:to-violet-900/30">
-                            <BookOpen className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
-                        </div>
-                        AI Flashcards
+                <div className="space-y-1">
+                    <h2 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">
+                        Flashcards
                     </h2>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">Generate personalized study cards instantly</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Type a topic, study the deck.</p>
                 </div>
 
                 {cards.length === 0 && (

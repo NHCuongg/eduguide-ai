@@ -5,7 +5,10 @@ import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { db } from './lib/db';
 import { users } from './lib/db/schema';
+import { child } from './lib/logger';
 import { eq } from 'drizzle-orm';
+
+const log = child('auth');
 
 const getUser = async (email: string) => {
     try {
@@ -14,7 +17,7 @@ const getUser = async (email: string) => {
             return userArr[0];
         }
     } catch (error) {
-        console.error('Failed to fetch user:', error);
+        log.error({ err: error }, 'Failed to fetch user');
     }
     return null;
 };

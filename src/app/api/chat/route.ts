@@ -128,7 +128,7 @@ export async function POST(req: Request) {
         prompt: lastUserMessage.content,
       })
 
-      const cached = cache.get<string>(cacheKey)
+      const cached = await cache.get<string>(cacheKey)
       if (cached !== null) {
         return NextResponse.json(
           { message: cached },
@@ -142,7 +142,7 @@ export async function POST(req: Request) {
         temperature: 0.5,
       })
 
-      cache.set(cacheKey, message, CHAT_CACHE_TTL)
+      await cache.set(cacheKey, message, CHAT_CACHE_TTL)
       cacheStatus = "MISS"
 
       return NextResponse.json({ message }, { headers: { "X-Cache": cacheStatus } })

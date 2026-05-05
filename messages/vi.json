@@ -24,6 +24,11 @@
     "workspaceEyebrow": "Workspace",
     "yourStudies": "Studies của bạn",
     "subtitle": "Tiếp tục lộ trình cá nhân hóa của bạn.",
+    "empty": {
+      "title": "Chưa có lộ trình học nào",
+      "subtitle": "Tạo lộ trình đầu tiên để AI thiết kế các mô-đun, quiz và flashcards phù hợp với mục tiêu của bạn.",
+      "cta": "Tạo lộ trình mới"
+    },
     "stats": {
       "streak": "Streak",
       "modules": "Mô-đun",
@@ -127,5 +132,54 @@
     "label": "Ngôn ngữ",
     "vi": "Tiếng Việt",
     "en": "English"
+  },
+  "settings": {
+    "eyebrow": "Cài đặt",
+    "title": "Cài đặt",
+    "subtitle": "Quản lý tài khoản, giao diện và ngôn ngữ.",
+    "account": {
+      "title": "Tài khoản",
+      "description": "Thông tin từ tài khoản đăng nhập của bạn.",
+      "displayName": "Tên hiển thị",
+      "email": "Email",
+      "verified": "Tài khoản đã xác thực",
+      "verifiedDescription": "Email đã xác thực"
+    },
+    "appearance": {
+      "title": "Giao diện",
+      "description": "Chọn theme. System tự đổi theo thiết lập máy."
+    },
+    "language": {
+      "title": "Ngôn ngữ",
+      "description": "Ngôn ngữ hiển thị toàn ứng dụng."
+    },
+    "security": {
+      "title": "Bảo mật",
+      "description": "Đặt lại mật khẩu hoặc đăng xuất.",
+      "resetPassword": "Đặt lại mật khẩu"
+    },
+    "manage": {
+      "title": "Quản lý",
+      "description": "Truy cập nhanh các phần khác.",
+      "learningProfile": "Hồ sơ học tập",
+      "manageCourses": "Quản lý khóa học"
+    }
+  },
+  "notes": {
+    "title": "Ghi chú",
+    "new": "Tạo mới",
+    "placeholderTitle": "Tiêu đề ghi chú",
+    "placeholderBody": "Ghi lại suy nghĩ của bạn… (Hỗ trợ Markdown)",
+    "close": "Đóng",
+    "delete": "Xóa",
+    "cancel": "Hủy",
+    "create": "Tạo",
+    "save": "Lưu",
+    "emptyTitle": "Chưa có ghi chú",
+    "emptyBody": "Ghi lại insights, công thức hoặc câu hỏi trong khi học.",
+    "noContent": "Chưa có nội dung",
+    "errorSave": "Không thể lưu",
+    "errorDelete": "Không thể xóa",
+    "errorRetry": "Vui lòng thử lại"
   }
 }

@@ -3,52 +3,34 @@
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import SectionWrapper from "./SectionWrapper"
-import { motion } from "framer-motion"
 import { useSession } from "next-auth/react"
+import { ArrowRight } from "lucide-react"
 
 export default function CTASection() {
     const { status } = useSession()
-    const ctaHref = status === 'authenticated' ? '/dashboard' : '/onboarding'
-    const ctaLabel = status === 'authenticated' ? 'Open my Workspace' : 'Try EduGuide Free'
+    const ctaHref = status === "authenticated" ? "/dashboard" : "/onboarding"
+    const ctaLabel = status === "authenticated" ? "Open my Workspace" : "Try EduGuide Free"
 
     return (
-        <section className="py-32 relative overflow-hidden bg-indigo-600 dark:bg-slate-900 transition-colors duration-500">
-            {}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-500 via-indigo-600 to-purple-600 dark:from-indigo-900 dark:via-slate-900 dark:to-slate-950 opacity-90" />
-
-            {}
-            <div className="absolute inset-0 opacity-[0.1] dark:opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }} />
-
-            {}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <motion.div
-                    animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-                    transition={{ duration: 10, repeat: Infinity }}
-                    className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/20 dark:bg-purple-600/30 rounded-full blur-[100px]"
-                />
-                <motion.div
-                    animate={{ scale: [1, 1.5, 1], opacity: [0.2, 0.4, 0.2] }}
-                    transition={{ duration: 15, repeat: Infinity, delay: 2 }}
-                    className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-purple-500/20 dark:bg-indigo-600/20 rounded-full blur-[120px]"
-                />
-            </div>
-
-            <div className="container mx-auto px-6 relative z-10 text-center">
+        <section className="py-24 md:py-32 bg-slate-50 dark:bg-zinc-950">
+            <div className="container mx-auto px-6">
                 <SectionWrapper>
-                    <h2 className="font-serif text-5xl md:text-7xl font-black text-white mb-6 tracking-tight">
-                        Study Smarter, <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 to-purple-200 dark:from-indigo-400 dark:to-purple-400">Not Harder.</span>
-                    </h2>
-                    <p className="text-indigo-100 dark:text-indigo-200 text-xl md:text-2xl mb-12 max-w-2xl mx-auto font-light leading-relaxed">
-                        Join thousands of self-directed learners building their own accredited-style education with the power of EduGuide AI.
-                    </p>
-
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                        <Link href={ctaHref}>
-                            <Button size="lg" className="h-16 px-10 text-lg bg-white text-indigo-600 dark:text-indigo-900 hover:bg-indigo-50 hover:scale-105 transition-all font-bold shadow-2xl rounded-full">
-                                {ctaLabel}
-                            </Button>
-                        </Link>
+                    <div className="max-w-4xl mx-auto rounded-3xl bg-slate-900 dark:bg-white p-10 md:p-16 text-center">
+                        <h2 className="font-serif text-3xl md:text-5xl font-semibold tracking-tight text-white dark:text-slate-900 mb-4">
+                            Study smarter, not harder.
+                        </h2>
+                        <p className="text-slate-300 dark:text-slate-600 text-base md:text-lg max-w-xl mx-auto mb-8 leading-relaxed">
+                            Join self-directed learners building their own accredited-style education with EduGuide AI.
+                        </p>
+                        <Button
+                            asChild
+                            size="lg"
+                            className="rounded-xl h-12 px-6 bg-white dark:bg-slate-900 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold"
+                        >
+                            <Link href={ctaHref}>
+                                {ctaLabel} <ArrowRight className="ml-2 h-4 w-4" />
+                            </Link>
+                        </Button>
                     </div>
                 </SectionWrapper>
             </div>

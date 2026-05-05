@@ -13,14 +13,15 @@ export default function Step1() {
         { id: "Advanced", desc: "I want to master it" },
     ]
 
-    const canContinue = Boolean(data.targetSkill && data.targetSkill.trim().length >= 2 && data.currentLevel)
+    // Subject is the only hard requirement; level defaults to Beginner if skipped.
+    const canContinue = Boolean(data.targetSkill && data.targetSkill.trim().length >= 2)
 
     return (
         <StepBody>
             <StepHeading
                 eyebrow="Subject"
                 title="What do you want to learn?"
-                subtitle="Một câu ngắn gọn — AI sẽ thiết kế lộ trình theo lĩnh vực bạn chọn."
+                subtitle="One line. We'll shape the rest of the plan around it."
             />
 
             <div>
@@ -35,7 +36,7 @@ export default function Step1() {
             </div>
 
             <div>
-                <StepLabel>Current proficiency</StepLabel>
+                <StepLabel>Current proficiency (optional)</StepLabel>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3" role="radiogroup">
                     {levels.map((lvl) => (
                         <ChoiceCard

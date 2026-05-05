@@ -1,68 +1,65 @@
-'use client'
-
 import Link from "next/link"
-import { Facebook, Twitter, Linkedin, Instagram, Youtube } from "lucide-react"
+import { Twitter, Linkedin, Github } from "lucide-react"
 
 export default function Footer() {
     return (
-        <footer className="bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 py-16 md:py-24 relative overflow-hidden transition-colors duration-500">
-            {}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/3 text-[20vw] font-black font-serif text-slate-900/[0.02] dark:text-white/[0.02] pointer-events-none select-none whitespace-nowrap">
-                EDUGUIDE
-            </div>
-
-            <div className="container mx-auto px-6 relative z-10">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">
-                    <div className="col-span-2 md:col-span-1 space-y-4">
-                        <div className="font-serif font-black text-2xl text-slate-900 dark:text-white flex items-center gap-2">
-                            <span className="text-3xl text-indigo-600">❖</span> EduGuide
+        <footer className="bg-white dark:bg-zinc-950 border-t border-slate-200 dark:border-zinc-800 py-14">
+            <div className="container mx-auto px-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-10">
+                    <div className="col-span-2 md:col-span-1 space-y-3">
+                        <div className="font-serif font-semibold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                            <span className="text-xl text-indigo-500">❖</span> EduGuide
                         </div>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
-                            Empowering self-directed learners with the structure of a university degree and the flexibility of AI.
+                        <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-w-xs">
+                            Empowering self-directed learners with the structure of a university and the flexibility of AI.
                         </p>
                     </div>
 
                     <div>
-                        <h4 className="font-bold text-slate-900 dark:text-white mb-6">Resources</h4>
-                        <ul className="space-y-4 text-slate-600 dark:text-slate-400 text-sm">
-                            <li><Link href="#" className="hover:text-indigo-600 dark:hover:text-indigo-400 hover:translate-x-1 transition-all inline-block">EduGuide Academy</Link></li>
-                            <li><Link href="#" className="hover:text-indigo-600 dark:hover:text-indigo-400 hover:translate-x-1 transition-all inline-block">Professional Development</Link></li>
-                            <li><Link href="#" className="hover:text-indigo-600 dark:hover:text-indigo-400 hover:translate-x-1 transition-all inline-block">FAQs</Link></li>
-                            <li><Link href="#" className="hover:text-indigo-600 dark:hover:text-indigo-400 hover:translate-x-1 transition-all inline-block">Community</Link></li>
+                        <h4 className="text-xs font-semibold text-slate-900 dark:text-white uppercase tracking-wider mb-4">
+                            Product
+                        </h4>
+                        <ul className="space-y-2.5 text-sm text-slate-600 dark:text-slate-400">
+                            <li><Link href="#methodology" className="hover:text-slate-900 dark:hover:text-white transition-colors">Methodology</Link></li>
+                            <li><Link href="#pricing" className="hover:text-slate-900 dark:hover:text-white transition-colors">Pricing</Link></li>
+                            <li><Link href="/onboarding" className="hover:text-slate-900 dark:hover:text-white transition-colors">Get started</Link></li>
                         </ul>
                     </div>
 
                     <div>
-                        <h4 className="font-bold text-slate-900 dark:text-white mb-6">Company</h4>
-                        <ul className="space-y-4 text-slate-600 dark:text-slate-400 text-sm">
-                            <li><Link href="#" className="hover:text-indigo-600 dark:hover:text-indigo-400 hover:translate-x-1 transition-all inline-block">About Us</Link></li>
-                            <li><Link href="#" className="hover:text-indigo-600 dark:hover:text-indigo-400 hover:translate-x-1 transition-all inline-block">Contact</Link></li>
-                            <li><Link href="#" className="hover:text-indigo-600 dark:hover:text-indigo-400 hover:translate-x-1 transition-all inline-block">Blog</Link></li>
-                            <li><Link href="#" className="hover:text-indigo-600 dark:hover:text-indigo-400 hover:translate-x-1 transition-all inline-block">Branding</Link></li>
+                        <h4 className="text-xs font-semibold text-slate-900 dark:text-white uppercase tracking-wider mb-4">
+                            Company
+                        </h4>
+                        <ul className="space-y-2.5 text-sm text-slate-600 dark:text-slate-400">
+                            <li><Link href="#" className="hover:text-slate-900 dark:hover:text-white transition-colors">About</Link></li>
+                            <li><Link href="#" className="hover:text-slate-900 dark:hover:text-white transition-colors">Contact</Link></li>
+                            <li><Link href="#" className="hover:text-slate-900 dark:hover:text-white transition-colors">Blog</Link></li>
                         </ul>
                     </div>
 
                     <div>
-                        <h4 className="font-bold text-slate-900 dark:text-white mb-6">Socials</h4>
-                        <div className="flex gap-4 mb-4">
-                            <a href="#" className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-400 hover:bg-indigo-600 hover:text-white transition-all hover:-translate-y-1"><Twitter className="h-4 w-4" /></a>
-                            <a href="#" className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-400 hover:bg-indigo-600 hover:text-white transition-all hover:-translate-y-1"><Facebook className="h-4 w-4" /></a>
-                            <a href="#" className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-400 hover:bg-indigo-600 hover:text-white transition-all hover:-translate-y-1"><Linkedin className="h-4 w-4" /></a>
-                        </div>
-                        <div className="flex gap-4">
-                            <a href="#" className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-400 hover:bg-indigo-600 hover:text-white transition-all hover:-translate-y-1"><Instagram className="h-4 w-4" /></a>
-                            <a href="#" className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-400 hover:bg-indigo-600 hover:text-white transition-all hover:-translate-y-1"><Youtube className="h-4 w-4" /></a>
+                        <h4 className="text-xs font-semibold text-slate-900 dark:text-white uppercase tracking-wider mb-4">
+                            Connect
+                        </h4>
+                        <div className="flex gap-2">
+                            <a href="#" aria-label="Twitter" className="w-9 h-9 rounded-lg border border-slate-200 dark:border-zinc-800 flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-zinc-700 transition-colors">
+                                <Twitter className="h-3.5 w-3.5" />
+                            </a>
+                            <a href="#" aria-label="LinkedIn" className="w-9 h-9 rounded-lg border border-slate-200 dark:border-zinc-800 flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-zinc-700 transition-colors">
+                                <Linkedin className="h-3.5 w-3.5" />
+                            </a>
+                            <a href="#" aria-label="GitHub" className="w-9 h-9 rounded-lg border border-slate-200 dark:border-zinc-800 flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-zinc-700 transition-colors">
+                                <Github className="h-3.5 w-3.5" />
+                            </a>
                         </div>
                     </div>
                 </div>
 
-                <div className="pt-8 border-t border-slate-100 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center text-sm text-slate-500 dark:text-slate-500">
-                    <div className="mb-4 md:mb-0">
-                        © 2026 EduGuide AI LLC. All Rights Reserved.
-                    </div>
-                    <div className="flex gap-8">
-                        <Link href="#" className="hover:text-slate-900 dark:hover:text-white transition-colors">Privacy Policy</Link>
-                        <Link href="#" className="hover:text-slate-900 dark:hover:text-white transition-colors">Terms of Service</Link>
+                <div className="pt-6 border-t border-slate-200 dark:border-zinc-800 flex flex-col md:flex-row justify-between items-center gap-3 text-xs text-slate-500 dark:text-slate-500">
+                    <p>© 2026 EduGuide AI. All rights reserved.</p>
+                    <div className="flex gap-6">
+                        <Link href="/privacy" className="hover:text-slate-900 dark:hover:text-white transition-colors">Privacy</Link>
+                        <Link href="/terms" className="hover:text-slate-900 dark:hover:text-white transition-colors">Terms</Link>
                     </div>
                 </div>
             </div>

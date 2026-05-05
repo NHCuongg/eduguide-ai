@@ -1,70 +1,59 @@
 'use client'
 
+import Image from "next/image"
 import { authenticate } from "@/lib/actions"
 import { registerUser, sendResetPasswordEmail } from "@/app/actions/auth"
-import { useActionState, useState, useEffect } from "react"
+import { useActionState, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { motion, AnimatePresence } from "framer-motion"
-import { AlertCircle, ArrowLeft, Loader2, Sparkles } from "lucide-react"
-import HeroParticles from "@/components/landing/HeroParticles"
+import { AlertCircle, ArrowLeft, Loader2 } from "lucide-react"
 import { showToast } from "@/lib/toast"
 
 const TESTIMONIALS = [
     {
-        quote: "The most sophisticated curriculum design tool I've ever used. It understands academic rigor unlike anything else.",
-        initials: "JD",
-        author: "Dr. James Dalton",
-        role: "Dean of Sciences, Cambridge"
+        quote: "I stopped buying courses. I plan a topic on Sunday and I'm three modules deep by Thursday.",
+        initials: "LM",
+        author: "Linh M.",
+        role: "Self-taught designer",
     },
     {
-        quote: "I passed my medical boards on the first try thanks to the spaced-repetition algorithms and AI roadmaps.",
-        initials: "MR",
-        author: "Maximiliano Rossi",
-        role: "Medical Student"
+        quote: "The roadmap actually fits my schedule. I told it I had 6 hours a week and it didn't pretend otherwise.",
+        initials: "TN",
+        author: "Tuan N.",
+        role: "Backend engineer",
     },
     {
-        quote: "EduGuide transforms unstructured chaos into a perfectly paved road of knowledge. An absolute game changer.",
+        quote: "Quizzes are short. Flashcards repeat what I missed. I keep coming back, which is the part I always failed before.",
         initials: "AK",
-        author: "Aisha Khan",
-        role: "Self-taught Developer"
-    }
+        author: "Anh K.",
+        role: "Master's student",
+    },
 ]
 
 const FEATURES = [
     {
-        quote: "Master complex topics through adaptive guidance and scientifically proven learning methods.",
+        quote: "Pick a topic. Get a path. Stick with it.",
         bullets: [
-            "Personalized curriculum driven by AI",
-            "Automated adaptive flashcards",
-            "Spaced repetition built-in"
-        ]
+            "A roadmap shaped by your goal and weekly hours",
+            "Reading, quizzes and flashcards generated per module",
+            "Progress saved across devices",
+        ],
     },
     {
-        quote: "Don't just memorize. Understand deeply with Socratic AI generation that challenges your assumptions.",
+        quote: "Built for the days you don't feel like studying.",
         bullets: [
-            "Dynamic Socratic quizzes",
-            "Feynman technique exercises",
-            "Concept-mapping assignments"
-        ]
-    }
+            "10-minute review decks",
+            "Short quizzes with one clear next step",
+            "Streaks without the guilt-trip",
+        ],
+    },
 ]
 
 export default function AuthScreen({ initialMode }: { initialMode: 'login' | 'register' | 'forgot-password' }) {
     const [mode, setMode] = useState<'login' | 'register' | 'forgot-password'>(initialMode)
-    const [activeIndex, setActiveIndex] = useState(0)
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setActiveIndex((prev) => prev + 1)
-        }, 5000)
-        return () => clearInterval(interval)
-    }, [])
-
-    const activeTestimonial = TESTIMONIALS[activeIndex % TESTIMONIALS.length]
-    const activeFeature = FEATURES[activeIndex % FEATURES.length]
 
     const [loginErrorMessage, loginDispatch, isLoginPending] = useActionState(async (prevState: string | undefined, formData: FormData) => {
         const err = await authenticate(prevState, formData);
@@ -93,7 +82,18 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
             } else if (result?.success) {
                 showToast.success("Tạo tài khoản thành công!", "Đang chuyển hướng...")
             }
-        } catch {
+        } catch (error) {
+            // Server Actions throw NEXT_REDIRECT to trigger navigation. Re-throw it
+            // so Next.js handles the redirect; otherwise the client treats success
+            // as a generic failure and shows a misleading error toast.
+            if (
+                error &&
+                typeof error === "object" &&
+                "message" in error &&
+                (error as Error).message === "NEXT_REDIRECT"
+            ) {
+                throw error
+            }
             const fallback = "Đã có lỗi xảy ra. Vui lòng thử lại."
             setRegisterErrorMessage(fallback)
             showToast.error("Đăng ký không thành công", fallback)
@@ -147,75 +147,69 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
         enterLeft: { opacity: 0, x: -20 },
     }
 
-    const textVariants = {
-        enter: { opacity: 0, y: 10 },
-        center: { opacity: 1, y: 0 },
-        exit: { opacity: 0, y: -10 },
-    }
-
     const isPending = isLoginPending || isRegisterPending || isForgotPasswordPending
 
+    // Pick a single testimonial/feature deterministically per render so it doesn't rotate.
+    const staticTestimonial = TESTIMONIALS[0]
+    const staticFeature = FEATURES[0]
+
     return (
-        <div className="w-full min-h-screen grid lg:grid-cols-2 bg-white dark:bg-slate-950 overflow-hidden">
-            {}
+        <div className="w-full min-h-screen grid lg:grid-cols-2 bg-white dark:bg-slate-950">
+            {/* Left side panel — image background, dark overlay for legibility */}
             <div className="hidden lg:flex relative bg-slate-900 text-white flex-col justify-between p-12 overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-indigo-900/40 via-slate-900 to-slate-950 pointer-events-none" />
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none" />
+                <Image
+                    src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1400&q=70"
+                    alt=""
+                    fill
+                    sizes="50vw"
+                    priority
+                    className="object-cover opacity-40"
+                />
+                <div
+                    aria-hidden
+                    className="absolute inset-0 bg-gradient-to-br from-slate-950/95 via-slate-900/85 to-slate-900/70"
+                />
 
                 <div className="relative z-10">
-                    <Link href="/" className="inline-flex items-center gap-2 font-serif font-black text-2xl mb-8">
-                        <span className="text-3xl bg-clip-text text-transparent bg-gradient-to-tr from-indigo-400 to-purple-400">❖</span>
+                    <Link href="/" className="inline-flex items-center gap-2 font-semibold text-lg tracking-tight">
+                        <span className="text-xl text-indigo-400">❖</span>
                         EduGuide AI
                     </Link>
                 </div>
 
-                <div className="relative z-10 max-w-lg h-56">
-                    <AnimatePresence mode="wait">
-                        {mode === 'login' ? (
-                            <motion.div
-                                key={`login-text-${activeTestimonial.initials}`}
-                                variants={textVariants}
-                                initial="enter"
-                                animate="center"
-                                exit="exit"
-                                transition={{ duration: 0.4 }}
-                            >
-                                <h2 className="font-serif text-3xl lg:text-4xl font-bold leading-tight mb-6">
-                                    &quot;{activeTestimonial.quote}&quot;
-                                </h2>
-                                <div className="flex items-center gap-4">
-                                    <div className="h-12 w-12 rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 p-0.5">
-                                        <div className="h-full w-full rounded-full bg-slate-900 flex items-center justify-center text-sm font-bold">{activeTestimonial.initials}</div>
-                                    </div>
-                                    <div>
-                                        <div className="font-bold text-lg">{activeTestimonial.author}</div>
-                                        <div className="text-slate-400">{activeTestimonial.role}</div>
-                                    </div>
+                <div className="relative z-10 max-w-lg space-y-6">
+                    {mode === 'login' ? (
+                        <>
+                            <p className="text-xl lg:text-2xl font-medium leading-snug tracking-tight text-slate-100">
+                                &ldquo;{staticTestimonial.quote}&rdquo;
+                            </p>
+                            <div className="flex items-center gap-3 pt-2">
+                                <div className="h-10 w-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-semibold">
+                                    {staticTestimonial.initials}
                                 </div>
-                            </motion.div>
-                        ) : (
-                            <motion.div
-                                key={`register-text-${activeIndex % FEATURES.length}`}
-                                variants={textVariants}
-                                initial="enter"
-                                animate="center"
-                                exit="exit"
-                                transition={{ duration: 0.4 }}
-                            >
-                                <h2 className="font-serif text-3xl lg:text-4xl font-bold leading-tight mb-6">
-                                    &quot;{activeFeature.quote}&quot;
-                                </h2>
-                                <div className="flex flex-col gap-2 opacity-80 pt-4 border-t border-slate-700/50 text-sm">
-                                    {activeFeature.bullets.map((bullet, i) => (
-                                        <p key={i}>✓ {bullet}</p>
-                                    ))}
+                                <div>
+                                    <div className="font-semibold text-sm">{staticTestimonial.author}</div>
+                                    <div className="text-xs text-slate-400">{staticTestimonial.role}</div>
                                 </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <p className="text-xl lg:text-2xl font-medium leading-snug tracking-tight text-slate-100">
+                                &ldquo;{staticFeature.quote}&rdquo;
+                            </p>
+                            <ul className="space-y-2 pt-2 text-sm text-slate-300 border-t border-slate-800 pt-4">
+                                {staticFeature.bullets.map((bullet, i) => (
+                                    <li key={i} className="flex items-start gap-2">
+                                        <span className="text-indigo-400 mt-0.5">✓</span> {bullet}
+                                    </li>
+                                ))}
+                            </ul>
+                        </>
+                    )}
                 </div>
 
-                <div className="relative z-10 flex gap-6 text-sm text-slate-400">
+                <div className="relative z-10 flex gap-5 text-xs text-slate-500">
                     <span>© 2026 EduGuide Inc.</span>
                     <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
                     <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
@@ -223,14 +217,7 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
             </div>
 
             {}
-            <div className="relative flex items-center justify-center p-8 transition-colors duration-500 overflow-y-auto bg-slate-50 dark:bg-slate-950/50">
-                <div className="absolute inset-0 block opacity-50 pointer-events-none">
-                    <HeroParticles />
-                </div>
-
-                {}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-500/5 dark:bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none" />
-
+            <div className="relative flex items-center justify-center p-8 overflow-y-auto bg-slate-50 dark:bg-slate-950/50">
                 <Link href="/" className="absolute top-8 left-8 lg:hidden mt-2 ml-2 z-50">
                     <Button variant="ghost" className="gap-2">
                         <ArrowLeft className="w-4 h-4" /> Back
@@ -285,11 +272,9 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
                                 transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                                 className="space-y-8"
                             >
-                                <div className="flex flex-col space-y-3 text-center">
-                                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-100 to-violet-100 dark:from-indigo-900/30 dark:to-violet-900/30 mx-auto mb-2">
-                                        <Sparkles className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
-                                    </div>
-                                    <h1 className="text-4xl font-serif font-black tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-200 bg-clip-text text-transparent">
+                                <div className="flex flex-col space-y-2 text-left">
+                                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-widest">Sign in</p>
+                                    <h1 className="text-4xl font-semibold tracking-tight text-slate-900 dark:text-white">
                                         Welcome back
                                     </h1>
                                     <p className="text-base text-slate-600 dark:text-slate-400 font-medium">
@@ -312,7 +297,7 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
                                                         autoComplete="email"
                                                         autoCorrect="off"
                                                         disabled={isPending}
-                                                        className="h-12 border-2 border-slate-200 dark:border-slate-700 focus:border-indigo-500 dark:focus:border-indigo-500 dark:bg-slate-900 rounded-xl shadow-sm hover:shadow-md transition-all"
+                                                        className="h-11 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-slate-900 dark:focus:border-white"
                                                     />
                                                 </div>
                                                 <div className="grid gap-2">
@@ -327,17 +312,17 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
                                                         autoCapitalize="none"
                                                         autoCorrect="off"
                                                         disabled={isPending}
-                                                        className="h-12 border-2 border-slate-200 dark:border-slate-700 focus:border-indigo-500 dark:focus:border-indigo-500 dark:bg-slate-900 rounded-xl shadow-sm hover:shadow-md transition-all"
+                                                        className="h-11 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-slate-900 dark:focus:border-white"
                                                     />
                                                 </div>
                                                 <Button
                                                     disabled={isPending}
-                                                    className="h-12 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all rounded-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 mt-2"
+                                                    className="h-11 mt-2"
                                                 >
                                                     {isLoginPending ? (
                                                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                                                     ) : (
-                                                        <span className="flex items-center gap-2">Sign In <Sparkles className="w-5 h-5" /></span>
+                                                        <span>Sign in</span>
                                                     )}
                                                 </Button>
                                             </div>
@@ -370,15 +355,13 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
                                 transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                                 className="space-y-8"
                             >
-                                <div className="flex flex-col space-y-3 text-center">
-                                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-100 to-violet-100 dark:from-indigo-900/30 dark:to-violet-900/30 mx-auto mb-2">
-                                        <Sparkles className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
-                                    </div>
-                                    <h1 className="text-4xl font-serif font-black tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-200 bg-clip-text text-transparent">
-                                        Create Account
+                                <div className="flex flex-col space-y-2 text-left">
+                                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-widest">Sign up</p>
+                                    <h1 className="text-4xl font-semibold tracking-tight text-slate-900 dark:text-white">
+                                        Create your account
                                     </h1>
-                                    <p className="text-base text-slate-600 dark:text-slate-400 font-medium">
-                                        Enter your details to generate your first syllabus
+                                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                                        It takes a minute. You can change anything later.
                                     </p>
                                 </div>
 
@@ -396,7 +379,7 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
                                                         autoComplete="name"
                                                         disabled={isPending}
                                                         required
-                                                        className="h-12 border-2 border-slate-200 dark:border-slate-700 focus:border-indigo-500 dark:focus:border-indigo-500 dark:bg-slate-900 rounded-xl shadow-sm hover:shadow-md transition-all"
+                                                        className="h-11 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-slate-900 dark:focus:border-white"
                                                     />
                                                 </div>
                                                 <div className="grid gap-2">
@@ -411,7 +394,7 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
                                                         autoCorrect="off"
                                                         disabled={isPending}
                                                         required
-                                                        className="h-12 border-2 border-slate-200 dark:border-slate-700 focus:border-indigo-500 dark:focus:border-indigo-500 dark:bg-slate-900 rounded-xl shadow-sm hover:shadow-md transition-all"
+                                                        className="h-11 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-slate-900 dark:focus:border-white"
                                                     />
                                                 </div>
                                                 <div className="grid gap-2">
@@ -423,14 +406,16 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
                                                         autoComplete="new-password"
                                                         disabled={isPending}
                                                         required
-                                                        minLength={6}
-                                                        className="h-12 border-2 border-slate-200 dark:border-slate-700 focus:border-indigo-500 dark:focus:border-indigo-500 dark:bg-slate-900 rounded-xl shadow-sm hover:shadow-md transition-all"
+                                                        minLength={8}
+                                                        pattern="(?=.*[A-Za-z])(?=.*[\d\W_]).{8,}"
+                                                        title="Tối thiểu 8 ký tự, bao gồm chữ cái và số (hoặc ký tự đặc biệt)"
+                                                        className="h-11 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-slate-900 dark:focus:border-white"
                                                     />
                                                 </div>
                                                 <Button
                                                     disabled={isPending}
                                                     type="submit"
-                                                    className="h-12 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all rounded-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 mt-2"
+                                                    className="h-11 mt-2"
                                                 >
                                                     {isRegisterPending ? (
                                                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
@@ -479,15 +464,13 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
                                 transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                                 className="space-y-8"
                             >
-                                <div className="flex flex-col space-y-3 text-center">
-                                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-100 to-violet-100 dark:from-indigo-900/30 dark:to-violet-900/30 mx-auto mb-2">
-                                        <Sparkles className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
-                                    </div>
-                                    <h1 className="text-4xl font-serif font-black tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-200 bg-clip-text text-transparent">
-                                        Reset Password
+                                <div className="flex flex-col space-y-2 text-left">
+                                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-widest">Recover</p>
+                                    <h1 className="text-4xl font-semibold tracking-tight text-slate-900 dark:text-white">
+                                        Reset your password
                                     </h1>
-                                    <p className="text-base text-slate-600 dark:text-slate-400 font-medium">
-                                        Enter your email to receive a recovery link
+                                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                                        We'll email you a link to choose a new one.
                                     </p>
                                 </div>
 
@@ -507,18 +490,18 @@ export default function AuthScreen({ initialMode }: { initialMode: 'login' | 're
                                                         autoCorrect="off"
                                                         disabled={isPending}
                                                         required
-                                                        className="h-12 border-2 border-slate-200 dark:border-slate-700 focus:border-indigo-500 dark:focus:border-indigo-500 dark:bg-slate-900 rounded-xl shadow-sm hover:shadow-md transition-all"
+                                                        className="h-11 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-slate-900 dark:focus:border-white"
                                                     />
                                                 </div>
                                                 <Button
                                                     disabled={isPending}
                                                     type="submit"
-                                                    className="h-12 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all rounded-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 mt-2"
+                                                    className="h-11 mt-2"
                                                 >
                                                     {isForgotPasswordPending ? (
                                                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                                                     ) : (
-                                                        <span className="flex items-center gap-2">Send Recovery Link <Sparkles className="w-5 h-5" /></span>
+                                                        <span>Send recovery link</span>
                                                     )}
                                                 </Button>
                                             </div>

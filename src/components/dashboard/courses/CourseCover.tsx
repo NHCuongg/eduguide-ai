@@ -1,4 +1,3 @@
-import { Sparkles } from "lucide-react"
 
 const PALETTES = [
     { from: "from-indigo-500", to: "to-violet-600" },
@@ -27,9 +26,6 @@ export function CourseCover({ id, title, aspect = "16/9" }: { id: string; title:
             aria-hidden
         >
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.18),transparent_60%)]" />
-            <div className="absolute top-3 left-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/20 backdrop-blur-sm text-[10px] font-semibold text-white uppercase tracking-wider">
-                <Sparkles className="w-3 h-3" /> AI-generated
-            </div>
             <div className="absolute inset-0 flex items-center justify-center">
                 <span className="text-6xl md:text-7xl font-serif font-bold text-white/80 drop-shadow-sm">{initial}</span>
             </div>

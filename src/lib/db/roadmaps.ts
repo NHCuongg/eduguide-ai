@@ -1,3 +1,4 @@
+import { cache as reactCache } from "react"
 import { and, desc, eq, inArray } from "drizzle-orm"
 import type { OnboardingData } from "../schemas"
 import type { Roadmap } from "../types"
@@ -36,41 +37,46 @@ function buildFlatModuleIds(content: Roadmap): string[] {
     return ids
 }
 
-export async function getActiveRoadmap(userId: string): Promise<ActiveRoadmapResult | null> {
-    const [profile] = await db.select().from(profiles).where(eq(profiles.userId, userId)).limit(1)
+// Wrapped in React.cache so a single render pass that calls this multiple times
+// (e.g. layout + nested server component) issues only one set of DB queries.
+export const getActiveRoadmap = reactCache(
+    async (userId: string): Promise<ActiveRoadmapResult | null> => {
+        const [profile, [roadmapRow]] = await Promise.all([
+            db.select().from(profiles).where(eq(profiles.userId, userId)).limit(1).then((r) => r[0]),
+            db
+                .select()
+                .from(roadmaps)
+                .where(and(eq(roadmaps.userId, userId), eq(roadmaps.status, "active")))
+                .orderBy(desc(roadmaps.createdAt))
+                .limit(1),
+        ])
 
-    const [roadmapRow] = await db
-        .select()
-        .from(roadmaps)
-        .where(and(eq(roadmaps.userId, userId), eq(roadmaps.status, "active")))
-        .orderBy(desc(roadmaps.createdAt))
-        .limit(1)
+        if (!roadmapRow) return null
 
-    if (!roadmapRow) return null
+        const content = roadmapRow.content as Roadmap
+        const flatIds = buildFlatModuleIds(content)
 
-    const content = roadmapRow.content as Roadmap
-    const flatIds = buildFlatModuleIds(content)
+        const moduleRows = await db
+            .select({ moduleIndex: studyModules.moduleIndex, isCompleted: studyModules.isCompleted })
+            .from(studyModules)
+            .where(eq(studyModules.roadmapId, roadmapRow.id))
 
-    const moduleRows = await db
-        .select({ moduleIndex: studyModules.moduleIndex, isCompleted: studyModules.isCompleted })
-        .from(studyModules)
-        .where(eq(studyModules.roadmapId, roadmapRow.id))
+        const completedModuleIds = moduleRows
+            .filter((row) => row.isCompleted)
+            .map((row) => flatIds[row.moduleIndex])
+            .filter((id): id is string => Boolean(id))
 
-    const completedModuleIds = moduleRows
-        .filter((row) => row.isCompleted)
-        .map((row) => flatIds[row.moduleIndex])
-        .filter((id): id is string => Boolean(id))
-
-    return {
-        id: roadmapRow.id,
-        title: roadmapRow.title,
-        content,
-        completedModuleIds,
-        onboardingData: (profile?.onboardingData ?? null) as Partial<OnboardingData> | null,
-        targetSkill: profile?.targetSkill ?? null,
-        currentLevel: profile?.currentLevel ?? null,
+        return {
+            id: roadmapRow.id,
+            title: roadmapRow.title,
+            content,
+            completedModuleIds,
+            onboardingData: (profile?.onboardingData ?? null) as Partial<OnboardingData> | null,
+            targetSkill: profile?.targetSkill ?? null,
+            currentLevel: profile?.currentLevel ?? null,
+        }
     }
-}
+)
 
 export async function getUserRoadmaps(userId: string): Promise<RoadmapSummary[]> {
     const rows = await db

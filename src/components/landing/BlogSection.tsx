@@ -1,5 +1,3 @@
-'use client'
-
 import { ArrowRight } from "lucide-react"
 import SectionWrapper from "./SectionWrapper"
 import Image from "next/image"

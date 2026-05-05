@@ -1,5 +1,7 @@
 'use server'
 
+import { child } from "@/lib/logger"
+const log = child("action:modules")
 import { and, eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import { auth } from "@/auth"
@@ -49,7 +51,7 @@ export async function setModuleCompletion(input: ToggleModuleInput) {
         revalidatePath("/dashboard/profile")
         return { success: true }
     } catch (error) {
-        console.error("Error setting module completion:", error)
+        log.error({ err: error }, "Error setting module completion:")
         return { success: false, error: "Internal Server Error" }
     }
 }

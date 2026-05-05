@@ -5,7 +5,22 @@ import { users, verificationTokens } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import bcrypt from "bcryptjs"
 import { signIn } from "@/auth"
-import { inngest } from "@/lib/inngest/client"
+import { child } from "@/lib/logger"
+
+const log = child("action:auth")
+
+const PASSWORD_MIN = 8
+const PASSWORD_COMPLEXITY = /(?=.*[A-Za-z])(?=.*[\d\W_])/
+
+function validatePasswordStrength(password: string): string | null {
+    if (password.length < PASSWORD_MIN) {
+        return `Mật khẩu phải dài tối thiểu ${PASSWORD_MIN} ký tự.`
+    }
+    if (!PASSWORD_COMPLEXITY.test(password)) {
+        return 'Mật khẩu phải chứa cả chữ cái và số (hoặc ký tự đặc biệt).'
+    }
+    return null
+}
 
 export async function registerUser(formData: FormData) {
     const name = formData.get('name') as string | null
@@ -16,8 +31,9 @@ export async function registerUser(formData: FormData) {
         return { error: 'Vui lòng điền đầy đủ các thông tin.' }
     }
 
-    if (password.length < 6) {
-        return { error: 'Mật khẩu phải dài tối thiểu 6 ký tự.' }
+    const pwError = validatePasswordStrength(password)
+    if (pwError) {
+        return { error: pwError }
     }
 
     try {
@@ -35,17 +51,8 @@ export async function registerUser(formData: FormData) {
             password: hashedPassword
         })
 
-        try {
-            await inngest.send({
-                name: "user/signup",
-                data: { email, name }
-            });
-        } catch (inngestError) {
-            console.warn('Inngest signup event failed (non-blocking):', inngestError)
-        }
-
     } catch (error: unknown) {
-        console.error('Failed to register user:', error)
+        log.error({ err: error }, 'register failed')
         if (typeof error === 'object' && error !== null) {
             const err = error as { code?: string, message?: string }
             if (err.code === 'ECONNREFUSED' || err.message?.includes('ECONNREFUSED')) {
@@ -63,7 +70,7 @@ export async function registerUser(formData: FormData) {
         if (authError && typeof authError === 'object' && 'message' in authError && authError.message === 'NEXT_REDIRECT') {
             throw authError; 
         }
-        console.error("Auto-login error:", authError)
+        log.error({ err: authError }, 'auto-login failed')
         return { error: 'Bản ghi đã được tạo tuy nhiên tự động đăng nhập thất bại. Xin vui lòng quay lại trang Sign In.' }
     }
 }
@@ -87,11 +94,8 @@ export async function sendResetPasswordEmail(formData: FormData) {
                 token,
                 expires
             })
-
-            await inngest.send({
-                name: "user/password-reset",
-                data: { email, token }
-            })
+            // Email delivery deliberately not configured. Token is stored
+            // in DB; admins can retrieve the reset link manually if needed.
         }
 
         return { success: true }
@@ -114,8 +118,9 @@ export async function resetPassword(formData: FormData) {
         return { error: 'Vui lòng cung cấp đầy đủ thông tin.' }
     }
 
-    if (newPassword.length < 6) {
-        return { error: 'Mật khẩu phải dài tối thiểu 6 ký tự.' }
+    const pwError = validatePasswordStrength(newPassword)
+    if (pwError) {
+        return { error: pwError }
     }
 
     try {
@@ -142,7 +147,7 @@ export async function resetPassword(formData: FormData) {
 
         return { success: true }
     } catch (error: unknown) {
-        console.error('Failed to reset password:', error)
+        log.error({ err: error }, 'reset password failed')
         return { error: 'Không thể đặt lại mật khẩu. Vui lòng thử lại sau.' }
     }
 }

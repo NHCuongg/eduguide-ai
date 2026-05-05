@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useCallback, useState, useTransition, Suspense } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { useTranslations } from "next-intl"
 import { useWizardStore } from "@/lib/store"
@@ -29,27 +28,11 @@ function StudyToolSkeleton() {
     )
 }
 
-function FlashcardSkeleton() {
-    return (
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 animate-pulse">
-            <div className="h-4 w-40 bg-slate-200 dark:bg-slate-700 rounded mb-4" />
-            <div className="h-48 bg-slate-100 dark:bg-slate-800 rounded-xl" />
-            <div className="flex gap-3 mt-4">
-                <div className="h-10 flex-1 bg-slate-200 dark:bg-slate-700 rounded-lg" />
-                <div className="h-10 flex-1 bg-slate-200 dark:bg-slate-700 rounded-lg" />
-            </div>
-        </div>
-    )
-}
-
 const QuizModal = dynamic(() => import("./quiz/QuizModal").then(mod => mod.QuizModal), { ssr: false })
 const ResourceModal = dynamic(() => import("./resources/ResourceModal").then(mod => mod.ResourceModal), { ssr: false })
-
 const NotesPanel = dynamic(() => import("./notes/NotesPanel").then(mod => mod.NotesPanel), { ssr: false })
-const FlashcardDeck = dynamic(() => import("./flashcards/FlashcardDeck").then(mod => mod.FlashcardDeck), { ssr: false })
 
 export default function MainContent() {
-    const router = useRouter()
     const { data, roadmap, activeRoadmapId, completedModules, toggleModule } = useWizardStore()
     const { xp, level, streak, checkStreak, addXP } = useGamificationStore()
     const { data: session } = useSession()
@@ -148,32 +131,32 @@ export default function MainContent() {
         return (xp / getNextLevelXP(level)) * 100
     }, [xp, level])
 
-    const handleRedirect = useCallback(() => {
-        if (!data?.targetSkill) {
-            router.push("/onboarding")
-        }
-    }, [data?.targetSkill, router])
-
     useEffect(() => {
         checkStreak()
     }, [checkStreak])
 
-    useEffect(() => {
-        handleRedirect()
-    }, [handleRedirect])
-
     if (!data?.targetSkill) {
         return (
             <main className="flex-1 overflow-y-auto bg-white dark:bg-slate-950 p-6 xl:p-10">
-                <div className="max-w-6xl mx-auto space-y-8" aria-busy="true" aria-live="polite">
-                    <div className="h-10 w-72 bg-slate-200 dark:bg-slate-800 rounded-xl animate-pulse" />
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {[0, 1, 2, 3].map((i) => (
-                            <div key={i} className="h-36 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 animate-pulse" />
-                        ))}
+                <div className="max-w-3xl mx-auto py-16 md:py-24 text-center space-y-6">
+                    <div className="mx-auto w-12 h-12 rounded-md border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
+                        <Plus className="w-5 h-5 text-slate-600 dark:text-slate-300" />
                     </div>
-                    <div className="h-64 rounded-3xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 animate-pulse" />
-                    <p className="sr-only">Loading your learning workspace…</p>
+                    <div className="space-y-2">
+                        <h1 className="text-2xl md:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">
+                            {t("empty.title")}
+                        </h1>
+                        <p className="text-slate-600 dark:text-slate-300 text-sm md:text-base max-w-md mx-auto">
+                            {t("empty.subtitle")}
+                        </p>
+                    </div>
+                    <div className="flex justify-center pt-2">
+                        <Button asChild className="h-11 px-6 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 font-semibold">
+                            <Link href="/onboarding?fresh=1">
+                                <Plus className="w-4 h-4 mr-2" /> {t("empty.cta")}
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
             </main>
         )
@@ -268,17 +251,6 @@ export default function MainContent() {
                                 <NotesPanel />
                             </Suspense>
                         </ErrorBoundary>
-                    </div>
-                    <div className="w-full">
-                        <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-shadow">
-                            <CardContent className="p-0">
-                                <ErrorBoundary>
-                                    <Suspense fallback={<FlashcardSkeleton />}>
-                                        <FlashcardDeck />
-                                    </Suspense>
-                                </ErrorBoundary>
-                            </CardContent>
-                        </Card>
                     </div>
                 </div>
 

@@ -49,20 +49,20 @@ export default function Navbar() {
             >
                 {}
                 <motion.div
-                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 origin-left opacity-80"
+                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-slate-900 dark:bg-white origin-left opacity-60"
                     style={{ scaleX }}
                 />
 
                 <div className="container mx-auto px-6 h-full flex items-center justify-between">
                     {}
-                    <Link href="/" className="font-serif font-black text-xl md:text-2xl text-zinc-900 dark:text-white flex items-center gap-2 group relative z-50">
-                        <span className="text-2xl md:text-3xl bg-clip-text text-transparent bg-gradient-to-tr from-indigo-600 to-violet-600 group-hover:scale-110 transition-transform">❖</span>
+                    <Link href="/" className="font-semibold text-base md:text-lg tracking-tight text-zinc-900 dark:text-white flex items-center gap-2 group relative z-50">
+                        <span className="text-lg text-indigo-600 dark:text-indigo-400">❖</span>
                         EduGuide AI
                     </Link>
 
                     {}
                     <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-zinc-600 dark:text-zinc-400">
-                        {["Methodology", "Resources", "Pricing"].map((item) => (
+                        {["Methodology", "Pricing", "FAQ"].map((item) => (
                             <Link key={item} href={`#${item.toLowerCase()}`} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors relative group">
                                 {item}
                                 <span className="absolute -bottom-1 left-1/2 w-0 h-0.5 bg-indigo-600 dark:bg-indigo-400 group-hover:w-full group-hover:left-0 transition-all duration-300 ease-out" />
@@ -117,7 +117,7 @@ export default function Navbar() {
                         className="fixed inset-0 z-40 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl pt-24 px-6 md:hidden flex flex-col items-center justify-center"
                     >
                         <ul className="flex flex-col gap-8 text-2xl font-bold text-zinc-900 dark:text-white text-center">
-                            {["Methodology", "Resources", "Pricing"].map((item, i) => (
+                            {["Methodology", "Pricing", "FAQ"].map((item, i) => (
                                 <motion.li
                                     key={item}
                                     initial={{ opacity: 0, y: 20 }}

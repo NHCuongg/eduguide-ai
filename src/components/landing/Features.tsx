@@ -1,72 +1,62 @@
 'use client'
 
-import { Brain, Layout, Layers, Zap, Clock, Sparkles } from "lucide-react"
+import { Brain, Layout, Layers, Zap, Clock } from "lucide-react"
 import SectionWrapper from "./SectionWrapper"
 import { cn } from "@/lib/utils"
 
 const features = [
     {
-        title: "Adaptive Architecture",
-        description: "Our AI engines analyze your current proficiency and learning style to construct a bespoke syllabus that evolves as you progress.",
+        title: "Adaptive architecture",
+        description:
+            "AI engines analyze your proficiency and learning style to construct a bespoke syllabus that evolves with you.",
         icon: Layout,
         className: "md:col-span-2 md:row-span-2",
-        color: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400",
-        delay: 0
     },
     {
-        title: "Curated Resources",
-        description: "Access a library of high-impact articles, videos, and papers.",
+        title: "Curated resources",
+        description: "A library of high-impact articles, papers, and exercises.",
         icon: Layers,
         className: "md:col-span-1 md:row-span-1",
-        color: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
-        delay: 0.1
     },
     {
-        title: "Socratic Guidance",
-        description: "AI Teaching Assistant available 24/7 to clarify complex topics.",
+        title: "Socratic guidance",
+        description: "AI teaching assistant available 24/7 to clarify complex topics.",
         icon: Brain,
         className: "md:col-span-1 md:row-span-1",
-        color: "bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400",
-        delay: 0.2
     },
     {
-        title: "Micro-Learning",
+        title: "Micro-learning",
         description: "Bite-sized modules designed for maximum retention.",
         icon: Zap,
         className: "md:col-span-1 md:row-span-1",
-        color: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-        delay: 0.3
     },
     {
-        title: "Smart Scheduling",
-        description: "Algorithms that optimize study times based on your circadian rhythm.",
+        title: "Smart scheduling",
+        description: "Algorithms that fit study sessions into your weekly schedule.",
         icon: Clock,
         className: "md:col-span-2 md:row-span-1",
-        color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-        delay: 0.4
     },
 ]
 
 export default function Features() {
     return (
-        <section id="methodology" className="py-20 md:py-32 bg-white dark:bg-black relative z-20">
+        <section id="methodology" className="py-20 md:py-28 bg-white dark:bg-zinc-950">
             <div className="container mx-auto px-6">
-                <SectionWrapper className="mb-20 text-center">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wider mb-6">
-                        <Sparkles className="w-3 h-3" />
+                <SectionWrapper className="mb-14 text-center max-w-2xl mx-auto">
+                    <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-3">
                         Methodology
-                    </div>
-                    <h2 className="font-serif text-4xl md:text-5xl font-bold text-zinc-900 dark:text-white mb-6">
-                        Engineered for Retention
+                    </p>
+                    <h2 className="font-serif text-3xl md:text-4xl font-semibold tracking-tight text-slate-900 dark:text-white mb-3">
+                        Engineered for retention
                     </h2>
-                    <p className="mt-6 text-zinc-500 dark:text-zinc-400 max-w-2xl mx-auto text-lg leading-relaxed font-light">
-                        We combine cognitive science with advanced artificial intelligence to create a learning experience that adapts to your brain.
+                    <p className="text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+                        Cognitive science meets AI to build a learning experience that adapts to your brain.
                     </p>
                 </SectionWrapper>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-3 gap-6 max-w-5xl mx-auto h-auto md:h-[800px]">
+                <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-3 gap-4 max-w-5xl mx-auto md:h-[640px]">
                     {features.map((feature, i) => (
-                        <BentoCard key={i} feature={feature} />
+                        <BentoCard key={i} feature={feature} delay={i * 0.05} />
                     ))}
                 </div>
             </div>
@@ -79,39 +69,30 @@ interface Feature {
     description: string
     icon: React.ComponentType<{ className?: string }>
     className: string
-    color: string
-    delay: number
 }
 
-function BentoCard({ feature }: { feature: Feature }) {
+function BentoCard({ feature, delay }: { feature: Feature; delay: number }) {
+    const Icon = feature.icon
     return (
         <SectionWrapper
-            delay={feature.delay}
+            delay={delay}
             className={cn(
-                "group relative p-8 rounded-3xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 cursor-pointer overflow-hidden transition-all duration-500 hover:shadow-2xl hover:border-zinc-200 dark:hover:border-zinc-700 hover:-translate-y-1",
+                "group relative p-6 md:p-8 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900 transition-colors duration-300 hover:border-slate-300 dark:hover:border-zinc-700",
                 feature.className
             )}
         >
-            <div className="relative z-10 h-full flex flex-col justify-between">
-                <div>
-                    <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center mb-6 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3", feature.color)}>
-                        <feature.icon className="h-6 w-6" />
-                    </div>
-                    <h3 className="font-serif text-2xl font-bold text-zinc-900 dark:text-white mb-3 tracking-tight">
+            <div className="relative h-full flex flex-col gap-4">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 flex items-center justify-center">
+                    <Icon className="h-4 w-4" />
+                </div>
+                <div className="space-y-2">
+                    <h3 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">
                         {feature.title}
                     </h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                        {feature.description}
+                    </p>
                 </div>
-                <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">
-                    {feature.description}
-                </p>
-            </div>
-
-            {}
-            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-indigo-50/50 dark:to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-            {}
-            <div className="absolute -right-8 -bottom-8 opacity-[0.03] dark:opacity-[0.05] pointer-events-none group-hover:scale-110 transition-transform duration-700">
-                <feature.icon className="w-40 h-40" />
             </div>
         </SectionWrapper>
     )

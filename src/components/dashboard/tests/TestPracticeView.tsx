@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from "react"
-import { Trophy, CheckCircle2, Clock, Sparkles, Search, X, Shuffle } from "lucide-react"
+import { Trophy, CheckCircle2, Clock, Search, X, Shuffle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
@@ -178,14 +178,14 @@ function QuickPracticeCard({
         <section className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 md:p-8 shadow-sm">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                 <div className="space-y-3 max-w-xl">
-                    <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-300 uppercase tracking-wider inline-flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5" /> Quick practice
+                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                        Quick practice
                     </p>
                     <h2 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-white tracking-tight">
                         Test what you just learned
                     </h2>
                     <p className="text-sm text-slate-600 dark:text-slate-300">
-                        AI sẽ tạo 5 câu hỏi cho mô-đun gần nhất chưa hoàn thành. Hoàn thành để nhận XP.
+                        Five questions on your latest unfinished module. Complete it for XP.
                     </p>
                     <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                         <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 font-semibold">

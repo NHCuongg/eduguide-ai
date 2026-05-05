@@ -2,7 +2,7 @@
 
 import { useWizardStore } from "@/lib/store"
 import type { OnboardingData } from "@/lib/schemas"
-import { Briefcase, GraduationCap, Laptop, Sparkles, Trophy } from "lucide-react"
+import { Briefcase, GraduationCap, Laptop, Compass, TrendingUp } from "lucide-react"
 import { ChoiceCard, StepBody, StepFooter, StepHeading, StepLabel } from "./_StepShell"
 
 export default function StepGoals() {
@@ -14,11 +14,11 @@ export default function StepGoals() {
         label: string
         desc: string
     }> = [
-        { id: "Career Change", Icon: Briefcase, label: "Career change", desc: "Chuyển sang lĩnh vực mới" },
-        { id: "Skill Improvement", Icon: Trophy, label: "Skill up", desc: "Nâng cao kỹ năng hiện tại" },
-        { id: "Academic", Icon: GraduationCap, label: "Academic", desc: "Trường lớp / đại học" },
-        { id: "Hobby", Icon: Sparkles, label: "Hobby", desc: "Học cho vui" },
-        { id: "Other", Icon: Laptop, label: "Other", desc: "Lý do khác" },
+        { id: "Career Change", Icon: Briefcase, label: "Career change", desc: "Switching into a new field" },
+        { id: "Skill Improvement", Icon: TrendingUp, label: "Level up", desc: "Sharpen what I already do" },
+        { id: "Academic", Icon: GraduationCap, label: "Academic", desc: "School, university, exams" },
+        { id: "Hobby", Icon: Compass, label: "Hobby", desc: "Just for me" },
+        { id: "Other", Icon: Laptop, label: "Other", desc: "Something else" },
     ]
 
     return (
@@ -26,11 +26,11 @@ export default function StepGoals() {
             <StepHeading
                 eyebrow="Goal"
                 title="What's your main motivation?"
-                subtitle="Hiểu động lực giúp chúng tôi điều chỉnh nhịp học và độ sâu."
+                subtitle="Optional — helps us pick pace and depth, but not required."
             />
 
             <div>
-                <StepLabel>Primary goal</StepLabel>
+                <StepLabel>Primary goal (optional)</StepLabel>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3" role="radiogroup">
                     {goals.map(({ id, Icon, label, desc }) => (
                         <ChoiceCard
@@ -45,7 +45,7 @@ export default function StepGoals() {
                 </div>
             </div>
 
-            <StepFooter onBack={prevStep} onNext={nextStep} nextDisabled={!data.primaryGoal} />
+            <StepFooter onBack={prevStep} onNext={nextStep} />
         </StepBody>
     )
 }

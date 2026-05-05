@@ -7,30 +7,38 @@ import { motion } from "framer-motion"
 
 import { cn } from "@/lib/utils"
 
+// Editorial button system. No gradients, no scale-up hover, no glow. Variants
+// stay close to native semantics so call sites read clearly:
+//   default — primary action (filled)
+//   outline — secondary action (border, transparent)
+//   ghost   — tertiary / icon-buttons in toolbars
+//   destructive — destructive confirmations
+//   secondary — muted filled (e.g. inactive tabs)
+//   link    — inline navigation
 const buttonVariants = cva(
-    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 relative overflow-hidden",
+    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
     {
         variants: {
             variant: {
                 default:
-                    "bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg hover:shadow-xl hover:from-indigo-700 hover:to-violet-700 hover:scale-105 active:scale-100",
+                    "bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200",
                 destructive:
-                    "bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-lg hover:shadow-xl hover:from-red-700 hover:to-rose-700 hover:scale-105 active:scale-100",
+                    "bg-red-600 text-white hover:bg-red-700",
                 outline:
-                    "border-2 border-slate-200 dark:border-slate-700 bg-background shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 hover:scale-105 active:scale-100",
+                    "border border-slate-300 dark:border-slate-700 bg-transparent text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800",
                 secondary:
-                    "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 shadow-sm hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105 active:scale-100",
-                ghost: "hover:bg-slate-100 dark:hover:bg-slate-800 hover:scale-105 active:scale-100",
-                link: "text-primary underline-offset-4 hover:underline",
-                glow: "bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-[0_0_20px_hsl(var(--primary)/0.5)] hover:shadow-[0_0_30px_hsl(var(--primary)/0.6)] border border-primary/20 hover:scale-105 active:scale-100",
-                glass: "bg-white/10 backdrop-blur-md border border-white/20 text-foreground hover:bg-white/20 dark:bg-black/20 dark:hover:bg-black/30 hover:scale-105 active:scale-100",
+                    "bg-slate-100 text-slate-900 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700",
+                ghost:
+                    "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800",
+                link:
+                    "text-slate-900 dark:text-slate-100 underline-offset-4 hover:underline",
             },
             size: {
                 default: "h-9 px-4 py-2",
-                sm: "h-8 rounded-md px-3 text-xs",
-                lg: "h-10 rounded-md px-8",
+                sm: "h-8 px-3 text-xs",
+                lg: "h-10 px-6",
                 icon: "h-9 w-9",
-                xl: "h-12 rounded-xl px-8 text-base",
+                xl: "h-11 px-6 text-base",
             },
         },
         defaultVariants: {

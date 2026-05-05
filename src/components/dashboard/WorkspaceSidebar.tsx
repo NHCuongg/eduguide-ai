@@ -68,10 +68,21 @@ export default function WorkspaceSidebar() {
 
             <div className="mt-auto p-5 border-t border-slate-200 dark:border-slate-800 space-y-1">
                 <LanguageSwitcher />
-                <Button variant="ghost" className="w-full justify-start gap-3 h-10 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800/60">
-                    <Settings className="h-4 w-4 text-slate-400 dark:text-slate-500" />
-                    {t("settings")}
-                </Button>
+                <Link href="/dashboard/settings" className="block">
+                    <Button
+                        variant="ghost"
+                        aria-current={pathname.startsWith("/dashboard/settings") ? "page" : undefined}
+                        className={cn(
+                            "w-full justify-start gap-3 h-10 rounded-lg text-sm font-medium transition-colors",
+                            pathname.startsWith("/dashboard/settings")
+                                ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm"
+                                : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800/60"
+                        )}
+                    >
+                        <Settings className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+                        {t("settings")}
+                    </Button>
+                </Link>
                 <Button
                     variant="ghost"
                     className="w-full justify-start gap-3 h-10 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-700 dark:hover:text-red-300"

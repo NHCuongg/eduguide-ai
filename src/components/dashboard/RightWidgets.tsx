@@ -1,8 +1,6 @@
 'use client'
 
-import Link from "next/link"
 import { Flame, Target } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { useWizardStore } from "@/lib/store"
 import { useGamificationStore, getNextLevelXP } from "@/lib/useGamificationStore"
 
@@ -80,15 +78,6 @@ export default function RightWidgets() {
                 </p>
             </section>
 
-            <section className="mt-auto rounded-2xl p-5 bg-slate-900 dark:bg-white text-white dark:text-slate-900">
-                <h3 className="font-semibold text-base mb-2 tracking-tight">Keep your streak alive</h3>
-                <p className="text-sm leading-relaxed text-slate-300 dark:text-slate-600 mb-4">
-                    Hoàn thành mô-đun tiếp theo để duy trì chuỗi ngày học.
-                </p>
-                <Button asChild size="sm" className="w-full h-9 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold">
-                    <Link href="/dashboard">Resume learning</Link>
-                </Button>
-            </section>
         </aside>
     )
 }

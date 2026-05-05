@@ -6,6 +6,7 @@ import { Menu } from "lucide-react"
 import { auth } from "@/auth"
 import { getActiveRoadmap } from "@/lib/db/roadmaps"
 import { DashboardHydrator } from "@/components/dashboard/DashboardHydrator"
+import { ThemeToggleButton } from "@/components/settings/ThemeToggleButton"
 
 export default async function DashboardLayout({
     children,
@@ -36,6 +37,9 @@ export default async function DashboardLayout({
                     <div className="font-serif font-semibold text-base text-slate-900 dark:text-white tracking-tight">
                         EduGuide AI
                     </div>
+                </div>
+                <div className="flex items-center gap-1">
+                    <ThemeToggleButton />
                 </div>
             </header>
 

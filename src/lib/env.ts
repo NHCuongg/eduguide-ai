@@ -5,9 +5,6 @@ const envSchema = z.object({
 
     AUTH_SECRET: z.string().min(1, 'AUTH_SECRET is required'),
 
-    NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().optional(),
-
     OPENROUTER_API_KEY: z.string().min(1, 'OPENROUTER_API_KEY is required'),
     OPENROUTER_BASE_URL: z.string().url().optional(),
     OPENROUTER_SITE_URL: z.string().url().optional(),
@@ -28,8 +25,6 @@ function getEnv() {
         return envSchema.parse({
             NODE_ENV: process.env.NODE_ENV,
             AUTH_SECRET: process.env.AUTH_SECRET,
-            NEXT_PUBLIC_SUPABASE_URL: normalize(process.env.NEXT_PUBLIC_SUPABASE_URL),
-            NEXT_PUBLIC_SUPABASE_ANON_KEY: normalize(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
             OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
             OPENROUTER_BASE_URL: normalize(process.env.OPENROUTER_BASE_URL),
             OPENROUTER_SITE_URL: normalize(process.env.OPENROUTER_SITE_URL),

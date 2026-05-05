@@ -24,6 +24,11 @@
     "workspaceEyebrow": "Workspace",
     "yourStudies": "Your studies",
     "subtitle": "Continue your personalized roadmap.",
+    "empty": {
+      "title": "No learning roadmap yet",
+      "subtitle": "Create your first roadmap so AI can design modules, quizzes, and flashcards tailored to your goals.",
+      "cta": "Create roadmap"
+    },
     "stats": {
       "streak": "Streak",
       "modules": "Modules",
@@ -127,5 +132,54 @@
     "label": "Language",
     "vi": "Vietnamese",
     "en": "English"
+  },
+  "settings": {
+    "eyebrow": "Settings",
+    "title": "Settings",
+    "subtitle": "Manage your account, appearance, and language.",
+    "account": {
+      "title": "Account",
+      "description": "Information from your signed-in account.",
+      "displayName": "Display name",
+      "email": "Email",
+      "verified": "Verified account",
+      "verifiedDescription": "Email confirmed"
+    },
+    "appearance": {
+      "title": "Appearance",
+      "description": "Pick a theme. System follows your device setting."
+    },
+    "language": {
+      "title": "Language",
+      "description": "Display language across the whole app."
+    },
+    "security": {
+      "title": "Security",
+      "description": "Reset your password or sign out.",
+      "resetPassword": "Reset password"
+    },
+    "manage": {
+      "title": "Manage",
+      "description": "Quick links to other areas.",
+      "learningProfile": "Learning profile",
+      "manageCourses": "Manage courses"
+    }
+  },
+  "notes": {
+    "title": "Notes",
+    "new": "New",
+    "placeholderTitle": "Note title",
+    "placeholderBody": "Write your thoughts… (Markdown supported)",
+    "close": "Close",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "create": "Create",
+    "save": "Save",
+    "emptyTitle": "No notes yet",
+    "emptyBody": "Capture insights, key formulas, or open questions while you study.",
+    "noContent": "No content",
+    "errorSave": "Couldn't save",
+    "errorDelete": "Couldn't delete",
+    "errorRetry": "Please try again"
   }
 }

@@ -10,12 +10,17 @@ import { cn } from "@/lib/utils"
 
 import { useGamificationStore } from "@/lib/useGamificationStore"
 import { showToast } from "@/lib/toast"
+import { useAsyncJob } from "@/lib/useAsyncJob"
 
 interface Question {
     id: number
     text: string
     options: string[]
     correctAnswer: string
+}
+
+interface QuizResult {
+    questions: Question[]
 }
 
 interface QuizModalProps {
@@ -26,7 +31,6 @@ interface QuizModalProps {
 
 export function QuizModal({ moduleTitle, difficulty = "Intermediate", trigger }: QuizModalProps) {
     const [isOpen, setIsOpen] = useState(false)
-    const [loading, setLoading] = useState(false)
     const [questions, setQuestions] = useState<Question[]>([])
     const [currentQuestion, setCurrentQuestion] = useState(0)
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
@@ -34,39 +38,30 @@ export function QuizModal({ moduleTitle, difficulty = "Intermediate", trigger }:
     const [isFinished, setIsFinished] = useState(false)
     const [showResult, setShowResult] = useState(false)
 
+    const { state, submit } = useAsyncJob<{ topic: string; skillLevel: string }, QuizResult>({
+        endpoint: '/api/generate-quiz',
+        buildBody: (input) => input,
+    })
+    const loading = state.status === 'queued' || state.status === 'active'
+
     const fetchQuiz = useCallback(async () => {
-        setLoading(true)
         try {
-            const res = await fetch('/api/generate-quiz', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ topic: moduleTitle, skillLevel: difficulty })
-            })
-            if (!res.ok) {
-                const errorData = await res.json()
-                if (res.status === 429) {
-                    showToast.error('Rate limit exceeded', `Please wait ${errorData.retryAfter || 60} seconds before trying again`)
-                } else {
-                    showToast.error('Failed to generate quiz', errorData.error || 'Please try again')
-                }
+            const result = await submit({ topic: moduleTitle, skillLevel: difficulty })
+            if (!result?.questions?.length) {
+                showToast.error('Failed to generate quiz', 'Empty response')
                 return
             }
-            const data = await res.json()
-            if (data.questions) {
-                setQuestions(data.questions)
-                setScore(0)
-                setCurrentQuestion(0)
-                setIsFinished(false)
-                setSelectedAnswer(null)
-                setShowResult(false)
-            }
+            setQuestions(result.questions)
+            setScore(0)
+            setCurrentQuestion(0)
+            setIsFinished(false)
+            setSelectedAnswer(null)
+            setShowResult(false)
         } catch (error) {
-            console.error("Failed to load quiz", error)
-            showToast.error('Network error', 'Please check your connection and try again')
-        } finally {
-            setLoading(false)
+            const message = error instanceof Error ? error.message : 'Please try again'
+            showToast.error('Failed to generate quiz', message)
         }
-    }, [moduleTitle, difficulty])
+    }, [moduleTitle, difficulty, submit])
 
     const handleAnswer = useCallback(() => {
         setShowResult(true)
@@ -115,7 +110,7 @@ export function QuizModal({ moduleTitle, difficulty = "Intermediate", trigger }:
                         <div className="p-2 rounded-xl bg-gradient-to-br from-indigo-100 to-violet-100 dark:from-indigo-900/30 dark:to-violet-900/30">
                             <Trophy className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
                         </div>
-                        <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">Quiz: {moduleTitle}</span>
+                        <span className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white">Quiz · {moduleTitle}</span>
                     </DialogTitle>
                 </DialogHeader>
 
@@ -136,14 +131,15 @@ export function QuizModal({ moduleTitle, difficulty = "Intermediate", trigger }:
                                 <Trophy className="w-16 h-16 text-yellow-600 dark:text-yellow-400" />
                             </div>
                         </div>
-                        <h3 className="text-3xl font-black mb-3 bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">Quiz Completed!</h3>
+                        <h3 className="text-3xl font-semibold tracking-tight mb-3 text-slate-900 dark:text-white">Done.</h3>
                         <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-900/20 dark:to-violet-900/20 border border-indigo-200 dark:border-indigo-800 mb-6">
                             <span className="text-slate-600 dark:text-slate-300 font-medium">You scored</span>
                             <span className="font-black text-3xl text-indigo-600 dark:text-indigo-400">{score}/{questions.length}</span>
                         </div>
-                        <Button 
-                            onClick={handleClaimXP} 
-                            className="w-full h-12 text-base font-bold bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+                        <Button
+                            onClick={handleClaimXP}
+                            size="lg"
+                            className="w-full bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-600 dark:text-white dark:hover:bg-indigo-700"
                         >
                             Claim {score * 10} XP & Close
                         </Button>
@@ -194,17 +190,19 @@ export function QuizModal({ moduleTitle, difficulty = "Intermediate", trigger }:
 
                         <div className="flex justify-end pt-4">
                             {!showResult ? (
-                                <Button 
-                                    onClick={handleAnswer} 
+                                <Button
+                                    onClick={handleAnswer}
                                     disabled={!selectedAnswer}
-                                    className="h-11 px-8 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                                    size="lg"
+                                    className="bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-600 dark:text-white dark:hover:bg-indigo-700"
                                 >
                                     Check Answer
                                 </Button>
                             ) : (
-                                <Button 
+                                <Button
                                     onClick={nextQuestion}
-                                    className="h-11 px-8 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+                                    size="lg"
+                                    className="bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-600 dark:text-white dark:hover:bg-indigo-700"
                                 >
                                     {currentQuestion < questions.length - 1 ? "Next Question" : "Finish Quiz"}
                                 </Button>

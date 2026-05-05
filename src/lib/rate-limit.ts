@@ -1,4 +1,7 @@
+import { child } from "./logger"
 import { getRedis } from "./redis"
+
+const log = child("rate-limit")
 
 export interface RateLimitResult {
     allowed: boolean
@@ -44,10 +47,13 @@ export class RateLimiter {
             try {
                 return await this.checkRedis(redis, identifier, limitValue, window)
             } catch (error) {
-                if (process.env.NODE_ENV !== "production") {
-                    console.warn("[rate-limit] redis check failed, falling back to memory:", error)
-                }
+                log.warn({ err: error }, "redis check failed, using local memory")
+                // Fall through to memory — local store still bounds abuse from a
+                // single instance even if it can't enforce across the cluster.
             }
+        } else if (process.env.NODE_ENV === "production") {
+            // No Redis configured in production — log loudly so ops notices.
+            log.error("REDIS_URL not configured in production")
         }
 
         return this.checkMemory(identifier, limitValue, window)
@@ -139,7 +145,7 @@ export async function rateLimit(
         const identifier = limiter.getIdentifier(req)
         return await limiter.check(identifier, limit, windowMs)
     } catch (error) {
-        console.error("Rate limit error:", error)
+        log.error({ err: error }, "Rate limit error")
         return null
     }
 }

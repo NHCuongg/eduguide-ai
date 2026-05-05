@@ -1,18 +1,31 @@
 services:
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: migrator
+    image: pet-manager-migrator:local
+    environment:
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-petmanager}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - pet-manager-network
+    restart: "no"
+
   app:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/petmanager}
-        AUTH_SECRET: ${AUTH_SECRET:-docker-dev-secret-key-change-in-production}
+      target: runner
     image: pet-manager-app:local
     container_name: pet-manager-app
     restart: unless-stopped
     ports:
       - "${APP_PORT:-3002}:3000"
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/petmanager}
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-petmanager}"
       AUTH_SECRET: ${AUTH_SECRET:-docker-dev-secret-key-change-in-production}
       AUTH_TRUST_HOST: "true"
       NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3002}
@@ -24,15 +37,14 @@ services:
       OPENROUTER_MODEL_ROADMAP: ${OPENROUTER_MODEL_ROADMAP:-openai/gpt-4o-mini}
       OPENROUTER_MODEL_QUIZ: ${OPENROUTER_MODEL_QUIZ:-openai/gpt-4o-mini}
       OPENROUTER_MODEL_FLASHCARDS: ${OPENROUTER_MODEL_FLASHCARDS:-google/gemini-2.5-flash-lite}
-      RESEND_API_KEY: ${RESEND_API_KEY:-re_dummy}
-      INNGEST_EVENT_KEY: ${INNGEST_EVENT_KEY:-}
-      INNGEST_SIGNING_KEY: ${INNGEST_SIGNING_KEY:-}
-      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      REDIS_URL: "redis://redis:6379"
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     networks:
       - pet-manager-network
     healthcheck:
@@ -41,6 +53,41 @@ services:
       timeout: 5s
       retries: 5
       start_period: 20s
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: worker
+    image: pet-manager-worker:local
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-petmanager}"
+      REDIS_URL: "redis://redis:6379"
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OPENROUTER_BASE_URL: ${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
+      OPENROUTER_SITE_URL: ${OPENROUTER_SITE_URL:-http://localhost:3002}
+      OPENROUTER_SITE_NAME: ${OPENROUTER_SITE_NAME:-Pet Manager}
+      OPENROUTER_MODEL_ROADMAP: ${OPENROUTER_MODEL_ROADMAP:-openai/gpt-4o-mini}
+      OPENROUTER_MODEL_QUIZ: ${OPENROUTER_MODEL_QUIZ:-openai/gpt-4o-mini}
+      OPENROUTER_MODEL_FLASHCARDS: ${OPENROUTER_MODEL_FLASHCARDS:-google/gemini-2.5-flash-lite}
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-4}
+      AUTH_SECRET: ${AUTH_SECRET:-docker-dev-secret-key-change-in-production}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - pet-manager-network
+    healthcheck:
+      # The worker has no HTTP port; verify the node process is alive and the
+      # bundle file exists (cheap, runs inside the container).
+      test: ["CMD-SHELL", "pgrep -f worker.cjs >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
 
   redis:
     image: redis:7-alpine
@@ -63,8 +110,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-petmanager}
-    ports:
-      - "${POSTGRES_PORT:-5433}:5432"
+    expose:
+      - "5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro

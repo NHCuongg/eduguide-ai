@@ -20,6 +20,23 @@ function initials(name: string): string {
         .toUpperCase()
 }
 
+const AVATAR_GRADIENTS = [
+    "from-indigo-500 to-violet-500",
+    "from-emerald-500 to-teal-500",
+    "from-rose-500 to-orange-500",
+    "from-sky-500 to-indigo-500",
+    "from-amber-500 to-rose-500",
+    "from-fuchsia-500 to-purple-500",
+]
+
+function avatarGradientFor(seed: string): string {
+    let hash = 0
+    for (let i = 0; i < seed.length; i++) {
+        hash = (hash * 31 + seed.charCodeAt(i)) >>> 0
+    }
+    return AVATAR_GRADIENTS[hash % AVATAR_GRADIENTS.length]
+}
+
 export default async function LearningProfilePage() {
     const session = await auth()
     if (!session?.user?.id) redirect("/login")
@@ -46,7 +63,10 @@ export default async function LearningProfilePage() {
                 </header>
 
                 <section className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 md:p-8 flex flex-col md:flex-row gap-6">
-                    <div className="h-20 w-20 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center text-xl font-semibold shrink-0">
+                    <div
+                        className={`h-20 w-20 rounded-full bg-gradient-to-br ${avatarGradientFor(userEmail || userName)} text-white flex items-center justify-center text-xl font-semibold shrink-0 shadow-[inset_0_-10px_20px_rgba(0,0,0,0.15)]`}
+                        aria-hidden
+                    >
                         {initials(userName) || "L"}
                     </div>
                     <div className="flex-1 min-w-0 space-y-3">

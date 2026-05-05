@@ -13,7 +13,13 @@ import { resetPassword } from "@/app/actions/auth"
 
 export default function ResetPasswordPage() {
     return (
-        <Suspense fallback={<div className="w-full min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-indigo-500" /></div>}>
+        <Suspense
+            fallback={
+                <div className="w-full min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                </div>
+            }
+        >
             <ResetPasswordScreen />
         </Suspense>
     )
@@ -22,7 +28,7 @@ export default function ResetPasswordPage() {
 function ResetPasswordScreen() {
     const router = useRouter()
     const searchParams = useSearchParams()
-    const token = searchParams.get('token')
+    const token = searchParams.get("token")
 
     const [isPending, setIsPending] = useState(false)
     const [errorMessage, setErrorMessage] = useState("")
@@ -31,8 +37,7 @@ function ResetPasswordScreen() {
         e.preventDefault()
 
         if (!token) {
-            showToast.error("Error", "No valid reset token provided.")
-            setErrorMessage("This reset link is invalid or has expired.")
+            setErrorMessage("Liên kết khôi phục không hợp lệ hoặc đã hết hạn.")
             return
         }
 
@@ -41,124 +46,120 @@ function ResetPasswordScreen() {
 
         try {
             const formData = new FormData(e.currentTarget)
-            const password = formData.get('password') as string
-            const confirmPassword = formData.get('confirmPassword') as string
+            const password = formData.get("password") as string
+            const confirmPassword = formData.get("confirmPassword") as string
 
             if (password !== confirmPassword) {
-                setErrorMessage("Passwords do not match.")
+                setErrorMessage("Mật khẩu không khớp.")
                 setIsPending(false)
                 return
             }
 
-            formData.append('token', token)
-
+            formData.append("token", token)
             const result = await resetPassword(formData)
             if (result?.error) {
                 setErrorMessage(result.error)
-                showToast.error("Failed", result.error)
+                showToast.error("Đặt lại thất bại", result.error)
             } else if (result?.success) {
-                showToast.success("Success!", "Your password has been updated.")
-                setTimeout(() => router.push('/login'), 2000)
+                showToast.success("Đã đổi mật khẩu", "Đang chuyển sang trang đăng nhập…")
+                setTimeout(() => router.push("/login"), 1500)
             }
-        } catch (error) {
-            console.error("Reset password error:", error)
-            setErrorMessage("Something went wrong. Please try again.")
+        } catch {
+            setErrorMessage("Đã có lỗi xảy ra. Vui lòng thử lại.")
         } finally {
             setIsPending(false)
         }
     }
 
     return (
-        <div className="w-full min-h-screen flex items-center justify-center p-8 bg-slate-50 dark:bg-slate-950">
-            <Link href="/login" className="absolute top-8 left-8 z-50">
-                <Button variant="ghost" className="gap-2">
-                    <ArrowLeft className="w-4 h-4" /> Back to Sign in
+        <div className="w-full min-h-screen flex items-center justify-center p-6 bg-slate-50 dark:bg-slate-950">
+            <Link href="/login" className="absolute top-6 left-6">
+                <Button variant="ghost" className="gap-2 text-slate-600 dark:text-slate-300">
+                    <ArrowLeft className="w-4 h-4" /> Back to sign in
                 </Button>
             </Link>
 
             <div className="w-full max-w-[400px]">
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                    className="space-y-8 bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800"
+                    transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                    className="space-y-7 bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800"
                 >
-                    <div className="flex flex-col space-y-3 text-center">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-100 to-violet-100 dark:from-indigo-900/30 dark:to-violet-900/30 mx-auto mb-2">
-                            <Sparkles className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
+                    <header className="text-center space-y-3">
+                        <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 mx-auto">
+                            <Sparkles className="w-5 h-5 text-indigo-600 dark:text-indigo-300" />
                         </div>
-                        <h1 className="text-3xl font-serif font-black tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-200 bg-clip-text text-transparent">
-                            Create a new password
+                        <h1 className="font-serif text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">
+                            Đặt mật khẩu mới
                         </h1>
-                        <p className="text-sm text-slate-600 dark:text-slate-400 font-medium pb-2">
-                            Please enter your new password below.
+                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                            Nhập mật khẩu mới cho tài khoản của bạn.
                         </p>
-                    </div>
+                    </header>
 
-                    <form onSubmit={handleSubmit}>
-                        <div className="grid gap-4">
-                            <div className="grid gap-2">
-                                <Label className="dark:text-slate-200 font-semibold text-slate-700" htmlFor="password">New password</Label>
-                                <Input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    autoComplete="new-password"
-                                    disabled={isPending || !token}
-                                    required
-                                    minLength={6}
-                                    className="h-12 border-2 rounded-xl focus:border-indigo-500"
-                                />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label className="dark:text-slate-200 font-semibold text-slate-700" htmlFor="confirmPassword">Confirm password</Label>
-                                <Input
-                                    id="confirmPassword"
-                                    name="confirmPassword"
-                                    type="password"
-                                    autoComplete="new-password"
-                                    disabled={isPending || !token}
-                                    required
-                                    minLength={6}
-                                    className="h-12 border-2 rounded-xl focus:border-indigo-500"
-                                />
-                            </div>
-                            <Button
+                    {!token ? (
+                        <div className="rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/40 p-3 text-sm text-amber-700 dark:text-amber-300 flex items-start gap-2">
+                            <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                            <p>Không tìm thấy token. Hãy bấm vào liên kết trong email khôi phục.</p>
+                        </div>
+                    ) : null}
+
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="password" className="text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
+                                Mật khẩu mới
+                            </Label>
+                            <Input
+                                id="password"
+                                name="password"
+                                type="password"
+                                autoComplete="new-password"
                                 disabled={isPending || !token}
-                                type="submit"
-                                className="h-12 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold shadow-lg mt-2 rounded-xl"
-                            >
-                                {isPending ? (
-                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                ) : (
-                                    <span>Save new password</span>
-                                )}
-                            </Button>
+                                required
+                                minLength={8}
+                                pattern="(?=.*[A-Za-z])(?=.*[\d\W_]).{8,}"
+                                title="Tối thiểu 8 ký tự, bao gồm chữ cái và số (hoặc ký tự đặc biệt)"
+                                className="h-11 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-colors"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="confirmPassword" className="text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
+                                Xác nhận mật khẩu
+                            </Label>
+                            <Input
+                                id="confirmPassword"
+                                name="confirmPassword"
+                                type="password"
+                                autoComplete="new-password"
+                                disabled={isPending || !token}
+                                required
+                                minLength={8}
+                                className="h-11 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-colors"
+                            />
                         </div>
 
-                        <div className="flex min-h-8 items-start mt-4 text-sm text-red-500 font-medium" aria-live="polite">
+                        <Button
+                            type="submit"
+                            disabled={isPending || !token}
+                            className="w-full h-11 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 font-semibold disabled:opacity-50"
+                        >
+                            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Lưu mật khẩu mới"}
+                        </Button>
+
+                        <div className="min-h-[2rem]" aria-live="polite">
                             <AnimatePresence>
-                                {!token && !errorMessage && (
+                                {errorMessage ? (
                                     <motion.div
-                                        initial={{ opacity: 0, y: -10 }}
+                                        initial={{ opacity: 0, y: -8 }}
                                         animate={{ opacity: 1, y: 0 }}
-                                        className="flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 px-3 py-2 rounded-lg border border-amber-100 text-amber-600 w-full"
+                                        exit={{ opacity: 0 }}
+                                        className="flex items-start gap-2 p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/40 text-sm text-red-600 dark:text-red-400"
                                     >
-                                        <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                                        <span>No token found. Please click the reset link in your email.</span>
-                                    </motion.div>
-                                )}
-                                {errorMessage && (
-                                    <motion.div
-                                        initial={{ opacity: 0, y: -10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, scale: 0.95 }}
-                                        className="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg border border-red-100 w-full"
-                                    >
-                                        <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                                        <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
                                         <span>{errorMessage}</span>
                                     </motion.div>
-                                )}
+                                ) : null}
                             </AnimatePresence>
                         </div>
                     </form>

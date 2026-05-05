@@ -2,11 +2,21 @@
 
 import { useWizardStore } from "@/lib/store"
 import { Input } from "@/components/ui/input"
-import { BookOpen, Hammer, Layers, Clock, Calendar } from "lucide-react"
+import { BookOpen, Hammer, Layers, Clock, Calendar as CalendarIcon } from "lucide-react"
 import { Check } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { OnboardingData } from "@/lib/schemas"
+import { format, parse, isValid } from "date-fns"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
 import { StepBody, StepFooter, StepHeading, StepLabel } from "./_StepShell"
+
+function parseIsoDate(value: string | undefined): Date | undefined {
+    if (!value) return undefined
+    const d = parse(value, "yyyy-MM-dd", new Date())
+    return isValid(d) ? d : undefined
+}
 
 type Style = OnboardingData["learningStyle"][number]
 
@@ -33,16 +43,15 @@ export default function Step2() {
         setData({ learningStyle: next })
     }
 
-    const canContinue = Boolean(
-        selectedStyles.length > 0 && data.availability && data.deadline
-    )
+    // All fields on this step are optional — defaults applied at submit time.
+    const canContinue = true
 
     return (
         <StepBody>
             <StepHeading
                 eyebrow="Schedule"
                 title="When and how will you study?"
-                subtitle="Chọn nhiều phương pháp — AI sẽ trộn chúng trong lộ trình."
+                subtitle="All optional — defaults work fine if you skip."
             />
 
             <div>
@@ -118,15 +127,37 @@ export default function Step2() {
                 <div>
                     <StepLabel>
                         <span className="inline-flex items-center gap-1.5">
-                            <Calendar className="w-3.5 h-3.5" /> Target date
+                            <CalendarIcon className="w-3.5 h-3.5" /> Target date
                         </span>
                     </StepLabel>
-                    <Input
-                        type="date"
-                        value={data.deadline || ""}
-                        onChange={(e) => setData({ deadline: e.target.value })}
-                        className="h-12 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-colors text-slate-900 dark:text-white"
-                    />
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                className={cn(
+                                    "h-12 w-full justify-start rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-left font-normal",
+                                    !data.deadline && "text-slate-400 dark:text-slate-500"
+                                )}
+                            >
+                                <CalendarIcon className="mr-2 h-4 w-4 opacity-60" />
+                                {data.deadline
+                                    ? format(parseIsoDate(data.deadline) ?? new Date(), "dd/MM/yyyy")
+                                    : "dd/mm/yyyy"}
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                                mode="single"
+                                selected={parseIsoDate(data.deadline)}
+                                onSelect={(d) =>
+                                    setData({ deadline: d ? format(d, "yyyy-MM-dd") : "" })
+                                }
+                                disabled={{ before: new Date() }}
+                                initialFocus
+                            />
+                        </PopoverContent>
+                    </Popover>
                 </div>
             </div>
 

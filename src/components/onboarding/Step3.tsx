@@ -2,12 +2,20 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Loader2, AlertCircle, RefreshCw, Sparkles, ArrowRight, ArrowLeft, CheckCircle2 } from "lucide-react"
+import { Loader2, AlertCircle, RefreshCw, ArrowRight, ArrowLeft, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useWizardStore } from "@/lib/store"
 import { saveOnboardingData } from "@/app/actions/onboarding"
 import type { Roadmap } from "@/lib/types"
+import { useAsyncJob } from "@/lib/useAsyncJob"
+import { format, parse, isValid } from "date-fns"
 import { StepBody, StepHeading } from "./_StepShell"
+
+function formatDeadline(value: string | undefined | null): string {
+    if (!value) return "—"
+    const d = parse(value, "yyyy-MM-dd", new Date())
+    return isValid(d) ? format(d, "dd/MM/yyyy") : value
+}
 
 type Stage = "review" | "preview"
 
@@ -17,33 +25,24 @@ export default function Step3() {
 
     const [stage, setStage] = useState<Stage>("review")
     const [preview, setPreview] = useState<Roadmap | null>(null)
-    const [isGenerating, setIsGenerating] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
+    const { state: roadmapState, submit: submitRoadmap } = useAsyncJob<typeof data, Roadmap>({
+        endpoint: "/api/generate-roadmap",
+        buildBody: (input) => input,
+    })
+    const isGenerating =
+        roadmapState.status === "queued" || roadmapState.status === "active"
+
     const generate = async () => {
-        setIsGenerating(true)
         setError(null)
         try {
-            const response = await fetch("/api/generate-roadmap", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
-            })
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}))
-                if (response.status === 429) {
-                    throw new Error(`Hệ thống đang giới hạn tốc độ. Vui lòng đợi ${errorData.retryAfter || 60} giây.`)
-                }
-                throw new Error(errorData.error || "Không thể tạo lộ trình từ AI.")
-            }
-            const roadmapData = (await response.json()) as Roadmap
+            const roadmapData = await submitRoadmap(data)
             setPreview(roadmapData)
             setStage("preview")
         } catch (e: unknown) {
             setError(e instanceof Error ? e.message : "Có lỗi xảy ra. Vui lòng thử lại.")
-        } finally {
-            setIsGenerating(false)
         }
     }
 
@@ -60,6 +59,11 @@ export default function Step3() {
                 throw new Error(saveResult.error || "Không thể lưu vào hệ thống.")
             }
             setRoadmap(preview, saveResult.roadmapId ?? null)
+
+            // Fire-and-forget: warm up server-side cache for the first phase's
+            // modules so quiz/flashcards open instantly when user clicks Resources.
+            prewarmModuleContent(preview.phases[0]?.modules ?? [])
+
             router.push("/dashboard")
         } catch (e: unknown) {
             setError(e instanceof Error ? e.message : "Có lỗi xảy ra khi lưu.")
@@ -173,7 +177,7 @@ export default function Step3() {
                     <Field label="Commitment" value={data.availability ? `${data.availability} hrs/week` : "—"} align="right" />
                     <Field label="Format" value={data.contentPreference ?? "—"} />
                     <Field label="Goal" value={data.primaryGoal ?? "—"} align="right" />
-                    <Field label="Target" value={data.deadline ?? "—"} />
+                    <Field label="Target" value={formatDeadline(data.deadline)} />
                     <Field label="Interests" value={(data.interests ?? []).slice(0, 3).join(", ") || "—"} align="right" />
                 </dl>
             </div>
@@ -199,16 +203,14 @@ export default function Step3() {
                     type="button"
                     onClick={generate}
                     disabled={isBusy}
-                    className="h-11 px-5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 font-semibold gap-2"
+                    size="lg"
                 >
                     {isGenerating ? (
                         <>
-                            <Loader2 className="w-4 h-4 animate-spin" /> Generating…
+                            <Loader2 className="w-4 h-4 animate-spin" /> Building…
                         </>
                     ) : (
-                        <>
-                            <Sparkles className="w-4 h-4" /> Generate preview
-                        </>
+                        <>Build my plan <ArrowRight className="w-4 h-4" /></>
                     )}
                 </Button>
             </div>
@@ -223,4 +225,44 @@ function Field({ label, value, align = "left" }: { label: string; value: string 
             <dd className="font-semibold text-slate-800 dark:text-slate-100">{value}</dd>
         </div>
     )
+}
+
+// Pre-warm the server-side LLM cache for upcoming Quiz + Flashcard content.
+// Concurrency-limited so we don't hammer the upstream provider.
+async function prewarmModuleContent(modules: { title: string }[]) {
+    const MAX_MODULES = 1
+    const CONCURRENCY = 2
+
+    const tasks: Array<() => Promise<void>> = []
+    for (const mod of modules.slice(0, MAX_MODULES)) {
+        if (!mod?.title) continue
+        tasks.push(async () => {
+            // Fire-and-forget: enqueue only. The worker will populate the
+            // server-side cache so ResourceModal/QuizModal can consume it.
+            await fetch("/api/generate-quiz?async=1", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ topic: mod.title, skillLevel: "Intermediate" }),
+            }).then((r) => r.json()).catch(() => undefined)
+        })
+        tasks.push(async () => {
+            await fetch("/api/generate-flashcards?async=1", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ topic: mod.title, context: mod.title }),
+            }).then((r) => r.json()).catch(() => undefined)
+        })
+    }
+
+    let cursor = 0
+    const worker = async () => {
+        while (cursor < tasks.length) {
+            const idx = cursor++
+            const task = tasks[idx]
+            if (task) await task()
+        }
+    }
+
+    // Fire-and-forget; failures are silent — ResourceModal will fall back to live gen.
+    Promise.all(Array.from({ length: CONCURRENCY }, worker)).catch(() => undefined)
 }
