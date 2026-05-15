@@ -1,0 +1,20 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:3003",
+  "loginUser": "phamdt203@gmail.com",
+  "loginPassword": "Tien1210@",
+  "executionArgs": {
+    "projectName": "pet-manager",
+    "projectPath": "/home/savvycom/pet-manager",
+    "testIds": [],
+    "additionalInstruction": "The Next.js dev server is running on http://localhost:3003 (NOT 3002). Login credentials in tmp/config.json are: email=phamdt203@gmail.com password=Tien1210@. If login fails because the test user does not exist in the local Postgres DB, register that user via the /register page first as part of the initial setup steps and then continue. Some routes use locale prefixes (en/vi) but the canonical URLs without prefix should also work via next-intl middleware. Ignore any AI-generation tests that time out due to BullMQ workers not being running — they are expected.",
+    "serverMode": "development",
+    "envs": {
+      "API_KEY": "sk-user-X1f--GUUNzTphgUHSV14VMfTlZY-zl66Q-R599QbD72jHS5k2oc8bXk-WqlvTLLGc_9uM8HAJ3hpd1mIXPtzAviKZqlf_JFrCB54U0pVZmWXnq2AmlDxqpMVxn0DZipnNCM"
+    }
+  },
+  "serverPort": 35665,
+  "proxy": "http://600b4ff5-c1af-4909-8b3d-6d16cecbfef4:uclsMpEWnVGgmFRakolUedLUlDReEwxn@tun.testsprite.com:8080"
+}

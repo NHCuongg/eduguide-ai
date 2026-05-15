@@ -1,0 +1,1863 @@
+[
+  {
+    "id": "TC001",
+    "title": "Login and reach dashboard",
+    "description": "Verifies that a learner can log in with valid credentials and is redirected to the dashboard.",
+    "category": "User Login",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user lands on the dashboard"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Successful login redirects to dashboard",
+    "description": "A learner can log in with valid credentials and is redirected to the dashboard.",
+    "category": "Dashboard Home",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user lands on the dashboard"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Persist theme preference across dashboard navigation",
+    "description": "Verifies the selected theme remains applied when navigating between dashboard pages after changing it in settings.",
+    "category": "Settings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the settings page"
+      },
+      {
+        "type": "action",
+        "description": "Toggle the theme setting"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the dashboard home"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the selected theme remains applied"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Switch theme persists across dashboard navigation",
+    "description": "A logged-in learner can change theme and the selection persists when navigating to another dashboard page and back.",
+    "category": "Dashboard Home",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Switch the theme from the dashboard header"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar link to open the settings page"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar link to return to the dashboard home"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the selected theme is still applied"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Dashboard shows core widgets and navigation",
+    "description": "A logged-in learner can view the dashboard home with active course progress and key widgets and access sidebar navigation.",
+    "category": "Dashboard Home",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the dashboard to finish loading"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify active course progress and dashboard widgets are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify sidebar navigation options are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Switch language persists across dashboard navigation",
+    "description": "A logged-in learner can switch language and the selection persists when navigating to another dashboard page and back.",
+    "category": "Dashboard Home",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Switch the language from the dashboard header"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar link to open the profile page"
+      },
+      {
+        "type": "action",
+        "description": "Click the sidebar link to return to the dashboard home"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the selected language is still applied"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Generate and complete a quiz practice session",
+    "description": "A learner can generate a quiz for a selected topic, answer questions, submit, and see a score with explanations.",
+    "category": "Quiz / Test Practice",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation link to view test practice"
+      },
+      {
+        "type": "action",
+        "description": "Select a module or topic to practice"
+      },
+      {
+        "type": "action",
+        "description": "Request generation of a quiz for the selected topic"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the quiz questions to be displayed"
+      },
+      {
+        "type": "action",
+        "description": "Answer the multiple-choice questions"
+      },
+      {
+        "type": "action",
+        "description": "Submit the quiz answers"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a quiz score is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify answer explanations are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "Toggle theme preference from settings",
+    "description": "Verifies a learner can toggle between light and dark theme from settings and the UI reflects the updated theme.",
+    "category": "Settings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the settings page"
+      },
+      {
+        "type": "action",
+        "description": "Toggle the theme setting"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the application theme updates"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "Mark a module complete and see overall completion update",
+    "description": "A learner can mark a module complete and the overall completion percentage updates accordingly.",
+    "category": "Study Plan & Modules",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation link to view the study plan"
+      },
+      {
+        "type": "action",
+        "description": "Mark a module as complete"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the overall completion percentage is updated"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC010",
+    "title": "Generate and review flashcards for a module",
+    "description": "Verifies a learner can generate a flashcard deck for a module, flip a card, navigate between cards, and mark a card as known or for review with the deck updating accordingly.",
+    "category": "Flashcards",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard"
+      },
+      {
+        "type": "action",
+        "description": "Open a module's flashcards section"
+      },
+      {
+        "type": "action",
+        "description": "Request generation of flashcards for the topic"
+      },
+      {
+        "type": "action",
+        "description": "Flip the current flashcard to reveal the answer"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the next flashcard"
+      },
+      {
+        "type": "action",
+        "description": "Mark the current flashcard as known or mark for review later"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a flashcard deck is displayed and supports flipping and navigation"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC011",
+    "title": "Register a new account and reach onboarding",
+    "description": "Verifies that a new user can register with valid details and is redirected into onboarding.",
+    "category": "User Registration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /register"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"Test User\" into the name field"
+      },
+      {
+        "type": "action",
+        "description": "Fill a unique email into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"ValidPass123!\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user lands on the onboarding page"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC012",
+    "title": "Resume learning from dashboard",
+    "description": "A logged-in learner can use the resume action from the dashboard to continue studying and sees a study content view open.",
+    "category": "Dashboard Home",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the resume learning action from the active course area"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a learning module or lesson view is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC013",
+    "title": "Persist language preference across dashboard navigation",
+    "description": "Verifies the selected language remains applied when navigating to another dashboard page after changing it in settings.",
+    "category": "Settings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the settings page"
+      },
+      {
+        "type": "action",
+        "description": "Switch the language setting to the other available language"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the profile page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the selected language remains applied"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC014",
+    "title": "Browse modules and expand a module to see sub-topics",
+    "description": "A learner can browse the study plan and expand a module to view its sub-topics.",
+    "category": "Study Plan & Modules",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation link to view the study plan"
+      },
+      {
+        "type": "action",
+        "description": "Expand a module in the roadmap"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify sub-topics for the expanded module are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC015",
+    "title": "Sign out from settings and return to login",
+    "description": "Verifies a learner can sign out from settings and is returned to the login page.",
+    "category": "Settings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the settings page"
+      },
+      {
+        "type": "action",
+        "description": "Sign out of the account"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user lands on the login page"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC016",
+    "title": "Switch active roadmap from the courses list",
+    "description": "A learner can set a different roadmap as active from the courses list and sees the active status change accordingly.",
+    "category": "Courses Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation link to view courses"
+      },
+      {
+        "type": "action",
+        "description": "Click a different course in the list to set it as active"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the selected course is indicated as the active course"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC017",
+    "title": "Ask the AI chat coach and receive a response",
+    "description": "Verifies a learner can open the chat coach, send a question, and see an AI response appear in the conversation.",
+    "category": "AI Chat Coach",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard"
+      },
+      {
+        "type": "action",
+        "description": "Open the chat panel"
+      },
+      {
+        "type": "action",
+        "description": "Fill a study-related question into the chat input"
+      },
+      {
+        "type": "action",
+        "description": "Send the chat message"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an AI response appears in the chat conversation"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC018",
+    "title": "Start new course creation from courses list",
+    "description": "A learner can start the new course flow from courses management and is taken to the onboarding wizard.",
+    "category": "Courses Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation link to view courses"
+      },
+      {
+        "type": "action",
+        "description": "Start the new course creation flow"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the onboarding wizard is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC019",
+    "title": "View learning profile summary",
+    "description": "Verifies an authenticated learner can open the profile page, see learning profile stats, and return to the dashboard successfully.",
+    "category": "Profile",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the profile page"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation control to return to the dashboard"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user lands on the dashboard"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC020",
+    "title": "Create, edit, and delete a note from the notes panel",
+    "description": "Verifies a learner can create a new note, edit it, and delete it with confirmation and the notes list updates accordingly.",
+    "category": "Notes",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard"
+      },
+      {
+        "type": "action",
+        "description": "Open the notes panel"
+      },
+      {
+        "type": "action",
+        "description": "Start creating a new note"
+      },
+      {
+        "type": "action",
+        "description": "Fill Note title 1 into the note title field"
+      },
+      {
+        "type": "action",
+        "description": "Fill Some **markdown** content into the note content field"
+      },
+      {
+        "type": "action",
+        "description": "Save the note"
+      },
+      {
+        "type": "action",
+        "description": "Open the newly created note from the list"
+      },
+      {
+        "type": "action",
+        "description": "Edit the note content to Updated **markdown** content"
+      },
+      {
+        "type": "action",
+        "description": "Save the note changes"
+      },
+      {
+        "type": "action",
+        "description": "Delete the note"
+      },
+      {
+        "type": "action",
+        "description": "Confirm the deletion"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the note is removed from the notes list"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC021",
+    "title": "Prevent submitting a quiz with unanswered questions",
+    "description": "A learner cannot submit the quiz until required questions are answered and sees an in-UI validation state.",
+    "category": "Quiz / Test Practice",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation link to view test practice"
+      },
+      {
+        "type": "action",
+        "description": "Select a module or topic to practice"
+      },
+      {
+        "type": "action",
+        "description": "Request generation of a quiz for the selected topic"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the quiz questions to be displayed"
+      },
+      {
+        "type": "action",
+        "description": "Submit the quiz answers without answering at least one question"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a validation indication is shown and the quiz is not scored"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC022",
+    "title": "Navigate flashcards previous/next within a generated deck",
+    "description": "Verifies a learner can move forward and backward through a generated flashcard deck and the displayed card changes accordingly.",
+    "category": "Flashcards",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard"
+      },
+      {
+        "type": "action",
+        "description": "Open a module's flashcards section"
+      },
+      {
+        "type": "action",
+        "description": "Request generation of flashcards for the topic"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the next flashcard"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the previous flashcard"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the flashcard deck allows moving to both next and previous cards"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC023",
+    "title": "Switch language between English and Vietnamese",
+    "description": "Verifies a learner can change the app language in settings and the UI updates to the selected language.",
+    "category": "Settings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the settings page"
+      },
+      {
+        "type": "action",
+        "description": "Switch the language setting to the other available language"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the application language updates"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC024",
+    "title": "Delete a roadmap with confirmation",
+    "description": "A learner can delete a roadmap from the courses list by confirming the delete dialog and the roadmap is removed from the list.",
+    "category": "Courses Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation link to view courses"
+      },
+      {
+        "type": "action",
+        "description": "Initiate deletion for a roadmap in the list"
+      },
+      {
+        "type": "action",
+        "description": "Confirm the deletion in the confirmation dialog"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the deleted roadmap no longer appears in the courses list"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC025",
+    "title": "Toggle a module from complete back to incomplete",
+    "description": "A learner can change a module from complete back to incomplete and sees the overall completion percentage update.",
+    "category": "Study Plan & Modules",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation link to view the study plan"
+      },
+      {
+        "type": "action",
+        "description": "Mark a module as complete"
+      },
+      {
+        "type": "action",
+        "description": "Mark the same module as incomplete"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the overall completion percentage reflects the module being incomplete"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC026",
+    "title": "Profile displays identity and skill level",
+    "description": "Verifies the profile page shows the learner identity details and current skill level information.",
+    "category": "Profile",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the profile page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user name and email are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the current skill level is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC027",
+    "title": "Track flashcards mastery actions across multiple cards",
+    "description": "Verifies a learner can apply known/review actions on multiple flashcards and the deck reflects the updated review state.",
+    "category": "Flashcards",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard"
+      },
+      {
+        "type": "action",
+        "description": "Open a module's flashcards section"
+      },
+      {
+        "type": "action",
+        "description": "Request generation of flashcards for the topic"
+      },
+      {
+        "type": "action",
+        "description": "Mark the current flashcard as known"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the next flashcard"
+      },
+      {
+        "type": "action",
+        "description": "Mark the current flashcard for review later"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify flashcard review actions are applied without leaving the deck"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC028",
+    "title": "Request password reset from settings",
+    "description": "Verifies a learner can request a password reset from settings and sees a confirmation indicating the request was submitted.",
+    "category": "Settings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the settings page"
+      },
+      {
+        "type": "action",
+        "description": "Submit a password reset request"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a password reset request confirmation is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC029",
+    "title": "View courses list with progress indicators",
+    "description": "A learner can view their generated roadmaps and see a progress percentage for each course.",
+    "category": "Courses Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation link to view courses"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a list of roadmaps is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify each displayed roadmap shows a progress percentage"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC030",
+    "title": "Clear or start a new AI chat conversation",
+    "description": "Verifies a learner can clear the chat history or start a new conversation and the chat panel resets to an empty state.",
+    "category": "AI Chat Coach",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard"
+      },
+      {
+        "type": "action",
+        "description": "Open the chat panel"
+      },
+      {
+        "type": "action",
+        "description": "Fill a short question into the chat input"
+      },
+      {
+        "type": "action",
+        "description": "Send the chat message"
+      },
+      {
+        "type": "action",
+        "description": "Clear the chat or start a new conversation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the chat conversation is cleared and ready for a new message"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC031",
+    "title": "Profile shows streak and completion statistics",
+    "description": "Verifies the profile page displays streak and completion statistics for the learner.",
+    "category": "Profile",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the profile page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify streak information is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify completion statistics are displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC032",
+    "title": "Validate note title/content length constraints",
+    "description": "Verifies saving a note with an excessively long title or content is blocked and validation errors are shown.",
+    "category": "Notes",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard"
+      },
+      {
+        "type": "action",
+        "description": "Open the notes panel"
+      },
+      {
+        "type": "action",
+        "description": "Start creating a new note"
+      },
+      {
+        "type": "action",
+        "description": "Fill an excessively long title into the note title field"
+      },
+      {
+        "type": "action",
+        "description": "Fill excessively long content into the note content field"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to save the note"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify note validation errors are displayed for title or content length"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC033",
+    "title": "Profile shows roadmap and module totals",
+    "description": "Verifies the profile page displays total roadmaps and total modules counts for the learner.",
+    "category": "Profile",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the profile page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify total roadmaps information is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify total modules information is displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC034",
+    "title": "Show validation error for too-short or weak password",
+    "description": "Verifies that registration blocks a weak password and shows a password validation error.",
+    "category": "User Registration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /register"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"Test User\" into the name field"
+      },
+      {
+        "type": "action",
+        "description": "Fill a unique email into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"short\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a password validation error is visible"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC035",
+    "title": "Prevent reset when passwords do not match",
+    "description": "A visitor with a token in the URL cannot reset the password when the confirmation does not match and sees a validation error.",
+    "category": "Password Reset",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /reset-password?token=invalid-token"
+      },
+      {
+        "type": "action",
+        "description": "Fill a new valid password into the new password field"
+      },
+      {
+        "type": "action",
+        "description": "Fill a different password into the confirm password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the reset password form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a password mismatch validation error is visible"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC036",
+    "title": "Cancel deleting a roadmap",
+    "description": "A learner can cancel a roadmap deletion from the confirmation dialog and the roadmap remains in the list.",
+    "category": "Courses Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation link to view courses"
+      },
+      {
+        "type": "action",
+        "description": "Initiate deletion for a roadmap in the list"
+      },
+      {
+        "type": "action",
+        "description": "Cancel the deletion in the confirmation dialog"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the roadmap still appears in the courses list"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC037",
+    "title": "Show error on invalid login credentials",
+    "description": "Verifies that login with an incorrect password is rejected and an invalid-credentials error is shown.",
+    "category": "User Login",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"invalid.user@example.com\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"WrongPassword123!\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an invalid-credentials error is visible"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC038",
+    "title": "Explore landing page sections and navigate to registration",
+    "description": "Verifies that a prospect can browse key landing sections and reach the registration page from the primary CTA.",
+    "category": "Landing Page",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the features section"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the pricing section"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the FAQ section"
+      },
+      {
+        "type": "action",
+        "description": "Click the primary get-started call to action"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user lands on the registration page"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC039",
+    "title": "Request a password reset from the reset page",
+    "description": "A visitor can submit a password reset request and sees an on-page confirmation that the request was received.",
+    "category": "Password Reset",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /reset-password"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a valid email address into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the password reset request form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a confirmation is visible indicating the reset request was submitted"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC040",
+    "title": "Cancel note deletion from confirmation",
+    "description": "Verifies a learner can cancel a note deletion from the confirmation step and the note remains in the list.",
+    "category": "Notes",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /dashboard"
+      },
+      {
+        "type": "action",
+        "description": "Open the notes panel"
+      },
+      {
+        "type": "action",
+        "description": "Start creating a new note"
+      },
+      {
+        "type": "action",
+        "description": "Fill Note title to keep into the note title field"
+      },
+      {
+        "type": "action",
+        "description": "Fill Temporary content into the note content field"
+      },
+      {
+        "type": "action",
+        "description": "Save the note"
+      },
+      {
+        "type": "action",
+        "description": "Initiate deleting the note"
+      },
+      {
+        "type": "action",
+        "description": "Cancel the deletion from the confirmation step"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the note still appears in the notes list"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC041",
+    "title": "Show error when reset token is missing",
+    "description": "A visitor who opens the reset form without a token cannot complete the reset and sees an invalid or missing token error.",
+    "category": "Password Reset",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /reset-password"
+      },
+      {
+        "type": "action",
+        "description": "Click the option to reset password using a token if the page offers separate modes"
+      },
+      {
+        "type": "action",
+        "description": "Fill a new valid password into the new password field"
+      },
+      {
+        "type": "action",
+        "description": "Fill the same password into the confirm password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the reset password form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an invalid or missing token error is visible"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC042",
+    "title": "Show validation error for missing required fields",
+    "description": "Verifies that registration requires required fields and shows validation errors when submitted empty.",
+    "category": "User Registration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /register"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify required-field validation errors are visible"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC043",
+    "title": "Validate required email for password reset request",
+    "description": "A visitor cannot submit a password reset request without an email and sees a validation error.",
+    "category": "Password Reset",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /reset-password"
+      },
+      {
+        "type": "action",
+        "description": "Clear the email field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the password reset request form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an email validation error is visible"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC044",
+    "title": "Profile page loads without an active roadmap",
+    "description": "Verifies the profile page provides a usable empty-state experience when the learner has no roadmap summary data available.",
+    "category": "Profile",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the profile page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a roadmap summary section is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an empty state message is visible when no roadmap data is available"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC045",
+    "title": "Navigate to password reset request from login",
+    "description": "Verifies that a learner can start the forgot-password flow from login and reach the reset-password page.",
+    "category": "User Login",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Click the forgot-password link"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user lands on the reset-password page"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC046",
+    "title": "Switch site language on landing page",
+    "description": "Verifies that a prospect can switch the landing page language and the page content updates accordingly.",
+    "category": "Landing Page",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Switch the site language to Vietnamese"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the page content is displayed in Vietnamese"
+      },
+      {
+        "type": "action",
+        "description": "Switch the site language to English"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the page content is displayed in English"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC047",
+    "title": "Open privacy policy from landing page",
+    "description": "Verifies that a prospect can open the privacy policy from the landing page and view the privacy content.",
+    "category": "Landing Page",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the footer"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to view the privacy policy"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the privacy policy page content is displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC048",
+    "title": "Open terms of service from landing page",
+    "description": "Verifies that a prospect can open the terms of service from the landing page and view the terms content.",
+    "category": "Landing Page",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the footer"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to view the terms of service"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the terms of service page content is displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC049",
+    "title": "Navigate landing page via navbar items",
+    "description": "Verifies that a prospect can use the landing page navigation to reach major sections on the page.",
+    "category": "Landing Page",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the navbar item that navigates to the features section"
+      },
+      {
+        "type": "action",
+        "description": "Click the navbar item that navigates to the pricing section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the pricing section is in view"
+      }
+    ],
+    "priority": "Low"
+  }
+]
